@@ -42,12 +42,38 @@
     <virtualType name="PayoneerPaymentGatewayCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
         <arguments>
             <argument name="commands" xsi:type="array">
+                <item name="authenticate" xsi:type="string">PayoneerPaymentGatewayAuthenticationCommand</item>
                 <item name="authorize" xsi:type="string">PayoneerPaymentGatewayAuthorizeCommand</item>
                 <item name="capture" xsi:type="string">PayoneerPaymentGatewayCaptureCommand</item>
                 <item name="void" xsi:type="string">PayoneerPaymentGatewayVoidCommand</item>
             </argument>
         </arguments>
     </virtualType>
+
+    <!-- Authentication command -->
+    <virtualType name="PayoneerPaymentGatewayAuthenticationCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayoneerPaymentGatewayAuthenticationRequest</argument>
+            <argument name="handler" xsi:type="object">PayoneerPaymentGatewayResponseHandlerComposite</argument>
+            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authentication Request -->
+    <virtualType name="PayoneerPaymentGatewayAuthenticationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="transaction" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AuthenticationRequest</item>
+                <item name="mockData" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\MockDataRequest</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\AuthenticationRequest">
+        <arguments>
+            <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
+        </arguments>
+    </type>
 
     <!-- Authorize command -->
     <virtualType name="PayoneerPaymentGatewayAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">

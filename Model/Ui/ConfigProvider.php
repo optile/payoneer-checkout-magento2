@@ -1,17 +1,14 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
+
 namespace Payoneer\OpenPaymentGateway\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock;
 
 /**
- * Class ConfigProvider
+ * Class ConfigProvider - Payoneer configuration class
  */
-final class ConfigProvider implements ConfigProviderInterface
+class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'payoneer';
 

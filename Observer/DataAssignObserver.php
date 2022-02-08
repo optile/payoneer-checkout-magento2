@@ -6,6 +6,7 @@
 namespace Payoneer\OpenPaymentGateway\Observer;
 
 use Magento\Framework\Event\Observer;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Observer\AbstractDataAssignObserver;
 
 class DataAssignObserver extends AbstractDataAssignObserver
@@ -13,6 +14,7 @@ class DataAssignObserver extends AbstractDataAssignObserver
     /**
      * @param Observer $observer
      * @return void
+     * @throws LocalizedException
      */
     public function execute(Observer $observer)
     {
