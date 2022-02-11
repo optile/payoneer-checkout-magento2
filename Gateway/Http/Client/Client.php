@@ -1,15 +1,14 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
+
 namespace Payoneer\OpenPaymentGateway\Gateway\Http\Client;
 
+use Magento\Framework\DataObject;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Magento\Payment\Model\Method\Logger;
+use Payoneer\OpenPaymentGateway\Model\Api\Request;
 
-class ClientMock implements ClientInterface
+class Client implements ClientInterface
 {
     const SUCCESS = 1;
     const FAILURE = 0;
@@ -25,37 +24,54 @@ class ClientMock implements ClientInterface
     /**
      * @var Logger
      */
-    private $logger;
+    protected $logger;
+
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
      * @param Logger $logger
+     * @param Request $request
      */
     public function __construct(
-        Logger $logger
+        Logger $logger,
+        Request $request
     ) {
         $this->logger = $logger;
+        $this->request = $request;
     }
 
     /**
-     * Places request to gateway. Returns result as ENV array
-     *
      * @param TransferInterface $transferObject
-     * @return array
+     * @return array|DataObject
      */
     public function placeRequest(TransferInterface $transferObject)
     {
-        $response = $this->generateResponseForCode(
-            $this->getResultCode(
-                $transferObject
-            )
+        $response = [];
+        $credentials['merchantCode'] = 'MRS_TEST_TRYZENS';
+        $credentials['apiKey'] = 'v3e7es43uj3qnfocl2thi5ccle245ta7g38s03t1';
+        $credentials['hostName'] = 'https://api.sandbox.oscato.com/';
+        $data = $transferObject->getBody();
+        file_put_contents(BP.'/var/log/payoneer.log','REQUEST:: '.
+            json_encode($data).PHP_EOL, FILE_APPEND);
+        $responseObj = $this->request->send(
+            $transferObject->getMethod(),
+            'api/lists',
+            $credentials,
+            $data
         );
 
-        $this->logger->debug(
-            [
-                'request' => $transferObject->getBody(),
-                'response' => $response
-            ]
-        );
+        $response['response'] = $responseObj->getData('response');
+        $response['status'] = $responseObj->getData('status');
+        $response['reason'] = $responseObj->getData('reason');
+        /* $this->logger->debug(
+             [
+                 'request' => $transferObject->getBody(),
+                 'response' => $response
+             ]
+         );*/
 
         return $response;
     }

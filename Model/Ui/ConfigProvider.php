@@ -3,7 +3,7 @@
 namespace Payoneer\OpenPaymentGateway\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
-use Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock;
+use Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client;
 
 /**
  * Class ConfigProvider - Payoneer configuration class
@@ -23,8 +23,8 @@ class ConfigProvider implements ConfigProviderInterface
             'payment' => [
                 self::CODE => [
                     'transactionResults' => [
-                        ClientMock::SUCCESS => __('Success'),
-                        ClientMock::FAILURE => __('Fraud')
+                        Client::SUCCESS => __('Success'),
+                        Client::FAILURE => __('Fraud')
                     ]
                 ]
             ]

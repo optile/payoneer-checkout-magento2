@@ -77,7 +77,7 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => __('AUTH'),
+                'value' => __('HOSTED'),
                 'label' => __('Deferred')
             ],
             [

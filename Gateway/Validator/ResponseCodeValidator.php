@@ -1,13 +1,10 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
+
 namespace Payoneer\OpenPaymentGateway\Gateway\Validator;
 
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
-use Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock;
+use Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client;
 
 class ResponseCodeValidator extends AbstractValidator
 {
@@ -47,6 +44,6 @@ class ResponseCodeValidator extends AbstractValidator
     private function isSuccessfulTransaction(array $response)
     {
         return isset($response[self::RESULT_CODE])
-        && $response[self::RESULT_CODE] !== ClientMock::FAILURE;
+        && $response[self::RESULT_CODE] !== Client::FAILURE;
     }
 }

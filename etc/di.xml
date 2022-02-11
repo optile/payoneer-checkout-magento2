@@ -1,10 +1,4 @@
 <?xml version="1.0"?>
-<!--
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <!-- Payment Method Facade configuration -->
@@ -32,7 +26,7 @@
         </arguments>
     </virtualType>
 
-    <type name="Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock">
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
         <arguments>
             <argument name="logger" xsi:type="object">PayoneerPaymentGatewayLogger</argument>
         </arguments>
@@ -42,95 +36,71 @@
     <virtualType name="PayoneerPaymentGatewayCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="authenticate" xsi:type="string">PayoneerPaymentGatewayAuthenticationCommand</item>
-                <item name="authorize" xsi:type="string">PayoneerPaymentGatewayAuthorizeCommand</item>
-                <item name="capture" xsi:type="string">PayoneerPaymentGatewayCaptureCommand</item>
-                <item name="void" xsi:type="string">PayoneerPaymentGatewayVoidCommand</item>
+                <item name="list_hosted" xsi:type="string">PayoneerPaymentGatewayHostedListCommand</item>
             </argument>
         </arguments>
     </virtualType>
 
-    <!-- Authentication command -->
-    <virtualType name="PayoneerPaymentGatewayAuthenticationCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+
+    <type name="Payoneer\OpenPaymentGateway\Model\GetHostedTransactionService">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">PayoneerPaymentGatewayAuthenticationRequest</argument>
+            <argument name="config"         xsi:type="object">PayoneerPaymentGatewayConfig</argument>
+            <argument name="commandPool"    xsi:type="object">PayoneerPaymentGatewayCommandPool</argument>
+        </arguments>
+    </type>
+
+    <!-- List command -->
+    <virtualType name="PayoneerPaymentGatewayHostedListCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\HostedListCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayoneerPaymentGatewayListRequest</argument>
+<!--
             <argument name="handler" xsi:type="object">PayoneerPaymentGatewayResponseHandlerComposite</argument>
+-->
             <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock</argument>
+            <argument name="client" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client</argument>
         </arguments>
     </virtualType>
 
-    <!-- Authentication Request -->
-    <virtualType name="PayoneerPaymentGatewayAuthenticationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <!-- List Request -->
+    <virtualType name="PayoneerPaymentGatewayListRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="transaction" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AuthenticationRequest</item>
-                <item name="mockData" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\MockDataRequest</item>
+                <item name="transaction" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\ListRequest</item>
+                <item name="customer" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\CustomerDataBuilder</item>
+                <item name="addresses" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AddressDataBuilder</item>
+                <item name="payment" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\PaymentDataBuilder</item>
+                <item name="style" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\StyleDataBuilder</item>
+                <item name="callback" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\CallBackBuilder</item>
             </argument>
         </arguments>
     </virtualType>
-    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\AuthenticationRequest">
+
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\ListRequest">
         <arguments>
             <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
         </arguments>
     </type>
-
-    <!-- Authorize command -->
-    <virtualType name="PayoneerPaymentGatewayAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
-        <arguments>
-            <argument name="requestBuilder" xsi:type="object">PayoneerPaymentGatewayAuthorizationRequest</argument>
-            <argument name="handler" xsi:type="object">PayoneerPaymentGatewayResponseHandlerComposite</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock</argument>
-        </arguments>
-    </virtualType>
-
-    <!-- Authorization Request -->
-    <virtualType name="PayoneerPaymentGatewayAuthorizationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
-        <arguments>
-            <argument name="builders" xsi:type="array">
-                <item name="transaction" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AuthorizationRequest</item>
-                <item name="mockData" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\MockDataRequest</item>
-            </argument>
-        </arguments>
-    </virtualType>
-    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\AuthorizationRequest">
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\CustomerDataBuilder">
         <arguments>
             <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
         </arguments>
     </type>
-
-    <!-- Capture command -->
-    <virtualType name="PayoneerPaymentGatewayCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
-        <arguments>
-            <argument name="requestBuilder" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Request\CaptureRequest</argument>
-            <argument name="handler" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Response\TxnIdHandler</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
-            <argument name="validator" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseCodeValidator</argument>
-            <argument name="client" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock</argument>
-        </arguments>
-    </virtualType>
-
-    <!-- Capture Request -->
-    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\CaptureRequest">
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\AddressDataBuilder">
         <arguments>
             <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
         </arguments>
     </type>
-
-    <!-- Void command -->
-    <virtualType name="PayoneerPaymentGatewayVoidCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\PaymentDataBuilder">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Request\VoidRequest</argument>
-            <argument name="handler" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Response\TxnIdHandler</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
-            <argument name="validator" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseCodeValidator</argument>
-            <argument name="client" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock</argument>
+            <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
         </arguments>
-    </virtualType>
-
-    <!-- Void Request -->
-    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\VoidRequest">
+    </type>
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\StyleDataBuilder">
+        <arguments>
+            <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
+        </arguments>
+    </type>
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\CallBackBuilder">
         <arguments>
             <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
         </arguments>

@@ -77,6 +77,8 @@ class ValidateCredentialsObserver implements ObserverInterface
             return;
         }
 
+        $credentials = [];
+
         $sharedFields = [
             'environment',
             'merchant_gateway_key'
@@ -112,6 +114,10 @@ class ValidateCredentialsObserver implements ObserverInterface
             $storeCode = $this->configFieldValues['live_store_code'];
         }
 
+        $credentials['merchantCode'] = $merchantCode;
+        $credentials['apiKey'] = $apiKey;
+        $credentials['hostName'] = $hostName;
+
         $data = $this->payoneerConfig->getMockData();
         if ($storeCode) {
             $data['division'] = $storeCode;
@@ -119,10 +125,8 @@ class ValidateCredentialsObserver implements ObserverInterface
 
         $response = $this->request->send(
             PayoneerConfig::METHOD_POST,
-            $hostName,
             PayoneerConfig::END_POINT,
-            $merchantCode,
-            $apiKey,
+            $credentials,
             $data
         );
         if ($response->getData('status') !== 200) {

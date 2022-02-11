@@ -1,29 +1,33 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
+
 namespace Payoneer\OpenPaymentGateway\Gateway\Http;
 
 use Magento\Payment\Gateway\Http\TransferBuilder;
 use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use Payoneer\OpenPaymentGateway\Gateway\Request\MockDataRequest;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 class TransferFactory implements TransferFactoryInterface
 {
     /**
      * @var TransferBuilder
      */
-    private $transferBuilder;
+    protected $transferBuilder;
+
+    /**
+     * @var Config
+     */
+    protected $config;
 
     /**
      * @param TransferBuilder $transferBuilder
      */
     public function __construct(
-        TransferBuilder $transferBuilder
+        TransferBuilder $transferBuilder,
+        Config $config
     ) {
         $this->transferBuilder = $transferBuilder;
+        $this->config = $config;
     }
 
     /**
@@ -34,15 +38,19 @@ class TransferFactory implements TransferFactoryInterface
      */
     public function create(array $request)
     {
+        $headers = [];
+        $headers['Content-Type'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
+        $headers['Accept'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
+        $headers['Authorization'] = 'Basic ' . base64_encode('MRS_TEST_TRYZENS' . ':' . 'v3e7es43uj3qnfocl2thi5ccle245ta7g38s03t1');
+
         return $this->transferBuilder
             ->setBody($request)
-            ->setMethod('POST')
+            ->setAuthUsername($this->config->getConfig('merchant_gateway_key'))
+            ->setAuthPassword($this->config->getConfig('sandbox_api_key'))
+            ->setMethod(Config::METHOD_POST)
+            ->setUri(Config::END_POINT)
             ->setHeaders(
-                [
-                    'force_result' => isset($request[MockDataRequest::FORCE_RESULT])
-                        ? $request[MockDataRequest::FORCE_RESULT]
-                        : null
-                ]
+                $headers
             )
             ->build();
     }

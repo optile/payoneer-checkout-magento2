@@ -8,7 +8,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -16,6 +15,9 @@ use Magento\Store\Model\Website;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
+    /**
+     * Module Name
+     */
     const MODULE_NAME = 'Payoneer_OpenPaymentGateway';
 
     /**
@@ -24,7 +26,36 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const METHOD_GET = 'GET';
     const METHOD_POST = 'POST';
 
+    /**
+     * API endpoints
+     */
     const END_POINT = 'api/lists';
+
+    /**
+     * API Request constants
+     */
+
+    const CALLBACK = 'callback';
+    const RETURN_URL = 'returnUrl';
+    const CANCEL_URL = 'cancelUrl';
+    const NOTIFICATION_URL = 'notificationUrl';
+    const PAYMENT = 'payment';
+    const AMOUNT = 'amount';
+    const CURRENCY = 'currency';
+    const REFERENCE = 'reference';
+    const CUSTOMER = 'customer';
+    const NUMBER = 'number';
+    const EMAIL = 'email';
+    const COMPANY = 'company';
+    const NAME = 'name';
+    const TITLE = 'title';
+    const FIRST_NAME = 'firstName';
+    const MIDDLE_NAME = 'middleName';
+    const LAST_NAME = 'lastName';
+    const SHIPPING = 'shipping';
+    const BILLING = 'billing';
+    const ADDRESSES = 'addresses';
+    const USE_BILLING_AS_SHIPPING = 'useBillingAsShippingAddress';
 
     /**
      * @var array<int, string>
@@ -52,14 +83,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     ];
 
     /**
-     * @var array<mixed>
-     */
-    protected $responseCodes = [
-        'success' => ['200'],
-        'failure' => ['401']
-    ];
-
-    /**
      * @var StoreManagerInterface
      */
     protected $storeManager;
@@ -68,11 +91,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
-
-    /**
-     * @var ModuleListInterface
-     */
-    protected $moduleList;
 
     /**
      * @var EncryptorInterface
@@ -93,7 +111,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * Config constructor.
      * @param StoreManagerInterface $storeManager
      * @param ScopeConfigInterface $scopeConfig
-     * @param ModuleListInterface $moduleList
      * @param EncryptorInterface $encryptor
      * @param ConfigResource $configResource
      * @param null $methodCode
@@ -102,7 +119,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function __construct(
         StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
-        ModuleListInterface $moduleList,
         EncryptorInterface $encryptor,
         ConfigResource $configResource,
         $methodCode = null,
@@ -111,7 +127,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
-        $this->moduleList = $moduleList;
         $this->encryptor = $encryptor;
         $this->configResource = $configResource;
     }
@@ -144,26 +159,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             }
         }
         return $config;
-    }
-
-    /**
-     * @param string $key
-     * @return array<string>
-     */
-    public function getResponseCode($key)
-    {
-        return $this->responseCodes[$key];
-    }
-
-    /**
-     * Find the installed module version
-     *
-     * @return mixed
-     */
-    public function getModuleVersion()
-    {
-        $module = $this->moduleList->getOne(self::MODULE_NAME);
-        return $module ? $module ['setup_version'] : null;
     }
 
     /**
@@ -308,15 +303,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             $this->storeCode[$storeId] = $this->storeManager->getStore($storeId)->getName();
         }
         return $this->storeCode[$storeId];
-    }
-
-    /**
-     * @param string $key
-     * @return mixed
-     */
-    public function getConfigPath($key)
-    {
-        return $this->config[$key]['path'];
     }
 
     /**

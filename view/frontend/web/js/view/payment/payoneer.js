@@ -1,7 +1,3 @@
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
 /*browser:true*/
 /*global define*/
 define(
@@ -17,7 +13,7 @@ define(
         rendererList.push(
             {
                 type: 'payoneer',
-                component: 'Payoneer_OpenPaymentGateway/js/view/payment/method-renderer/payoneer'
+                component: 'Payoneer_OpenPaymentGateway/js/view/payment/method-renderer/payoneer-hosted'
             }
         );
         /** Add view logic here if needed */

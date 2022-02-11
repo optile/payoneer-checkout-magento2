@@ -1,21 +1,17 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
+
 namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Request\BuilderInterface;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
 
-class CaptureRequest implements BuilderInterface
+class StyleDataBuilder implements BuilderInterface
 {
     /**
      * @var ConfigInterface
      */
-    private $config;
+    protected $config;
 
     /**
      * @param ConfigInterface $config
@@ -40,24 +36,16 @@ class CaptureRequest implements BuilderInterface
             throw new \InvalidArgumentException('Payment data object should be provided');
         }
 
-        /** @var PaymentDataObjectInterface $paymentDO */
-        $paymentDO = $buildSubject['payment'];
-
-        $order = $paymentDO->getOrder();
-
-        $payment = $paymentDO->getPayment();
-
-        if (!$payment instanceof OrderPaymentInterface) {
-            throw new \LogicException('Order payment should be provided.');
-        }
+        /** @var PaymentDataObjectInterface $payment */
+        $payment = $buildSubject['payment'];
+        $order = $payment->getOrder();
+        $address = $order->getShippingAddress();
 
         return [
-            'TXN_TYPE' => 'S',
-            'TXN_ID' => $payment->getLastTransId(),
-            'MERCHANT_KEY' => $this->config->getValue(
-                'merchant_gateway_key',
-                $order->getStoreId()
-            )
+            'style' => [
+                'hostedVersion' => 'v3',
+                'resolution' => '3x',
+            ]
         ];
     }
 }

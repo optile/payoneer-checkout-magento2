@@ -67,6 +67,10 @@ class ValidateCredentials extends Action
         $storeId = $this->getRequest()->getParam('storeId', 0);
         $environment = $this->getRequest()->getParam('environment');
 
+        $credentials['merchantCode'] = $merchantCode;
+        $credentials['apiKey'] = $apiKey;
+        $credentials['hostName'] = $hostName;
+
         if ($storeCode) {
             $data["division"] = $storeCode;
         }
@@ -77,10 +81,8 @@ class ValidateCredentials extends Action
         try {
             $gatewayResponse = $this->request->send(
                 Config::METHOD_POST,
-                $hostName,
                 $endPoint,
-                $merchantCode,
-                $apiKey,
+                $credentials,
                 $data
             );
             $response->setHttpResponseCode($gatewayResponse['status']);

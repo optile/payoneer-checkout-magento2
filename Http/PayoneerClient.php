@@ -63,6 +63,7 @@ class PayoneerClient
             $client = $this->clientFactory->create(['config' => [
                 'base_uri' => $hostname
             ]]);
+
             $response = $client->request(
                 $requestMethod,
                 $uriEndpoint,

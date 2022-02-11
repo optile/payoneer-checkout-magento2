@@ -4,7 +4,7 @@
         <section id="payment">
             <group id="payoneer" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Payoneer Payment Gateway</label>
-                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
@@ -60,7 +60,7 @@
                     <label></label>
                     <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ValidateCredentials</frontend_model>
                 </field>
-                <field id="payment_action" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="payment_action" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>
                     <source_model>Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields::paymentAction</source_model>
                 </field>
@@ -72,11 +72,11 @@
                     <label>Order Reference Message</label>
                 </field>
                 <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
-                       showInStore="0">
+                       showInStore="1">
                     <label>Sort Order</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
-                <field id="debug" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="debug" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>

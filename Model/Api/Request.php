@@ -37,19 +37,15 @@ class Request
 
     /**
      * @param string $method
-     * @param string $hostname
      * @param string $endPoint
-     * @param string $merchantCode
-     * @param string $apiKey
+     * @param $credentials
      * @param array<mixed> $data
      * @return DataObject
      */
     public function send(
         $method,
-        $hostname,
         $endPoint,
-        $merchantCode,
-        $apiKey,
+        $credentials,
         array $data = []
     ): DataObject {
         $options = [];
@@ -58,9 +54,9 @@ class Request
         } else {
             $options['json']  =   $data;
         }
-        $options['headers'] = $this->prepareHeaders($merchantCode, $apiKey);
+        $options['headers'] = $this->prepareHeaders($credentials['merchantCode'], $credentials['apiKey']);
 
-        return $this->payoneerHttpClient->send($method, $hostname, $endPoint, $options);
+        return $this->payoneerHttpClient->send($method, $credentials['hostName'], $endPoint, $options);
     }
 
     /**
