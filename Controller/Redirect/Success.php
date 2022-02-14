@@ -8,11 +8,9 @@ use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use Payoneer\OpenPaymentGateway\Model\Api\Request;
+use Magento\Quote\Model\Quote;
 
 /**
  * Class Success
@@ -69,11 +67,9 @@ class Success implements HttpGetActionInterface
     {
         try {
             $cartId = $this->context->getRequest()->getParam('cart_id');
-            /** @var \Magento\Quote\Model\Quote $quote */
+
+            /** @var Quote $quote */
             $quote = $this->cartRepository->getActive($cartId);
-            /*if ($quote->getPayment()->getAdditionalInformation(Config::ACCESS_CODE) != $accessCode) {
-                throw new LocalizedException(__('Your session is expired, please try again.'));
-            }*/
 
             if (!$quote->getCustomerId()) {
                 $quote->setCheckoutMethod(CartManagementInterface::METHOD_GUEST);

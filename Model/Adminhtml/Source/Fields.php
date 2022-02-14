@@ -77,11 +77,11 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => __('HOSTED'),
+                'value' => __('authorize'),
                 'label' => __('Deferred')
             ],
             [
-                'value' => __('Deferred'),
+                'value' => __('capture'),
                 'label' => __('Direct payment')
             ]
         ];
@@ -94,11 +94,11 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => __('standalone'),
+                'value' => __('HOSTED'),
                 'label' => __('Standalone')
             ],
             [
-                'value' => __('embedded'),
+                'value' => __('SELECTIVE_NATIVE'),
                 'label' => __('Embedded')
             ]
         ];

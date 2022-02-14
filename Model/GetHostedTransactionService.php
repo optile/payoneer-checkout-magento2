@@ -1,6 +1,7 @@
 <?php
 namespace Payoneer\OpenPaymentGateway\Model;
 
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\ConfigInterface;
@@ -50,12 +51,24 @@ class GetHostedTransactionService
         $this->config = $config;
     }
 
+    /**
+     * Process Api request
+     *
+     * @param Quote $quote
+     * @return Json | array <mixed>
+     * @throws \Exception
+     */
     public function process(Quote $quote)
     {
-        /*if (!$quote->getReservedOrderId()) {
-            $quote->reserveOrderId()->save();
-        }*/
+        if (!$this->config->getConfig('payoneer_active')) {
+            return [];
+        }
 
+        if (!$quote->getReservedOrderId()) {
+            $quote->reserveOrderId()->save();
+        }
+
+        $jsonData = [];
         $payment = $quote->getPayment();
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
@@ -66,12 +79,14 @@ class GetHostedTransactionService
             ]);
             file_put_contents(
                 BP . '/var/log/payoneer.log',
-                'RESPONSE' .json_encode($result). PHP_EOL,
+                'RESPONSE' . json_encode($result) . PHP_EOL,
                 FILE_APPEND
             );
-            $jsonData = [
-                'redirectURL' => $result['response']['redirect']['url']
-            ];
+            if (isset($result['response']['redirect'])) {
+                $jsonData = [
+                    'redirectURL' => $result['response']['redirect']['url']
+                ];
+            }
 
             return $this->resultJsonFactory->create()->setData($jsonData);
         } catch (\Exception $e) {

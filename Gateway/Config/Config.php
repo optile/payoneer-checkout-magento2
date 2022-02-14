@@ -12,9 +12,12 @@ use Magento\Framework\UrlInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields as AdminFields;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
+    const DEFAULT_PATH_PATTERN = 'payment/%s/%s';
+
     /**
      * Module Name
      */
@@ -55,7 +58,23 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const SHIPPING = 'shipping';
     const BILLING = 'billing';
     const ADDRESSES = 'addresses';
+    const STREET = 'street';
+    const HOUSE_NUMBER = 'houseNumber';
+    const ZIP = 'zip';
+    const CITY = 'city';
+    const STATE = 'state';
+    const COUNTRY = 'country';
     const USE_BILLING_AS_SHIPPING = 'useBillingAsShippingAddress';
+    const TRANSACTION_ID = 'transactionId';
+    const INTEGRATION = 'integration';
+    const DIVISION = 'division';
+    const PRODUCTS = 'products';
+    const SKU = 'code';
+    const QUANTITY = 'quantity';
+    const TYPE = 'type';
+    const NET_AMOUNT = 'netAmount';
+    const TAX_AMOUNT = 'taxAmount';
+    const TAX_PERCENT = 'taxRatePercentage';
 
     /**
      * @var array<int, string>
@@ -108,6 +127,16 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     protected $entity;
 
     /**
+     * @var string|null
+     */
+    private $methodCode;
+
+    /**
+     * @var string|null
+     */
+    private $pathPattern;
+
+    /**
      * Config constructor.
      * @param StoreManagerInterface $storeManager
      * @param ScopeConfigInterface $scopeConfig
@@ -121,9 +150,10 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         ScopeConfigInterface $scopeConfig,
         EncryptorInterface $encryptor,
         ConfigResource $configResource,
-        $methodCode = null,
+        $methodCode = 'payoneer',
         $pathPattern = self::DEFAULT_PATH_PATTERN
-    ) {
+    )
+    {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
@@ -142,7 +172,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getConfig($key, $scopeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        $config='';
+        $config = '';
         if (isset($this->config[$key]['path'])) {
             $configPath = $this->config[$key]['path'];
             if ($scopeId === null) {
@@ -326,5 +356,52 @@ class Config extends \Magento\Payment\Gateway\Config\Config
                 'cancelUrl' => 'https://resources.integration.oscato.com/paymentpage/v3-examples/cancel.html'
             ]
         ];
+    }
+
+
+    /**
+     * Prepare header for API requests
+     *
+     * @param null $merchantCode
+     * @param null $appKey
+     * @return array
+     */
+    public function prepareHeaders(
+        $merchantCode = null,
+        $appKey = null
+    ): array
+    {
+        $headers = [];
+        $headers['Content-Type'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
+        $headers['Accept'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
+        $headers['Authorization'] = 'Basic ' . base64_encode($merchantCode . ':' . $appKey);
+        return $headers;
+    }
+
+    /**
+     * Get environment credentials
+     *
+     * @param string $key
+     * @return mixed|string
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function getCredentials($key)
+    {
+        $environment = $this->getConfig('environment');
+        switch ($key) {
+            case 'api_key':
+                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX) ?
+                    $this->getConfig('sandbox_api_key') :
+                    $this->getConfig('live_api_key');
+            case 'store_code':
+                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX) ?
+                    $this->getConfig('sandbox_store_code') :
+                    $this->getConfig('live_store_code');
+            case 'host_name':
+                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX) ?
+                    $this->getConfig('sandbox_host_name') :
+                    $this->getConfig('live_host_name');
+        }
     }
 }

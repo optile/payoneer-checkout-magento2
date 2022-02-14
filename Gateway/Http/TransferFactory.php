@@ -2,11 +2,17 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Http;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Gateway\Http\TransferBuilder;
 use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
+/**
+ * Class TransferFactory
+ * @package Payoneer\OpenPaymentGateway\Gateway\Http
+ */
 class TransferFactory implements TransferFactoryInterface
 {
     /**
@@ -21,6 +27,7 @@ class TransferFactory implements TransferFactoryInterface
 
     /**
      * @param TransferBuilder $transferBuilder
+     * @param Config $config
      */
     public function __construct(
         TransferBuilder $transferBuilder,
@@ -35,22 +42,22 @@ class TransferFactory implements TransferFactoryInterface
      *
      * @param array $request
      * @return TransferInterface
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function create(array $request)
     {
-        $headers = [];
-        $headers['Content-Type'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
-        $headers['Accept'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
-        $headers['Authorization'] = 'Basic ' . base64_encode('MRS_TEST_TRYZENS' . ':' . 'v3e7es43uj3qnfocl2thi5ccle245ta7g38s03t1');
+        $merchantCode = $this->config->getConfig('merchant_gateway_key');
+        $apiKey = $this->config->getCredentials('api_key');
 
         return $this->transferBuilder
             ->setBody($request)
-            ->setAuthUsername($this->config->getConfig('merchant_gateway_key'))
-            ->setAuthPassword($this->config->getConfig('sandbox_api_key'))
+            ->setAuthUsername($merchantCode)
+            ->setAuthPassword($apiKey)
             ->setMethod(Config::METHOD_POST)
             ->setUri(Config::END_POINT)
             ->setHeaders(
-                $headers
+                $this->config->prepareHeaders($merchantCode, $apiKey)
             )
             ->build();
     }

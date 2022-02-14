@@ -54,24 +54,8 @@ class Request
         } else {
             $options['json']  =   $data;
         }
-        $options['headers'] = $this->prepareHeaders($credentials['merchantCode'], $credentials['apiKey']);
+        $options['headers'] = $this->config->prepareHeaders($credentials['merchantCode'], $credentials['apiKey']);
 
         return $this->payoneerHttpClient->send($method, $credentials['hostName'], $endPoint, $options);
-    }
-
-    /**
-     * @param null $merchantCode
-     * @param null $appKey
-     * @return array
-     */
-    public function prepareHeaders(
-        $merchantCode = null,
-        $appKey = null
-    ): array {
-        $headers = [];
-        $headers['Content-Type'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
-        $headers['Accept'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
-        $headers['Authorization'] = 'Basic ' . base64_encode($merchantCode . ':' . $appKey);
-        return $headers;
     }
 }

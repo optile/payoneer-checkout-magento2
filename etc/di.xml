@@ -13,7 +13,7 @@
     </virtualType>
 
     <!-- Configuration reader -->
-    <virtualType name="PayoneerPaymentGatewayConfig" type="Magento\Payment\Gateway\Config\Config">
+    <virtualType name="PayoneerPaymentGatewayConfig" type="Payoneer\OpenPaymentGateway\Gateway\Config\Config">
         <arguments>
             <argument name="methodCode" xsi:type="const">\Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider::CODE</argument>
         </arguments>
@@ -53,9 +53,7 @@
     <virtualType name="PayoneerPaymentGatewayHostedListCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\HostedListCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">PayoneerPaymentGatewayListRequest</argument>
-<!--
             <argument name="handler" xsi:type="object">PayoneerPaymentGatewayResponseHandlerComposite</argument>
--->
             <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
             <argument name="client" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client</argument>
         </arguments>
@@ -65,9 +63,12 @@
     <virtualType name="PayoneerPaymentGatewayListRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="transaction" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\ListRequest</item>
+                <item name="base_request" xsi:type="string">
+                    Payoneer\OpenPaymentGateway\Gateway\Request\BaseRequestDataBuilder
+                </item>
                 <item name="customer" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\CustomerDataBuilder</item>
                 <item name="addresses" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AddressDataBuilder</item>
+                <item name="items" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\ItemsDataBuilder</item>
                 <item name="payment" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\PaymentDataBuilder</item>
                 <item name="style" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\StyleDataBuilder</item>
                 <item name="callback" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\CallBackBuilder</item>
@@ -75,17 +76,22 @@
         </arguments>
     </virtualType>
 
-    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\ListRequest">
+    <!--<type name="Payoneer\OpenPaymentGateway\Gateway\Request\BaseRequestDataBuilder">
         <arguments>
             <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
         </arguments>
-    </type>
+    </type>-->
     <type name="Payoneer\OpenPaymentGateway\Gateway\Request\CustomerDataBuilder">
         <arguments>
             <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
         </arguments>
     </type>
     <type name="Payoneer\OpenPaymentGateway\Gateway\Request\AddressDataBuilder">
+        <arguments>
+            <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
+        </arguments>
+    </type>
+    <type name="Payoneer\OpenPaymentGateway\Gateway\Request\ItemsDataBuilder">
         <arguments>
             <argument name="config" xsi:type="object">PayoneerPaymentGatewayConfig</argument>
         </arguments>

@@ -44,15 +44,16 @@ class CallBackBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
-        $params = [];
+        $successParams = [];
+        $cancelParams = ['error' => true];
         if ($this->checkoutSession->hasQuote()) {
-            $params['cart_id'] = $this->checkoutSession->getQuoteId();
+            $successParams['cart_id'] = $this->checkoutSession->getQuoteId();
         }
 
         return [
             Config::CALLBACK => [
-                Config::RETURN_URL => $this->urlBuilder->getUrl('payoneer/redirect/success', $params),
-                Config::CANCEL_URL => $this->urlBuilder->getUrl('payoneer/redirect/cancel'),
+                Config::RETURN_URL => $this->urlBuilder->getUrl('payoneer/redirect/success', $successParams),
+                Config::CANCEL_URL => $this->urlBuilder->getUrl('payoneer/redirect/cancel', [$cancelParams]),
                 Config::NOTIFICATION_URL => 'https://dev.oscato.com/shop/notify',
             ]
         ];

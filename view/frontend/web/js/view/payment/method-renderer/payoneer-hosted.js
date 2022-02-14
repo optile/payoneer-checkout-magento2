@@ -3,9 +3,10 @@
 define(
     [
         'jquery',
-        'Magento_Checkout/js/view/payment/default'
+        'Magento_Checkout/js/view/payment/default',
+        'Magento_Customer/js/customer-data'
     ],
-    function ($, Component) {
+    function ($, Component, customerData) {
         'use strict';
 
         return Component.extend({
@@ -43,9 +44,16 @@ define(
                     dataType: 'json'
                 }).done(function (response) {
                     //console.log(response);
-                    window.location.href = response.redirectURL;
-                }).fail(function (data) {
-                    alert('failure');
+                    customerData.invalidate(['cart']);
+                    if(response.redirectURL) {
+                        window.location.href = response.redirectURL;
+                    } else {
+                        $('body').trigger('processStop');
+                        alert('Something went wrong while processing payment1');
+                    }
+                }).fail(function (response) {
+                    $('body').trigger('processStop');
+                    alert('Something went wrong while processing payment2');
                 });
             }
         });
