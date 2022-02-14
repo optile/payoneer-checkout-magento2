@@ -37,10 +37,7 @@ class CallBackBuilder implements BuilderInterface
     }
 
     /**
-     * Builds request
-     *
-     * @param array $buildSubject
-     * @return array
+     * @inheritdoc
      */
     public function build(array $buildSubject)
     {
@@ -52,9 +49,9 @@ class CallBackBuilder implements BuilderInterface
 
         return [
             Config::CALLBACK => [
-                Config::RETURN_URL => $this->urlBuilder->getUrl('payoneer/redirect/success', $successParams),
-                Config::CANCEL_URL => $this->urlBuilder->getUrl('payoneer/redirect/cancel', [$cancelParams]),
-                Config::NOTIFICATION_URL => 'https://dev.oscato.com/shop/notify',
+                Config::RETURN_URL => $this->urlBuilder->getUrl(Config::RETURN_URL_PATH, $successParams),
+                Config::CANCEL_URL => $this->urlBuilder->getUrl(Config::CANCEL_URL_PATH, $cancelParams),
+                Config::NOTIFICATION_URL => $this->urlBuilder->getUrl(Config::NOTIFICATION_URL_PATH)
             ]
         ];
     }

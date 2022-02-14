@@ -21,6 +21,7 @@ class BaseRequestDataBuilder implements BuilderInterface
     ) {
         $this->config = $config;
     }
+
     /**
      * @inheritdoc
      */

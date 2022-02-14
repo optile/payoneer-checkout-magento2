@@ -13,6 +13,7 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Store\Model\Website;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields as AdminFields;
+use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
 
 class Config extends \Magento\Payment\Gateway\Config\Config
 {
@@ -40,8 +41,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     const CALLBACK = 'callback';
     const RETURN_URL = 'returnUrl';
+    const RETURN_URL_PATH = 'payoneer/redirect/success';
     const CANCEL_URL = 'cancelUrl';
+    const CANCEL_URL_PATH = 'payoneer/redirect/cancel';
     const NOTIFICATION_URL = 'notificationUrl';
+    const NOTIFICATION_URL_PATH = 'payoneer/redirect/notification';
     const PAYMENT = 'payment';
     const AMOUNT = 'amount';
     const CURRENCY = 'currency';
@@ -150,10 +154,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         ScopeConfigInterface $scopeConfig,
         EncryptorInterface $encryptor,
         ConfigResource $configResource,
-        $methodCode = 'payoneer',
+        $methodCode = ConfigProvider::CODE,
         $pathPattern = self::DEFAULT_PATH_PATTERN
-    )
-    {
+    ) {
         parent::__construct($scopeConfig, $methodCode, $pathPattern);
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
@@ -358,7 +361,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         ];
     }
 
-
     /**
      * Prepare header for API requests
      *
@@ -369,8 +371,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function prepareHeaders(
         $merchantCode = null,
         $appKey = null
-    ): array
-    {
+    ): array {
         $headers = [];
         $headers['Content-Type'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';
         $headers['Accept'] = 'application/vnd.optile.payment.enterprise-v1-extensible+json';

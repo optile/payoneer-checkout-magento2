@@ -13,10 +13,7 @@ use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 class PaymentDataBuilder implements BuilderInterface
 {
     /**
-     * Builds payment data
-     *
-     * @param array $buildSubject
-     * @return array
+     * @inheritdoc
      */
     public function build(array $buildSubject)
     {

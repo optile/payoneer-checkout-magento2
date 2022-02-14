@@ -3,9 +3,13 @@
 namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
 use Magento\Payment\Gateway\ConfigInterface;
-use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 
+/**
+ * Class StyleDataBuilder
+ * Builds Style data array
+ */
 class StyleDataBuilder implements BuilderInterface
 {
     /**
@@ -23,23 +27,11 @@ class StyleDataBuilder implements BuilderInterface
     }
 
     /**
-     * Builds ENV request
-     *
-     * @param array $buildSubject
-     * @return array
+     * @inheritdoc
      */
     public function build(array $buildSubject)
     {
-        if (!isset($buildSubject['payment'])
-            || !$buildSubject['payment'] instanceof PaymentDataObjectInterface
-        ) {
-            throw new \InvalidArgumentException('Payment data object should be provided');
-        }
-
-        /** @var PaymentDataObjectInterface $payment */
-        $payment = $buildSubject['payment'];
-        $order = $payment->getOrder();
-        $address = $order->getShippingAddress();
+        $payment = SubjectReader::readPayment($buildSubject);
 
         return [
             'style' => [
