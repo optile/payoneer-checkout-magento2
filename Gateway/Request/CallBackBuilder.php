@@ -45,6 +45,7 @@ class CallBackBuilder implements BuilderInterface
         $cancelParams = ['error' => true];
         if ($this->checkoutSession->hasQuote()) {
             $successParams['cart_id'] = $this->checkoutSession->getQuoteId();
+            $successParams['token'] = 'sdfgfgsfdg';//todo
         }
 
         return [

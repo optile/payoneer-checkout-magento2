@@ -6,8 +6,6 @@ use Exception;
 use Magento\Backend\App\Action;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields as AdminFields;
 use Payoneer\OpenPaymentGateway\Model\Api\Request;
@@ -52,9 +50,9 @@ class ValidateCredentials extends Action
     }
 
     /**
+     * Validates the field values
+     *
      * @return ResultInterface
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
     public function execute(): ResultInterface
     {
@@ -94,22 +92,21 @@ class ValidateCredentials extends Action
     }
 
     /**
+     * Set the field values
      * @param $environment
      * @param $storeId
      * @return void
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
     public function setFieldValues($environment, $storeId)
     {
         if ($environment === AdminFields::ENVIRONMENT_SANDBOX) {
-            $this->fields['apiKey'] = $this->config->getConfig('sandbox_api_key', $storeId);
-            $this->fields['storeCode'] = $this->config->getConfig('sandbox_store_code', $storeId);
-            $this->fields['hostName'] = $this->config->getConfig('sandbox_host_name', $storeId);
+            $this->fields['apiKey'] = $this->config->getValue('sandbox_api_key', $storeId);
+            $this->fields['storeCode'] = $this->config->getValue('sandbox_store_code', $storeId);
+            $this->fields['hostName'] = $this->config->getValue('sandbox_host_name', $storeId);
         } else {
-            $this->fields['apiKey'] = $this->config->getConfig('live_api_key', $storeId);
-            $this->fields['storeCode'] = $this->config->getConfig('live_store_code', $storeId);
-            $this->fields['hostName'] = $this->config->getConfig('live_host_name', $storeId);
+            $this->fields['apiKey'] = $this->config->getValue('live_api_key', $storeId);
+            $this->fields['storeCode'] = $this->config->getValue('live_store_code', $storeId);
+            $this->fields['hostName'] = $this->config->getValue('live_host_name', $storeId);
         }
     }
 }

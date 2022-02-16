@@ -6,6 +6,7 @@ use Magento\Framework\DataObject;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Magento\Payment\Model\Method\Logger;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Api\Request;
 
 class Client implements ClientInterface
@@ -32,15 +33,23 @@ class Client implements ClientInterface
     protected $request;
 
     /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
      * @param Logger $logger
      * @param Request $request
+     * @param Config $config
      */
     public function __construct(
         Logger $logger,
-        Request $request
+        Request $request,
+        Config $config
     ) {
         $this->logger = $logger;
         $this->request = $request;
+        $this->config = $config;
     }
 
     /**
@@ -50,15 +59,19 @@ class Client implements ClientInterface
     public function placeRequest(TransferInterface $transferObject)
     {
         $response = [];
-        $credentials['merchantCode'] = 'MRS_TEST_TRYZENS';
-        $credentials['apiKey'] = 'v3e7es43uj3qnfocl2thi5ccle245ta7g38s03t1';
-        $credentials['hostName'] = 'https://api.sandbox.oscato.com/';
+
+        $credentials['merchantCode'] = $this->config->getValue('merchant_gateway_key');
+        $credentials['apiKey'] = $this->config->getCredentials('api_key');
+        $credentials['hostName'] = $this->config->getCredentials('host_name');
+
         $data = $transferObject->getBody();
-        file_put_contents(BP.'/var/log/payoneer.log','REQUEST:: '.
-            json_encode($data).PHP_EOL, FILE_APPEND);
+        if ((bool)$this->config->getValue('debug') == true) {
+            $this->logger->debug(['request' => $data]);
+        }
+
         $responseObj = $this->request->send(
             $transferObject->getMethod(),
-            'api/lists',
+            Config::END_POINT,
             $credentials,
             $data
         );
@@ -66,12 +79,10 @@ class Client implements ClientInterface
         $response['response'] = $responseObj->getData('response');
         $response['status'] = $responseObj->getData('status');
         $response['reason'] = $responseObj->getData('reason');
-        /* $this->logger->debug(
-             [
-                 'request' => $transferObject->getBody(),
-                 'response' => $response
-             ]
-         );*/
+
+        if ((bool)$this->config->getValue('debug') == true) {
+            $this->logger->debug(['response' => $response]);
+        }
 
         return $response;
     }
@@ -83,7 +94,6 @@ class Client implements ClientInterface
      */
     protected function generateResponseForCode($resultCode)
     {
-
         return array_merge(
             [
                 'RESULT_CODE' => $resultCode,

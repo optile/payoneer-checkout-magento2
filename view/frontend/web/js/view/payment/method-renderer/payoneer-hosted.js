@@ -43,9 +43,8 @@ define(
                     type: "GET",
                     dataType: 'json'
                 }).done(function (response) {
-                    //console.log(response);
-                    customerData.invalidate(['cart']);
                     if(response.redirectURL) {
+                        customerData.invalidate(['cart']);
                         window.location.href = response.redirectURL;
                     } else {
                         $('body').trigger('processStop');

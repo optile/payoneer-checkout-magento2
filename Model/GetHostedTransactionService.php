@@ -10,7 +10,7 @@ use Magento\Quote\Model\Quote;
 
 class GetHostedTransactionService
 {
-    const COMMAND_GET_LIST = 'list_hosted';
+    const COMMAND_GET_LIST = 'hosted';
 
     /**
      * @var CommandPoolInterface
@@ -60,7 +60,7 @@ class GetHostedTransactionService
      */
     public function process(Quote $quote)
     {
-        if (!$this->config->getConfig('payoneer_active')) {
+        if (!$this->config->getValue('active')) {
             return [];
         }
 
@@ -77,11 +77,7 @@ class GetHostedTransactionService
                 'payment' => $paymentDataObject,
                 'amount' => $quote->getGrandTotal()
             ]);
-            file_put_contents(
-                BP . '/var/log/payoneer.log',
-                'RESPONSE' . json_encode($result) . PHP_EOL,
-                FILE_APPEND
-            );
+
             if (isset($result['response']['redirect'])) {
                 $jsonData = [
                     'redirectURL' => $result['response']['redirect']['url']
@@ -90,11 +86,6 @@ class GetHostedTransactionService
 
             return $this->resultJsonFactory->create()->setData($jsonData);
         } catch (\Exception $e) {
-            file_put_contents(
-                BP . '/var/log/payoneer.log',
-                'Exception' . $e->getMessage() . PHP_EOL,
-                FILE_APPEND
-            );
             return $this->resultJsonFactory->create()->setHttpResponseCode(400)->setData([
                 'error' => $e->getMessage()
             ]);

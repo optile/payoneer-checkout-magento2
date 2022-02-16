@@ -73,7 +73,7 @@ class ValidateCredentialsObserver implements ObserverInterface
      */
     public function validateApi(Observer $observer)
     {
-        if (!$this->payoneerConfig->getConfig('payoneer_active')) {
+        if (!$this->payoneerConfig->getValue('payoneer_active')) {
             return;
         }
 
@@ -146,7 +146,7 @@ class ValidateCredentialsObserver implements ObserverInterface
     {
         foreach ($fields as $field) {
             if (isset($group['fields'][$field]['inherit'])) {
-                $this->configFieldValues[$field] = $this->payoneerConfig->getConfig($field);
+                $this->configFieldValues[$field] = $this->payoneerConfig->getValue($field);
             } else {
                 $this->configFieldValues[$field] = $group['fields'][$field]['value'];
             }

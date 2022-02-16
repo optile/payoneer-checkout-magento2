@@ -3,7 +3,6 @@
     <default>
         <payment>
             <payoneer>
-                <debug>0</debug>
                 <active>0</active>
                 <model>PayoneerFacade</model>
                 <order_status>pending_payment</order_status>

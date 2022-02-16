@@ -25,7 +25,7 @@ class Notification implements HttpGetActionInterface
     protected $messageManager;
 
     /**
-     * Cancel constructor.
+     * Notification constructor.
      * @param ManagerInterface $messageManager
      * @param RedirectFactory $resultRedirectFactory
      */

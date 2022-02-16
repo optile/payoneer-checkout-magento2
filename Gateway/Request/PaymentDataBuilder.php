@@ -25,6 +25,7 @@ class PaymentDataBuilder implements BuilderInterface
                 Config::AMOUNT => $buildSubject[Config::AMOUNT],
                 Config::CURRENCY => $order->getCurrencyCode(),
                 Config::REFERENCE => $order->getId(),
+                Config::INVOICE_ID=> $order->getId()
             ]
         ];
     }
