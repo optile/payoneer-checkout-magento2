@@ -6,6 +6,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 
 /**
  * Class CallBackBuilder
@@ -37,15 +38,20 @@ class CallBackBuilder implements BuilderInterface
     }
 
     /**
-     * @inheritdoc
+     * @param array $buildSubject
+     * @return array
      */
     public function build(array $buildSubject)
     {
+        $payment = SubjectReader::readPayment($buildSubject);
+        $token = $payment->getPayment()->getAdditionalInformation('token');
+
         $successParams = [];
-        $cancelParams = ['error' => true];
+        $cancelParams = ['error' => true, 'token' => $token];
+
         if ($this->checkoutSession->hasQuote()) {
             $successParams['cart_id'] = $this->checkoutSession->getQuoteId();
-            $successParams['token'] = 'sdfgfgsfdg';//todo
+            $successParams['token'] = $token;
         }
 
         return [

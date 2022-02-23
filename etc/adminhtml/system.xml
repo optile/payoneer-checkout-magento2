@@ -25,7 +25,7 @@
                     </depends>
                 </field>
                 <field id="live_store_code" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Live Store Code</label>
+                    <label>Live Store Code(Division)</label>
                     <depends>
                         <field id="environment">live</field>
                     </depends>
@@ -44,7 +44,7 @@
                     </depends>
                 </field>
                 <field id="sandbox_store_code" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Test Store Code</label>
+                    <label>Test Store Code(Division)</label>
                     <depends>
                         <field id="environment">test</field>
                     </depends>
@@ -59,6 +59,18 @@
                 <field id="key_validation" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label></label>
                     <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ValidateCredentials</frontend_model>
+                    <comment>Makes a list API call and see if it is returning HTTP 200</comment>
+                </field>
+                <field id="success_url" translate="label" type="text" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Success URL</label>
+                    <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\Disable</frontend_model>
+                </field>
+                <field id="cancel_url" translate="label" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Cancel URL</label>
+                    <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\Disable</frontend_model>
+                </field>
+                <field id="notification_url" translate="label" type="text" sortOrder="113" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Notification URL</label>
                 </field>
                 <field id="payment_action" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>

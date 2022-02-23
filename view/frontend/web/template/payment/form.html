@@ -18,7 +18,7 @@
             <!-- ko template: getTemplate() --><!-- /ko -->
             <!--/ko-->
         </div>
-
+        <!-- ko if: isHostedIntegration() -->
         <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
@@ -31,8 +31,9 @@
                 </button>
             </div>
         </div>
-
-        <!--<div class="actions-toolbar">
+        <!-- /ko -->
+        <!-- ko ifnot: isHostedIntegration() -->
+        <div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
                         type="submit"
@@ -43,6 +44,7 @@
                     <span data-bind="i18n: 'Place Order'"></span>
                 </button>
             </div>
-        </div>-->
+        </div>
+        <!-- /ko -->
     </div>
 </div>
