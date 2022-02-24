@@ -3,17 +3,19 @@
 define(
     [
         'jquery',
+        'ko',
         'Magento_Checkout/js/view/payment/default',
         'Magento_Customer/js/customer-data'
     ],
-    function ($, Component, customerData) {
+    function ($, ko, Component, customerData) {
         'use strict';
 
         return Component.extend({
             defaults: {
-                template: 'Payoneer_OpenPaymentGateway/payment/form-hosted',
+                template: 'Payoneer_OpenPaymentGateway/payment/form',
                 transactionResult: ''
             },
+            isVisible: ko.observable(false),
 
             initObservable: function () {
 
@@ -22,6 +24,15 @@ define(
                         'transactionResult'
                     ]);
                 return this;
+            },
+
+            afterPlaceOrder: function () {
+                alert('afterplaceorder');
+            },
+
+            initialize: function () {
+                $('.payoneer.message.error').hide();
+                this._super();
             },
 
             getCode: function() {
@@ -34,8 +45,21 @@ define(
                 };
             },
 
+            isActive: function() {
+                return window.checkoutConfig.payment.payoneer.config.active;
+            },
+
+            isHostedIntegration: function() {
+                return window.checkoutConfig.payment.payoneer.config.payment_flow == 'HOSTED';
+            },
+
+            getErrorMessage: function() {
+                return 'Something went wrong while processing payment2';
+            },
+
             processHostedPayment: function() {
-                var endpoint = '/payoneer/hosted/processpayment'
+                $('.payoneer.message.error').hide();
+                var endpoint = '/payoneer/hosted/processpayment';
                 $('body').trigger('processStart');
                 $.ajax({
                     //showLoader: true,
@@ -52,6 +76,8 @@ define(
                     }
                 }).fail(function (response) {
                     $('body').trigger('processStop');
+                    $('.payoneer.message.error').show();
+                    this.isVisible(true);
                     alert('Something went wrong while processing payment2');
                 });
             }

@@ -2,20 +2,16 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
-use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
+use Magento\Payment\Gateway\Request\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
-/**
- * Class PaymentDataBuilder
- * Builds payment data
- */
-class PaymentDataBuilder implements BuilderInterface
+class CaptureRequestDataBuilder implements BuilderInterface
 {
     /**
      * @var Config
      */
-    protected $config;
+    private $config;
 
     /**
      * @param Config $config
@@ -27,7 +23,10 @@ class PaymentDataBuilder implements BuilderInterface
     }
 
     /**
-     * @inheritdoc
+     * Builds ENV request
+     *
+     * @param array $buildSubject
+     * @return array
      */
     public function build(array $buildSubject)
     {
@@ -35,12 +34,12 @@ class PaymentDataBuilder implements BuilderInterface
         $order = $payment->getOrder();
 
         return [
-            Config::PAYMENT => [
-                Config::AMOUNT => $buildSubject[Config::AMOUNT],
-                Config::CURRENCY => $order->getCurrencyCode(),
-                Config::REFERENCE => $this->config->getValue('order_reference_message'),
-                Config::INVOICE_ID=> $order->getId()
-            ]
+            'TXN_TYPE' => 'S',
+            'TXN_ID' => $order->getOrderIncrementId(),
+            'MERCHANT_KEY' => $this->config->getValue(
+                'merchant_gateway_key',
+                $order->getStoreId()
+            )
         ];
     }
 }

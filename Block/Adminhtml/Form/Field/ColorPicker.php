@@ -5,8 +5,16 @@ namespace Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
+/**
+ * Class ColorPicker
+ * Creates ColorPicker element
+ */
 class ColorPicker extends Field
 {
+    /**
+     * @param AbstractElement $element
+     * @return string
+     */
     protected function _getElementHtml(AbstractElement $element)
     {
         $html = $element->getElementHtml();

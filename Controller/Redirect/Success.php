@@ -2,7 +2,6 @@
 
 namespace Payoneer\OpenPaymentGateway\Controller\Redirect;
 
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Request\Http as HttpRequest;
@@ -21,6 +20,7 @@ use Magento\Quote\Model\Quote;
 class Success implements HttpGetActionInterface
 {
     const INTERACTION_CODE_PROCEED = 'PROCEED';
+
     /**
      * @var Context
      */
@@ -45,25 +45,20 @@ class Success implements HttpGetActionInterface
      */
     protected $resultRedirectFactory;
 
-    protected $checkoutSession;
-
     /**
      * Success constructor.
      * @param Context $context
      * @param CartManagementInterface $cartManagement
      * @param CartRepositoryInterface $cartRepository
-     * @param CheckoutSession $checkoutSession
      */
     public function __construct(
         Context $context,
         CartManagementInterface $cartManagement,
-        CartRepositoryInterface $cartRepository,
-        CheckoutSession $checkoutSession
+        CartRepositoryInterface $cartRepository
     ) {
         $this->context = $context;
         $this->cartManagement = $cartManagement;
         $this->cartRepository = $cartRepository;
-        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -76,20 +71,29 @@ class Success implements HttpGetActionInterface
         $cartId = $this->context->getRequest()->getParam('cart_id');
         $listUrl = $this->context->getRequest()->getParam('listUrl', null);
         $interactionCode = $this->context->getRequest()->getParam('interactionCode', null);
+        $token = $this->context->getRequest()->getParam('token', null);
 
         try {
             if ($listUrl && $interactionCode == self::INTERACTION_CODE_PROCEED) {
 
                 /** @var Quote $quote */
                 $quote = $this->cartRepository->getActive($cartId);
+                $payment = $quote->getPayment();
+
+                if ($payment->getAdditionalInformation('token') != $token) {
+                    return $this->redirectToCart(__('Something went wrong while processing payment22.'));
+                } else {
+                    foreach ($this->context->getRequest()->getParams() as $key => $value) {
+                        $payment->setAdditionalInformation($key, $value);
+                    }
+                    $payment->save();
+                }
 
                 if (!$quote->getCustomerId()) {
                     $quote->setCheckoutMethod(CartManagementInterface::METHOD_GUEST);
                 }
 
                 $this->cartManagement->placeOrder($cartId);
-
-                //$this->checkoutSession->clearStorage();
 
                 return $this->context->getResultRedirectFactory()->create()->setPath('checkout/onepage/success');
             } else {
@@ -98,16 +102,6 @@ class Success implements HttpGetActionInterface
         } catch (\Exception $e) {
             return $this->redirectToCart($e->getMessage());
         }
-    }
-
-    /**
-     * Clears checkout session
-     */
-    public function clearCheckoutSession()
-    {
-        //$this->checkoutSession->clearQuote();
-        $this->checkoutSession->clearStorage();
-        //$this->checkoutSession->restoreQuote();
     }
 
     /**

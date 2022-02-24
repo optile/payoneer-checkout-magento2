@@ -12,7 +12,7 @@ use Magento\Payment\Gateway\Helper\SubjectReader;
  * Class CallBackBuilder
  * Builds 'Callback' array
  */
-class CallBackBuilder implements BuilderInterface
+class CallBackDataBuilder implements BuilderInterface
 {
     /**
      * @var UrlInterface

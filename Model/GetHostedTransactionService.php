@@ -3,6 +3,7 @@ namespace Payoneer\OpenPaymentGateway\Model;
 
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
@@ -33,22 +34,30 @@ class GetHostedTransactionService
     protected $config;
 
     /**
+     * @var ManagerInterface
+     */
+    protected $messageManager;
+
+    /**
      * GetHostedTransactionService constructor.
      * @param CommandPoolInterface $commandPool
      * @param PaymentDataObjectFactory $paymentDataObjectFactory
      * @param JsonFactory $resultJsonFactory
      * @param ConfigInterface $config
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
         CommandPoolInterface $commandPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
         JsonFactory $resultJsonFactory,
-        ConfigInterface $config
+        ConfigInterface $config,
+        ManagerInterface $messageManager
     ) {
         $this->commandPool = $commandPool;
         $this->paymentDataObjectFactory = $paymentDataObjectFactory;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->config = $config;
+        $this->messageManager = $messageManager;
     }
 
     /**
@@ -69,7 +78,11 @@ class GetHostedTransactionService
         }
 
         $jsonData = [];
+        $token = strtotime('now') . uniqid();
+
         $payment = $quote->getPayment();
+        $payment->setAdditionalInformation('token', $token);
+        $payment->save();
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
         try {
@@ -82,6 +95,8 @@ class GetHostedTransactionService
                 $jsonData = [
                     'redirectURL' => $result['response']['redirect']['url']
                 ];
+            } else {
+                $this->messageManager->addErrorMessage(__('Something went wrong while processing payment.'));
             }
 
             return $this->resultJsonFactory->create()->setData($jsonData);

@@ -7,6 +7,10 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\Store;
 
+/**
+ * Class ValidateCredentials
+ * Creates button for validating the credentials
+ */
 class ValidateCredentials extends Field
 {
     /**

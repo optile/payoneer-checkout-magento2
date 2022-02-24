@@ -6,6 +6,11 @@ use Magento\Framework\Phrase;
 use Magento\Payment\Block\ConfigurableInfo;
 use Payoneer\OpenPaymentGateway\Gateway\Response\FraudHandler;
 
+/**
+ * Class Info
+ *
+ * Info block for Payoneer payment gateway
+ */
 class Info extends ConfigurableInfo
 {
     /**
@@ -29,7 +34,7 @@ class Info extends ConfigurableInfo
     protected function getValueView($field, $value)
     {
         switch ($field) {
-            case FraudHandler::FRAUD_MSG_LIST:
+            case 'test'://FraudHandler::FRAUD_MSG_LIST: //todo
                 return implode('; ', $value);
         }
         return parent::getValueView($field, $value);

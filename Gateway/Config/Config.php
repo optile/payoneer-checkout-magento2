@@ -35,11 +35,15 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     const CALLBACK              = 'callback';
     const RETURN_URL            = 'returnUrl';
-    const RETURN_URL_PATH       = 'payoneer/redirect/success';
     const CANCEL_URL            = 'cancelUrl';
-    const CANCEL_URL_PATH       = 'payoneer/redirect/cancel';
     const NOTIFICATION_URL      = 'notificationUrl';
+    const RETURN_URL_PATH       = 'payoneer/redirect/success';
+    const CANCEL_URL_PATH       = 'payoneer/redirect/cancel';
     const NOTIFICATION_URL_PATH = 'payoneer/redirect/notification';
+
+    const PRESELECTION          = 'preselection';
+    const DEFERRAL              = 'deferral';
+
     const PAYMENT               = 'payment';
     const AMOUNT                = 'amount';
     const CURRENCY              = 'currency';
@@ -73,6 +77,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const TAX_AMOUNT            = 'taxAmount';
     const TAX_PERCENT           = 'taxRatePercentage';
     const INVOICE_ID            = 'invoiceId';
+    const STYLE                 = 'style';
+    const HOSTED_VERSION        = 'hostedVersion';
+    const TOKEN_ID              = 'token';
 
     /**
      * @var StoreManagerInterface

@@ -9,18 +9,15 @@ use Magento\Payment\Model\Method\Logger;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Api\Request;
 
+/**
+ * Class Client
+ * Payoneer client for transactions
+ */
 class Client implements ClientInterface
 {
-    const SUCCESS = 1;
-    const FAILURE = 0;
-
-    /**
-     * @var array
-     */
-    private $results = [
-        self::SUCCESS,
-        self::FAILURE
-    ];
+    const AUTHORIZE = 'authorize';
+    const LIST      = 'list';
+    const CAPTURE   = 'authorize_capture';
 
     /**
      * @var Logger
@@ -38,18 +35,26 @@ class Client implements ClientInterface
     protected $config;
 
     /**
+     * @var string
+     */
+    protected $operation;
+
+    /**
      * @param Logger $logger
      * @param Request $request
      * @param Config $config
+     * @param $operation
      */
     public function __construct(
         Logger $logger,
         Request $request,
-        Config $config
+        Config $config,
+        $operation
     ) {
         $this->logger = $logger;
         $this->request = $request;
         $this->config = $config;
+        $this->operation = $operation;
     }
 
     /**
@@ -60,25 +65,21 @@ class Client implements ClientInterface
     {
         $response = [];
 
-        $credentials['merchantCode'] = $this->config->getValue('merchant_gateway_key');
-        $credentials['apiKey'] = $this->config->getCredentials('api_key');
-        $credentials['hostName'] = $this->config->getCredentials('host_name');
-
-        $data = $transferObject->getBody();
-        if ((bool)$this->config->getValue('debug') == true) {
-            $this->logger->debug(['request' => $data]);
+        switch ($this->operation) {
+            case self::LIST:
+                $responseObj = $this->processListRequest($transferObject);
+                break;
+            case self::AUTHORIZE:
+            case self::CAPTURE:
+                $responseObj = $this->processAuthRequest($transferObject);
+                break;
+            default:
+                throw new \InvalidArgumentException(sprintf('Unknown operation [%s]', $this->operation));
         }
 
-        $responseObj = $this->request->send(
-            $transferObject->getMethod(),
-            Config::END_POINT,
-            $credentials,
-            $data
-        );
-
-        $response['response'] = $responseObj->getData('response');
-        $response['status'] = $responseObj->getData('status');
-        $response['reason'] = $responseObj->getData('reason');
+        $response['response'] = $responseObj->getData('response') ?: '';
+        $response['status'] = $responseObj->getData('status') ?: '';
+        $response['reason'] = $responseObj->getData('reason') ?: '';
 
         if ((bool)$this->config->getValue('debug') == true) {
             $this->logger->debug(['response' => $response]);
@@ -88,62 +89,51 @@ class Client implements ClientInterface
     }
 
     /**
-     * Generates response
-     *
-     * @return array
+     * @param TransferInterface $transferObject
+     * @return array|DataObject
      */
-    protected function generateResponseForCode($resultCode)
+    public function processListRequest($transferObject)
     {
-        return array_merge(
-            [
-                'RESULT_CODE' => $resultCode,
-                'TXN_ID' => $this->generateTxnId()
-            ],
-            $this->getFieldsBasedOnResponseType($resultCode)
+        $credentials['merchantCode'] = $this->config->getValue('merchant_gateway_key');
+        $credentials['apiKey'] = $this->config->getCredentials('api_key');
+        $credentials['hostName'] = $this->config->getCredentials('host_name');
+
+        $data = $transferObject->getBody();
+
+        if ((bool)$this->config->getValue('debug') == true) {
+            $this->logger->debug(['request' => $data]);
+        }
+
+        return $this->request->send(
+            $transferObject->getMethod(),
+            Config::END_POINT,
+            $credentials,
+            $data
         );
     }
 
+
     /**
-     * @return string
+     * @param TransferInterface $transferObject
+     * @return DataObject
      */
-    protected function generateTxnId()
+    protected function processAuthRequest($transferObject)
     {
-        return md5(mt_rand(0, 1000));
+        $responseObject = new \Magento\Framework\DataObject();
+        $responseObject->setData('response', $this->getResultCode($transferObject));
+        return $responseObject;
     }
 
     /**
-     * Returns result code
-     *
      * @param TransferInterface $transfer
-     * @return int
+     * @return array|mixed
      */
     private function getResultCode(TransferInterface $transfer)
     {
         $headers = $transfer->getHeaders();
 
-        if (isset($headers['force_result'])) {
-            return (int)$headers['force_result'];
-        }
-
-        return $this->results[mt_rand(0, 1)];
-    }
-
-    /**
-     * Returns response fields for result code
-     *
-     * @param int $resultCode
-     * @return array
-     */
-    private function getFieldsBasedOnResponseType($resultCode)
-    {
-        switch ($resultCode) {
-            case self::FAILURE:
-                return [
-                    'FRAUD_MSG_LIST' => [
-                        'Stolen card',
-                        'Customer location differs'
-                    ]
-                ];
+        if (isset($headers['TXN_ID'])) {
+            return ['TXN_ID' => $headers['TXN_ID']];
         }
 
         return [];

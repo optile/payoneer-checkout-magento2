@@ -4,11 +4,10 @@ namespace Payoneer\OpenPaymentGateway\Gateway\Validator;
 
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
-use Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client;
 
 class ResponseCodeValidator extends AbstractValidator
 {
-    const RESULT_CODE = 'RESULT_CODE';
+    const RESULT_CODE = 'status';
 
     /**
      * Performs validation of result code
@@ -44,6 +43,6 @@ class ResponseCodeValidator extends AbstractValidator
     private function isSuccessfulTransaction(array $response)
     {
         return isset($response[self::RESULT_CODE])
-        && $response[self::RESULT_CODE] !== Client::FAILURE;
+        && $response[self::RESULT_CODE] !== '404';
     }
 }
