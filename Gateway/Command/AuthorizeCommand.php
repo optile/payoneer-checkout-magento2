@@ -12,18 +12,50 @@ use Magento\Payment\Gateway\Validator\ValidatorInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class HostedListCommand
- * Class for Payoneer hosted payment command
+ * Class AuthorizeCommand
+ * Class for Payoneer hosted payment authorize operation
  */
 class AuthorizeCommand extends GatewayCommand
 {
-    protected $requestBuilder; // @codingStandardsIgnoreLine
-    protected $transferFactory; // @codingStandardsIgnoreLine
-    protected $client; // @codingStandardsIgnoreLine
-    protected $logger; // @codingStandardsIgnoreLine
-    protected $handler; // @codingStandardsIgnoreLine
-    protected $validator; // @codingStandardsIgnoreLine
+    /**
+     * @var BuilderInterface
+     */
+    protected $requestBuilder;
 
+    /**
+     * @var TransferFactoryInterface
+     */
+    protected $transferFactory;
+
+    /**
+     * @var ClientInterface
+     */
+    protected $client;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var HandlerInterface|null
+     */
+    protected $handler;
+
+    /**
+     * @var ValidatorInterface|null
+     */
+    protected $validator;
+
+    /**
+     * AuthorizeCommand constructor.
+     * @param BuilderInterface $requestBuilder
+     * @param TransferFactoryInterface $transferFactory
+     * @param ClientInterface $client
+     * @param LoggerInterface $logger
+     * @param HandlerInterface|null $handler
+     * @param ValidatorInterface|null $validator
+     */
     public function __construct(
         BuilderInterface $requestBuilder,
         TransferFactoryInterface $transferFactory,
@@ -32,7 +64,6 @@ class AuthorizeCommand extends GatewayCommand
         HandlerInterface $handler = null,
         ValidatorInterface $validator = null
     ) {
-
         parent::__construct($requestBuilder, $transferFactory, $client, $logger, $handler, $validator);
         $this->requestBuilder = $requestBuilder;
         $this->transferFactory = $transferFactory;

@@ -10,7 +10,7 @@ use GuzzleHttp\Psr7\ResponseFactory;
 use Magento\Framework\Webapi\Rest\Request;
 
 /**
- * Class Client to manage API client communication
+ * Class PayoneerClient to manage API client communication
  */
 class PayoneerClient
 {
@@ -31,7 +31,7 @@ class PayoneerClient
     protected $handlers = [];
 
     /**
-     * Client constructor.
+     * PayoneerClient constructor.
      * @param ClientFactory $clientFactory
      * @param ResponseFactory $responseFactory
      */

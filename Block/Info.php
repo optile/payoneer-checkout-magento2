@@ -22,12 +22,4 @@ class Info extends ConfigurableInfo
     {
         return __($field);
     }
-    /*protected function getValueView($field, $value)
-    {
-        switch ($field) {
-            case 'FRAUD_MSG_LIST'://FraudHandler::FRAUD_MSG_LIST: //todo
-                return implode('; ', $value);
-        }
-        return parent::getValueView($field, $value);
-    }*/
 }
