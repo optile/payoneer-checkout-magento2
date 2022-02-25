@@ -46,10 +46,8 @@
             </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: (isVisible()) -->
-        <div class="payoneer message error">
+        <div data-bind="visible: shouldShowMessage" class="message error">
             <span data-bind="text: getErrorMessage()"></span>
         </div>
-        <!-- /ko -->
     </div>
 </div>

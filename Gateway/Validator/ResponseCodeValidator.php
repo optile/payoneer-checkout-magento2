@@ -2,6 +2,7 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Validator;
 
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
 
@@ -17,11 +18,8 @@ class ResponseCodeValidator extends AbstractValidator
      */
     public function validate(array $validationSubject)
     {
-        if (!isset($validationSubject['response']) || !is_array($validationSubject['response'])) {
-            throw new \InvalidArgumentException('Response does not exist');
-        }
-
-        $response = $validationSubject['response'];
+        $response = SubjectReader::readResponse($validationSubject);
+        $paymentDO = SubjectReader::readPayment($validationSubject);
 
         if ($this->isSuccessfulTransaction($response)) {
             return $this->createResult(

@@ -2,11 +2,12 @@
 
 namespace Payoneer\OpenPaymentGateway\Controller\Redirect;
 
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Message\ManagerInterface;
+use Payoneer\OpenPaymentGateway\Model\Helper;
 
 /**
  * Class Cancel
@@ -14,38 +15,34 @@ use Magento\Framework\Message\ManagerInterface;
  */
 class Cancel implements HttpGetActionInterface
 {
-    /**
-     * @var RedirectFactory
-     */
-    protected $resultRedirectFactory;
 
     /**
-     * @var ManagerInterface
+     * @var Context
      */
-    protected $messageManager;
+    protected $context;
+
+    /**
+     * @var Helper
+     */
+    protected $helper;
 
     /**
      * Cancel constructor.
-     * @param ManagerInterface $messageManager
-     * @param RedirectFactory $resultRedirectFactory
+     * @param Helper $helper
      */
     public function __construct(
-        ManagerInterface $messageManager,
-        RedirectFactory $resultRedirectFactory
+        Context $context,
+        Helper $helper
     ) {
-        $this->messageManager = $messageManager;
-        $this->resultRedirectFactory = $resultRedirectFactory;
+        $this->context = $context;
+        $this->helper = $helper;
     }
 
     /**
-     * Dispatch request
-     *
-     * @return ResultInterface|ResponseInterface
+     * @return ResponseInterface|Redirect|ResultInterface
      */
     public function execute()
     {
-        $this->messageManager->addErrorMessage(__('Something went wrong while processing payment.'));
-        return $this->resultRedirectFactory->create()
-            ->setPath('checkout/cart');
+        return $this->helper->redirectToCart(__('Something went wrong while processing request CANCEL'));
     }
 }

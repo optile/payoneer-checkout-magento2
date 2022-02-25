@@ -4,11 +4,11 @@ namespace Payoneer\OpenPaymentGateway\Controller\Redirect;
 
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
-use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Redirect;
-use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\View\Result\Page;
+use Magento\Framework\View\Result\PageFactory;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -36,35 +36,32 @@ class Success implements HttpGetActionInterface
     private $cartRepository;
 
     /**
-     * @var HttpRequest
+     * @var PageFactory
      */
-    protected $request;
-
-    /**
-     * @var RedirectFactory
-     */
-    protected $resultRedirectFactory;
+    protected $resultPageFactory;
 
     /**
      * Success constructor.
      * @param Context $context
      * @param CartManagementInterface $cartManagement
      * @param CartRepositoryInterface $cartRepository
+     * @param PageFactory $resultPageFactory
      */
     public function __construct(
         Context $context,
         CartManagementInterface $cartManagement,
-        CartRepositoryInterface $cartRepository
+        CartRepositoryInterface $cartRepository,
+        PageFactory $resultPageFactory
     ) {
         $this->context = $context;
         $this->cartManagement = $cartManagement;
         $this->cartRepository = $cartRepository;
+        $this->resultPageFactory = $resultPageFactory;
     }
 
     /**
      * Dispatch request
-     *
-     * @return ResultInterface|ResponseInterface
+     * @return ResponseInterface|Redirect|ResultInterface|Page
      */
     public function execute()
     {
@@ -94,8 +91,7 @@ class Success implements HttpGetActionInterface
                 }
 
                 $this->cartManagement->placeOrder($cartId);
-
-                return $this->context->getResultRedirectFactory()->create()->setPath('checkout/onepage/success');
+                return $this->resultPageFactory->create();
             } else {
                 return $this->redirectToCart(__('Something went wrong while processing payment.'));
             }

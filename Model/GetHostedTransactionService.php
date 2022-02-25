@@ -1,6 +1,7 @@
 <?php
 namespace Payoneer\OpenPaymentGateway\Model;
 
+use Exception;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Message\ManagerInterface;
@@ -9,6 +10,11 @@ use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Quote\Model\Quote;
 
+/**
+ * Class GetHostedTransactionService
+ *
+ * Process List Api Request
+ */
 class GetHostedTransactionService
 {
     const COMMAND_GET_LIST = 'hosted';
@@ -65,7 +71,7 @@ class GetHostedTransactionService
      *
      * @param Quote $quote
      * @return Json | array <mixed>
-     * @throws \Exception
+     * @throws Exception
      */
     public function process(Quote $quote)
     {
@@ -100,7 +106,7 @@ class GetHostedTransactionService
             }
 
             return $this->resultJsonFactory->create()->setData($jsonData);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->resultJsonFactory->create()->setHttpResponseCode(400)->setData([
                 'error' => $e->getMessage()
             ]);

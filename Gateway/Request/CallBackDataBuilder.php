@@ -38,6 +38,7 @@ class CallBackDataBuilder implements BuilderInterface
     }
 
     /**
+     * Builds callback array
      * @param array $buildSubject
      * @return array
      */

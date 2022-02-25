@@ -21,6 +21,5 @@ class Disable extends Field
     {
         $element->setDisabled('disabled');
         return $element->getElementHtml();
-
     }
 }

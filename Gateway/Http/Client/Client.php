@@ -112,7 +112,6 @@ class Client implements ClientInterface
         );
     }
 
-
     /**
      * @param TransferInterface $transferObject
      * @return DataObject

@@ -30,7 +30,7 @@ class BaseRequestDataBuilder implements BuilderInterface
         $payment = SubjectReader::readPayment($buildSubject);
         return [
             Config::TRANSACTION_ID => $payment->getPayment()->getAdditionalInformation('transaction_id') ?:
-                $payment->getOrder()->getId(),
+                $payment->getOrder()->getOrderIncrementId(),
             Config::COUNTRY => $payment->getOrder()->getBillingAddress()->getCountryId(),
             Config::INTEGRATION=> $this->config->getValue('payment_flow'),
             Config::DIVISION => $this->config->getValue('environment') == Fields::ENVIRONMENT_SANDBOX ?

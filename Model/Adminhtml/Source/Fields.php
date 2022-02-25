@@ -3,7 +3,6 @@
 namespace Payoneer\OpenPaymentGateway\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
-use Magento\Payment\Model\MethodInterface;
 
 /**
  * Class Environment - Lists the environment options
@@ -78,11 +77,11 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => __(MethodInterface::ACTION_AUTHORIZE),
+                'value' => __('authorize'),
                 'label' => __('Deferred')
             ],
             [
-                'value' => __(MethodInterface::ACTION_AUTHORIZE_CAPTURE),
+                'value' => __('authorize_capture'),
                 'label' => __('Direct payment')
             ]
         ];

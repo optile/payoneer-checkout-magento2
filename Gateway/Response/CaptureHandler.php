@@ -7,12 +7,10 @@ use Magento\Payment\Gateway\Response\HandlerInterface;
 class CaptureHandler implements HandlerInterface
 {
     /**
-    * Handles transaction id
-    *
-    * @param array $handlingSubject
-    * @param array $response
-    * @return void
-    */
+     * Handles transaction id
+     * @param array $handlingSubject
+     * @param array $response
+     */
     public function handle(array $handlingSubject, array $response)
     {
         $paymentDO = SubjectReader::readPayment($handlingSubject);

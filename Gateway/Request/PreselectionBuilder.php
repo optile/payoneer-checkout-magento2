@@ -19,8 +19,8 @@ class PreselectionBuilder implements BuilderInterface
     const NON_DEFERRED = 'NON_DEFERRED';
 
     /**
-    * @var Config
-    */
+     * @var Config
+     */
     protected $config;
 
     /**
