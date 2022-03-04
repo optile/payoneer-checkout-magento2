@@ -78,7 +78,7 @@ class Success implements HttpGetActionInterface
                 $payment = $quote->getPayment();
 
                 if ($payment->getAdditionalInformation('token') != $token) {
-                    return $this->redirectToCart(__('Something went wrong while processing payment22.'));
+                    return $this->redirectToCart(__('Something went wrong while processing payment.'));
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
                         $payment->setAdditionalInformation($key, $value);

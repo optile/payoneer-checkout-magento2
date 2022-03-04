@@ -63,6 +63,10 @@ define(
                 return 'Something went wrong while processing payment';
             },
 
+            getWidgetCssUrl: function() {
+                return window.checkoutConfig.payment.payoneer.config.widgetCssUrl;
+            },
+
             deferUntilJqueryAvailable: function(fn) {
                 if (window.jQuery) {
                     // If jquery is available, then run the function
@@ -107,7 +111,8 @@ define(
                                 payButtonContainer: 'submitBtnContainer',
                                 listUrl: response.links.self,
                                 smartSwitch: true,
-                                fullPageLoading: false
+                                fullPageLoading: false,
+                                widgetCssUrl: self.getWidgetCssUrl()
                             }
 
                             // Run this function when window.jQuery is available.
