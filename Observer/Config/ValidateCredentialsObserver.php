@@ -7,7 +7,6 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config as PayoneerConfig;
 use Payoneer\OpenPaymentGateway\Model\Api\Request;
 
@@ -58,7 +57,6 @@ class ValidateCredentialsObserver implements ObserverInterface
      * @return void
      * @throws AlreadyExistsException
      * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
     public function execute(Observer $observer)
     {
@@ -66,42 +64,27 @@ class ValidateCredentialsObserver implements ObserverInterface
     }
 
     /**
+     * Validates Api call
      * @param Observer $observer
      * @throws AlreadyExistsException
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
+     * @return void
      */
     public function validateApi(Observer $observer)
     {
-        if (!$this->payoneerConfig->getValue('payoneer_active')) {
+        if (!$this->payoneerConfig->getValue('active')) {
             return;
         }
 
         $credentials = [];
-
-        $sharedFields = [
-            'environment',
-            'merchant_gateway_key'
-        ];
-
-        $sandboxFields = [
-            'sandbox_api_key',
-            'sandbox_host_name',
-            'sandbox_store_code'
-        ];
-
-        $liveFields = [
-            'live_api_key',
-            'live_host_name',
-            'live_store_code'
-        ];
+        $sharedFields = ['environment', 'merchant_gateway_key'];
+        $sandboxFields = ['sandbox_api_key', 'sandbox_host_name', 'sandbox_store_code'];
+        $liveFields = ['live_api_key', 'live_host_name', 'live_store_code'];
 
         $groups = $this->context->getRequest()->getPost('groups');
         $payoneerGroup = $groups['payoneer'];
 
         $this->prepareConfigValues($sharedFields, $payoneerGroup);
 
-        $merchantCode = $this->configFieldValues['merchant_gateway_key'];
         if ($this->configFieldValues['environment'] == 'test') {
             $this->prepareConfigValues($sandboxFields, $payoneerGroup);
             $apiKey = $this->configFieldValues['sandbox_api_key'];
@@ -114,7 +97,7 @@ class ValidateCredentialsObserver implements ObserverInterface
             $storeCode = $this->configFieldValues['live_store_code'];
         }
 
-        $credentials['merchantCode'] = $merchantCode;
+        $credentials['merchantCode'] = $this->configFieldValues['merchant_gateway_key'];
         $credentials['apiKey'] = $apiKey;
         $credentials['hostName'] = $hostName;
 
@@ -129,6 +112,7 @@ class ValidateCredentialsObserver implements ObserverInterface
             $credentials,
             $data
         );
+
         if ($response->getData('status') !== 200) {
             throw new AlreadyExistsException(__(
                 'Payoneer validation failed. Please make sure the credentials you\'ve entered are correct'
@@ -139,8 +123,6 @@ class ValidateCredentialsObserver implements ObserverInterface
     /**
      * @param array <mixed> $fields
      * @param array <mixed> $group
-     * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
     public function prepareConfigValues($fields, $group)
     {

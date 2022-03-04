@@ -58,19 +58,16 @@ class ValidateCredentials extends Action
     {
         $endPoint = Config::END_POINT;
         $data = $this->config->getMockData();
-        $apiKey = $this->getRequest()->getParam('apiKey');
-        $merchantCode = $this->getRequest()->getParam('merchantCode');
         $storeCode = $this->getRequest()->getParam('storeCode');
-        $hostName = $this->getRequest()->getParam('hostName');
         $storeId = $this->getRequest()->getParam('storeId', 0);
         $environment = $this->getRequest()->getParam('environment');
 
-        $credentials['merchantCode'] = $merchantCode;
-        $credentials['apiKey'] = $apiKey;
-        $credentials['hostName'] = $hostName;
+        $credentials['merchantCode'] = $this->getRequest()->getParam('merchantCode');
+        $credentials['apiKey'] = $this->getRequest()->getParam('apiKey');
+        $credentials['hostName'] = $this->getRequest()->getParam('hostName');
 
         if ($storeCode) {
-            $data["division"] = $storeCode;
+            $data['division'] = $storeCode;
         }
 
         $this->setFieldValues($environment, $storeId);
@@ -99,7 +96,7 @@ class ValidateCredentials extends Action
      */
     public function setFieldValues($environment, $storeId)
     {
-        if ($environment === AdminFields::ENVIRONMENT_SANDBOX) {
+        if ($environment === AdminFields::ENVIRONMENT_SANDBOX_VALUE) {
             $this->fields['apiKey'] = $this->config->getValue('sandbox_api_key', $storeId);
             $this->fields['storeCode'] = $this->config->getValue('sandbox_store_code', $storeId);
             $this->fields['hostName'] = $this->config->getValue('sandbox_host_name', $storeId);

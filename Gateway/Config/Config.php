@@ -19,6 +19,19 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const DEFAULT_PATH_PATTERN = 'payment/%s/%s';
 
     /**
+     * Style configuration path constants
+     */
+    const XML_PATH_BACKGROUND_COLOR     =   'payment/payoneer/widget_appearance/background_color';
+    const XML_PATH_BACKGROUND_TEXT      =   'payment/payoneer/widget_appearance/background_text';
+    const XML_PATH_PLACEHOLDERS_COLOR   =   'payment/payoneer/widget_appearance/placeholders_color';
+    const XML_PATH_FONT_SIZE            =   'payment/payoneer/widget_appearance/font_size';
+    const XML_PATH_FONT_WEIGHT          =   'payment/payoneer/widget_appearance/font_weight';
+    const XML_PATH_LETTER_SPACING       =   'payment/payoneer/widget_appearance/letter_spacing';
+    const XML_PATH_LINE_HEIGHT          =   'payment/payoneer/widget_appearance/line_height';
+    const XML_PATH_PADDING              =   'payment/payoneer/widget_appearance/padding';
+    const XML_PATH_ALIGN_TEXT           =   'payment/payoneer/widget_appearance/align_text';
+
+    /**
      * API method types
      */
     const METHOD_GET    = 'GET';
@@ -32,54 +45,57 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /**
      * API Request constants
      */
+    const CALLBACK              =   'callback';
+    const RETURN_URL            =   'returnUrl';
+    const CANCEL_URL            =   'cancelUrl';
+    const NOTIFICATION_URL      =   'notificationUrl';
+    const RETURN_URL_PATH       =   'payoneer/redirect/success';
+    const CANCEL_URL_PATH       =   'payoneer/redirect/cancel';
+    const NOTIFICATION_URL_PATH =   'payoneer/redirect/notification';
+    const EMBEDDED_STYLE_PATH   =   'payoneer/embedded/style';
 
-    const CALLBACK              = 'callback';
-    const RETURN_URL            = 'returnUrl';
-    const CANCEL_URL            = 'cancelUrl';
-    const NOTIFICATION_URL      = 'notificationUrl';
-    const RETURN_URL_PATH       = 'payoneer/redirect/success';
-    const CANCEL_URL_PATH       = 'payoneer/redirect/cancel';
-    const NOTIFICATION_URL_PATH = 'payoneer/redirect/notification';
+    const PRESELECTION          =   'preselection';
+    const DEFERRAL              =   'deferral';
 
-    const PRESELECTION          = 'preselection';
-    const DEFERRAL              = 'deferral';
-
-    const PAYMENT               = 'payment';
-    const AMOUNT                = 'amount';
-    const CURRENCY              = 'currency';
-    const REFERENCE             = 'reference';
-    const CUSTOMER              = 'customer';
-    const NUMBER                = 'number';
-    const EMAIL                 = 'email';
-    const COMPANY               = 'company';
-    const NAME                  = 'name';
-    const TITLE                 = 'title';
-    const FIRST_NAME            = 'firstName';
-    const MIDDLE_NAME           = 'middleName';
-    const LAST_NAME             = 'lastName';
-    const SHIPPING              = 'shipping';
-    const BILLING               = 'billing';
-    const ADDRESSES             = 'addresses';
-    const STREET                = 'street';
-    const HOUSE_NUMBER          = 'houseNumber';
-    const ZIP                   = 'zip';
-    const CITY                  = 'city';
-    const STATE                 = 'state';
-    const COUNTRY               = 'country';
-    const TRANSACTION_ID        = 'transactionId';
-    const INTEGRATION           = 'integration';
-    const DIVISION              = 'division';
-    const PRODUCTS              = 'products';
-    const SKU                   = 'code';
-    const QUANTITY              = 'quantity';
-    const TYPE                  = 'type';
-    const NET_AMOUNT            = 'netAmount';
-    const TAX_AMOUNT            = 'taxAmount';
-    const TAX_PERCENT           = 'taxRatePercentage';
-    const INVOICE_ID            = 'invoiceId';
-    const STYLE                 = 'style';
-    const HOSTED_VERSION        = 'hostedVersion';
-    const TOKEN_ID              = 'token';
+    const PAYMENT               =   'payment';
+    const AMOUNT                =   'amount';
+    const CURRENCY              =   'currency';
+    const REFERENCE             =   'reference';
+    const CUSTOMER              =   'customer';
+    const NUMBER                =   'number';
+    const EMAIL                 =   'email';
+    const COMPANY               =   'company';
+    const NAME                  =   'name';
+    const TITLE                 =   'title';
+    const FIRST_NAME            =   'firstName';
+    const MIDDLE_NAME           =   'middleName';
+    const LAST_NAME             =   'lastName';
+    const SHIPPING              =   'shipping';
+    const BILLING               =   'billing';
+    const ADDRESSES             =   'addresses';
+    const STREET                =   'street';
+    const HOUSE_NUMBER          =   'houseNumber';
+    const ZIP                   =   'zip';
+    const CITY                  =   'city';
+    const STATE                 =   'state';
+    const COUNTRY               =   'country';
+    const TRANSACTION_ID        =   'transactionId';
+    const INTEGRATION           =   'integration';
+    const DIVISION              =   'division';
+    const PRODUCTS              =   'products';
+    const SKU                   =   'code';
+    const QUANTITY              =   'quantity';
+    const TYPE                  =   'type';
+    const NET_AMOUNT            =   'netAmount';
+    const TAX_AMOUNT            =   'taxAmount';
+    const TAX_PERCENT           =   'taxRatePercentage';
+    const INVOICE_ID            =   'invoiceId';
+    const STYLE                 =   'style';
+    const RESOLUTION_1X         =   '1x';
+    const HOSTED_VERSION        =   'hostedVersion';
+    const VERSION_V4            =   'v4';
+    const TOKEN_ID              =   'token';
+    const TXN_ID                =   'TXN_ID';
 
     /**
      * @var StoreManagerInterface
@@ -207,24 +223,51 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * Get environment credentials
      *
      * @param string $key
-     * @return mixed|string
+     * @return mixed|string|null
      */
     public function getCredentials($key)
     {
         $environment = $this->getValue('environment');
         switch ($key) {
             case 'api_key':
-                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX) ?
+                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX_VALUE) ?
                     $this->getValue('sandbox_api_key') :
                     $this->getValue('live_api_key');
             case 'store_code':
-                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX) ?
+                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX_VALUE) ?
                     $this->getValue('sandbox_store_code') :
                     $this->getValue('live_store_code');
             case 'host_name':
-                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX) ?
+                return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX_VALUE) ?
                     $this->getValue('sandbox_host_name') :
                     $this->getValue('live_host_name');
         }
+        return null;
+    }
+
+    /**
+     * Check if hosted integration
+     * @return bool
+     */
+    public function isHostedIntegration()
+    {
+        return $this->getValue('payment_flow') == AdminFields::HOSTED;
+    }
+
+    /**
+     * Get style configuration values
+     * @return array <mixed>
+     */
+    public function getStyleConfig()
+    {
+        $styleConfigValues = [];
+        $styleConfigValues['background-color'] = $this->scopeConfig->getValue(self::XML_PATH_BACKGROUND_COLOR);
+        $styleConfigValues['font-size'] = $this->scopeConfig->getValue(self::XML_PATH_FONT_SIZE);
+        $styleConfigValues['font-weight'] = $this->scopeConfig->getValue(self::XML_PATH_FONT_WEIGHT);
+        $styleConfigValues['letter-spacing'] = $this->scopeConfig->getValue(self::XML_PATH_LETTER_SPACING);
+        $styleConfigValues['line-height'] = $this->scopeConfig->getValue(self::XML_PATH_LINE_HEIGHT);
+        $styleConfigValues['padding'] = $this->scopeConfig->getValue(self::XML_PATH_PADDING);
+        $styleConfigValues['text-align'] = $this->scopeConfig->getValue(self::XML_PATH_ALIGN_TEXT);
+        return $styleConfigValues;
     }
 }

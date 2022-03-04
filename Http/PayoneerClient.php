@@ -44,6 +44,29 @@ class PayoneerClient
     }
 
     /**
+     * @param string $method
+     * @param $hostname
+     * @param $endpoint
+     * @param array<mixed> $options
+     * @return mixed
+     */
+    public function send(
+        $method,
+        $hostname,
+        $endpoint,
+        array $options = []
+    ) {
+        $response = $this->doRequest($hostname, $endpoint, $options, $method);
+        $responseBody = $response->getBody();
+        $responseBody->rewind();
+        $responseObject = new \Magento\Framework\DataObject();
+        $responseObject->setData('status', $response->getStatusCode());
+        $responseObject->setData('reason', $response->getReasonPhrase());
+        $responseObject->setData('response', json_decode($responseBody->getContents(), true));
+        return $responseObject;
+    }
+
+    /**
      * Do API request with provided params
      *
      * @param $hostname
@@ -79,28 +102,5 @@ class PayoneerClient
             ]);
         }
         return $response;
-    }
-
-    /**
-     * @param string $method
-     * @param $hostname
-     * @param $endpoint
-     * @param array<mixed> $options
-     * @return mixed
-     */
-    public function send(
-        $method,
-        $hostname,
-        $endpoint,
-        array $options = []
-    ) {
-        $response = $this->doRequest($hostname, $endpoint, $options, $method);
-        $responseBody = $response->getBody();
-        $responseBody->rewind();
-        $responseObject = new \Magento\Framework\DataObject();
-        $responseObject->setData('status', $response->getStatusCode());
-        $responseObject->setData('reason', $response->getReasonPhrase());
-        $responseObject->setData('response', json_decode($responseBody->getContents(), true));
-        return $responseObject;
     }
 }

@@ -89,7 +89,6 @@ class Success implements HttpGetActionInterface
                 if (!$quote->getCustomerId()) {
                     $quote->setCheckoutMethod(CartManagementInterface::METHOD_GUEST);
                 }
-
                 $this->cartManagement->placeOrder($cartId);
                 return $this->resultPageFactory->create();
             } else {

@@ -2,6 +2,7 @@
 namespace Payoneer\OpenPaymentGateway\Model;
 
 use Exception;
+use Magento\Framework\App\RequestInterface as Request;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Message\ManagerInterface;
@@ -11,14 +12,13 @@ use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Quote\Model\Quote;
 
 /**
- * Class GetHostedTransactionService
+ * Class GetPayoneerTransactionService
  *
  * Process List Api Request
  */
-class GetHostedTransactionService
+class TransactionService
 {
-    const COMMAND_GET_LIST = 'hosted';
-
+    const HOSTED = 'hosted';
     /**
      * @var CommandPoolInterface
      */
@@ -45,25 +45,33 @@ class GetHostedTransactionService
     protected $messageManager;
 
     /**
-     * GetHostedTransactionService constructor.
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * GetPayoneerTransactionService constructor.
      * @param CommandPoolInterface $commandPool
      * @param PaymentDataObjectFactory $paymentDataObjectFactory
      * @param JsonFactory $resultJsonFactory
      * @param ConfigInterface $config
      * @param ManagerInterface $messageManager
+     * @param Request $request
      */
     public function __construct(
         CommandPoolInterface $commandPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
         JsonFactory $resultJsonFactory,
         ConfigInterface $config,
-        ManagerInterface $messageManager
+        ManagerInterface $messageManager,
+        Request $request
     ) {
         $this->commandPool = $commandPool;
         $this->paymentDataObjectFactory = $paymentDataObjectFactory;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->config = $config;
         $this->messageManager = $messageManager;
+        $this->request = $request;
     }
 
     /**
@@ -83,7 +91,6 @@ class GetHostedTransactionService
             $quote->reserveOrderId()->save();
         }
 
-        $jsonData = [];
         $token = strtotime('now') . uniqid();
 
         $payment = $quote->getPayment();
@@ -92,17 +99,19 @@ class GetHostedTransactionService
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
         try {
-            $result = $this->commandPool->get(self::COMMAND_GET_LIST)->execute([
+            $params = $this->request->getParams();
+            $integration = $params['integration'];
+
+            $isHostedIntegration = $integration == self::HOSTED;
+            $result = $this->commandPool->get($integration)->execute([
                 'payment' => $paymentDataObject,
                 'amount' => $quote->getGrandTotal()
             ]);
 
-            if (isset($result['response']['redirect'])) {
-                $jsonData = [
-                    'redirectURL' => $result['response']['redirect']['url']
-                ];
+            if ($isHostedIntegration) {
+                $jsonData = $this->processHostedResponse($result);
             } else {
-                $this->messageManager->addErrorMessage(__('Something went wrong while processing payment.'));
+                $jsonData = $this->processEmbeddedResponse($result);
             }
 
             return $this->resultJsonFactory->create()->setData($jsonData);
@@ -111,5 +120,41 @@ class GetHostedTransactionService
                 'error' => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Process response of hosted integration
+     * @param array <mixed> $result
+     * @return array <mixed>
+     */
+    public function processHostedResponse($result)
+    {
+        $jsonData = [];
+        if (isset($result['response']['redirect'])) {
+            $jsonData = [
+                'redirectURL' => $result['response']['redirect']['url']
+            ];
+        } else {
+            $this->messageManager->addErrorMessage(__('Something went wrong while processing payment.'));
+        }
+        return $jsonData;
+    }
+
+    /**
+     * Process response of embedded integration
+     * @param array <mixed> $result
+     * @return array <mixed>
+     */
+    public function processEmbeddedResponse($result)
+    {
+        $jsonData = [];
+        if (isset($result['response']['links'])) {
+            $jsonData = [
+                'links' => $result['response']['links']
+            ];
+        } else {
+            $this->messageManager->addErrorMessage(__('Something went wrong while processing payment.'));
+        }
+        return $jsonData;
     }
 }

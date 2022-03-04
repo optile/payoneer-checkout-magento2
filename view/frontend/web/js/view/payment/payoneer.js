@@ -13,7 +13,7 @@ define(
         rendererList.push(
             {
                 type: 'payoneer',
-                component: 'Payoneer_OpenPaymentGateway/js/view/payment/method-renderer/payoneer-hosted'
+                component: 'Payoneer_OpenPaymentGateway/js/view/payment/method-renderer/payoneer'
             }
         );
         /** Add view logic here if needed */

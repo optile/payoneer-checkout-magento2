@@ -80,7 +80,6 @@ class Client implements ClientInterface
         $response['response'] = $responseObj->getData('response') ?: '';
         $response['status'] = $responseObj->getData('status') ?: '';
         $response['reason'] = $responseObj->getData('reason') ?: '';
-
         if ((bool)$this->config->getValue('debug') == true) {
             $this->logger->debug(['response' => $response]);
         }
@@ -131,8 +130,8 @@ class Client implements ClientInterface
     {
         $headers = $transfer->getHeaders();
 
-        if (isset($headers['TXN_ID'])) {
-            return ['TXN_ID' => $headers['TXN_ID']];
+        if (isset($headers[Config::TXN_ID])) {
+            return [Config::TXN_ID => $headers[Config::TXN_ID]];
         }
 
         return [];

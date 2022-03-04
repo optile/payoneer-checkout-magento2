@@ -21,5 +21,15 @@
                 <sort_order>1</sort_order>
             </payoneer>
         </payment>
+        <csp>
+            <mode>
+                <storefront>
+                    <report_only>1</report_only>
+                </storefront>
+                <admin>
+                    <report_only>1</report_only>
+                </admin>
+            </mode>
+        </csp>
     </default>
 </config>

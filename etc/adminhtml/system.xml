@@ -82,6 +82,7 @@
                 </field>
                 <field id="order_reference_message" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Order Reference Message</label>
+                    <validate>required-entry</validate>
                 </field>
                 <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
                        showInStore="1">

@@ -12,10 +12,10 @@ use Magento\Payment\Gateway\Validator\ValidatorInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class HostedListCommand
+ * Class ListCommand
  * Class for Payoneer hosted payment command
  */
-class HostedListCommand extends GatewayCommand
+class ListCommand extends GatewayCommand
 {
     /**
      * @var BuilderInterface
@@ -48,7 +48,7 @@ class HostedListCommand extends GatewayCommand
     protected $validator;
 
     /**
-     * HostedListCommand constructor.
+     * ListCommand constructor.
      * @param BuilderInterface $requestBuilder
      * @param TransferFactoryInterface $transferFactory
      * @param ClientInterface $client

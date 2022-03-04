@@ -24,7 +24,7 @@
                 <button class="action primary checkout"
                         type="submit"
                         data-bind="
-                        click: processHostedPayment,
+                        click: processPayoneerPayment,
                         attr: {title: $t('Proceed to Payoneer')}
                         ">
                     <span data-bind="i18n: 'Proceed to Payoneer'"></span>
@@ -33,7 +33,15 @@
         </div>
         <!-- /ko -->
         <!-- ko ifnot: isHostedIntegration() -->
-        <div class="actions-toolbar">
+        <div data-bind="visible: isSuccessResponse" id="paymentNetworks" class="payment-networks-container"></div>
+        <div data-bind="visible: isSuccessResponse" id="submitBtnContainer" class="submitBtn submit-buttons-container">
+            <button
+                id="submitBtn"
+                type="button"
+                class="submit-button"
+            ></button>
+        </div>
+        <!--<div class="actions-toolbar">
             <div class="primary">
                 <button class="action primary checkout"
                         type="submit"
@@ -44,7 +52,7 @@
                     <span data-bind="i18n: 'Place Order'"></span>
                 </button>
             </div>
-        </div>
+        </div>-->
         <!-- /ko -->
         <div data-bind="visible: shouldShowMessage" class="message error">
             <span data-bind="text: getErrorMessage()"></span>

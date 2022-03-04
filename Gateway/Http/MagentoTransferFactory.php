@@ -44,17 +44,12 @@ class MagentoTransferFactory implements TransferFactoryInterface
      */
     public function create(array $request)
     {
-        /*$merchantCode = $this->config->getValue('merchant_gateway_key');
-        $apiKey = $this->config->getCredentials('api_key');*/
         return $this->transferBuilder
             ->setBody($request)
-            /*->setAuthUsername($merchantCode)
-            ->setAuthPassword($apiKey)*/
             ->setMethod(Config::METHOD_POST)
-            //->setUri(Config::END_POINT)
             ->setHeaders(
                 [
-                    'TXN_ID' => $request['TXN_ID']
+                    Config::TXN_ID => $request[Config::TXN_ID]
                 ]
             )
             ->build();

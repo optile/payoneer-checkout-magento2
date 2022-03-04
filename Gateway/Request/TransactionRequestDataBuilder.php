@@ -6,22 +6,12 @@ use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
-class CaptureRequestDataBuilder implements BuilderInterface
+/**
+ * Class TransactionRequestDataBuilder
+ * Builds magento transaction request
+ */
+class TransactionRequestDataBuilder implements BuilderInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @param Config $config
-     */
-    public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
-
     /**
      * Builds ENV request
      *
@@ -34,12 +24,7 @@ class CaptureRequestDataBuilder implements BuilderInterface
         $order = $payment->getOrder();
 
         return [
-            'TXN_TYPE' => 'S',
-            'TXN_ID' => $order->getOrderIncrementId(),
-            'MERCHANT_KEY' => $this->config->getValue(
-                'merchant_gateway_key',
-                $order->getStoreId()
-            )
+            Config::TXN_ID => $order->getOrderIncrementId()
         ];
     }
 }

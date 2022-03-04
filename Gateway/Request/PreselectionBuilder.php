@@ -4,7 +4,7 @@ namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use phpDocumentor\Reflection\Types\Self_;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields;
 
 /**
  * Class PreselectionBuilder
@@ -41,7 +41,7 @@ class PreselectionBuilder implements BuilderInterface
     {
         return [
             Config::PRESELECTION => [
-                Config::DEFERRAL => $this->config->getValue('payment_action') == 'authorize'
+                Config::DEFERRAL => $this->config->getValue('payment_action') == Fields::AUTHORIZE
                     ? self::DEFERRED
                     : self::NON_DEFERRED
             ]

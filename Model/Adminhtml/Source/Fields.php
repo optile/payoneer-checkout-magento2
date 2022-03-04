@@ -5,13 +5,33 @@ namespace Payoneer\OpenPaymentGateway\Model\Adminhtml\Source;
 use Magento\Framework\Data\OptionSourceInterface;
 
 /**
- * Class Environment - Lists the environment options
+ * Class Fields
+ * Admin config fields
  */
 class Fields implements OptionSourceInterface
 {
-
-    const ENVIRONMENT_PRODUCTION = 'live';
-    const ENVIRONMENT_SANDBOX = 'test';
+    const ENVIRONMENT_PRODUCTION_LABEL  =   'Live';
+    const ENVIRONMENT_PRODUCTION_VALUE  =   'live';
+    const ENVIRONMENT_SANDBOX_LABEL     =   'Test';
+    const ENVIRONMENT_SANDBOX_VALUE     =   'test';
+    const HOSTED                        =   'HOSTED';
+    const SELECTIVE_NATIVE              =   'SELECTIVE_NATIVE';
+    const AUTHORIZE                     =   'authorize';
+    const CAPTURE                       =   'authorize_capture';
+    const STANDALONE                    =   'Standalone';
+    const EMBEDDED                      =   'Embedded';
+    const DIRECT_PAYMENT                =   'Direct payment';
+    const DEFERRED                      =   'Deferred';
+    const FONT_BOLD                     =   'bold';
+    const FONT_LIGHTER                  =   'lighter';
+    const FONT_NORMAL                   =   'normal';
+    const REGULAR                       =   'Regular';
+    const BOLD                          =   'Bold';
+    const LIGHTER                       =   'Lighter';
+    const LEFT                          =   'Left';
+    const ALIGN_LEFT                    =   'left';
+    const RIGHT                         =   'Right';
+    const ALIGN_RIGHT                   =   'right';
 
     /**
      * Possible environment types
@@ -22,12 +42,12 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => self::ENVIRONMENT_SANDBOX,
-                'label' => 'Test',
+                'value' => self::ENVIRONMENT_SANDBOX_VALUE,
+                'label' => self::ENVIRONMENT_SANDBOX_LABEL
             ],
             [
-                'value' => self::ENVIRONMENT_PRODUCTION,
-                'label' => 'Live'
+                'value' => self::ENVIRONMENT_PRODUCTION_VALUE,
+                'label' => self::ENVIRONMENT_PRODUCTION_LABEL
             ]
         ];
     }
@@ -39,16 +59,16 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => 'lighter',
-                'label' => 'Lighter',
+                'value' => self::FONT_LIGHTER,
+                'label' => self::LIGHTER,
             ],
             [
-                'value' => 'regular',
-                'label' => 'Regular'
+                'value' => self::FONT_NORMAL,
+                'label' => self::REGULAR
             ],
             [
-                'value' => 'bold',
-                'label' => 'Bold'
+                'value' => self::FONT_BOLD,
+                'label' => self::BOLD
             ]
         ];
     }
@@ -60,12 +80,12 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => 'left',
-                'label' => 'Left',
+                'value' => self::ALIGN_LEFT,
+                'label' => self::LEFT,
             ],
             [
-                'value' => 'right',
-                'label' => 'Right'
+                'value' => self::ALIGN_RIGHT,
+                'label' => self::RIGHT
             ]
         ];
     }
@@ -77,12 +97,12 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => __('authorize'),
-                'label' => __('Deferred')
+                'value' => self::AUTHORIZE,
+                'label' => self::DEFERRED
             ],
             [
-                'value' => __('authorize_capture'),
-                'label' => __('Direct payment')
+                'value' => self::CAPTURE,
+                'label' => self::DIRECT_PAYMENT
             ]
         ];
     }
@@ -94,12 +114,12 @@ class Fields implements OptionSourceInterface
     {
         return [
             [
-                'value' => __('HOSTED'),
-                'label' => __('Standalone')
+                'value' => self::HOSTED,
+                'label' => self::STANDALONE
             ],
             [
-                'value' => __('SELECTIVE_NATIVE'),
-                'label' => __('Embedded')
+                'value' => self::SELECTIVE_NATIVE,
+                'label' => self::EMBEDDED
             ]
         ];
     }

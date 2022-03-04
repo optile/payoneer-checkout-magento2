@@ -1,18 +1,16 @@
 <?php
 
-namespace Payoneer\OpenPaymentGateway\Controller\Hosted;
+namespace Payoneer\OpenPaymentGateway\Controller\Integration;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\HttpGetActionInterface;
-use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Payoneer\OpenPaymentGateway\Model\Api\Request;
-use Payoneer\OpenPaymentGateway\Model\GetHostedTransactionService;
+use Payoneer\OpenPaymentGateway\Model\TransactionService;
 
 /**
  * Class ProcessPayment
@@ -31,34 +29,35 @@ class ProcessPayment implements HttpGetActionInterface
     protected $checkoutSession;
 
     /**
-     * @var GetHostedTransactionService
+     * @var TransactionService
      */
-    protected $hostedTransactionService;
+    protected $transactionService;
 
     /**
      * ProcessPayment constructor.
      * @param JsonFactory $resultJsonFactory
      * @param Session $checkoutSession
-     * @param GetHostedTransactionService $hostedTransactionService
+     * @param TransactionService $transactionService
      */
     public function __construct(
         JsonFactory $resultJsonFactory,
         Session $checkoutSession,
-        GetHostedTransactionService $hostedTransactionService
+        TransactionService $transactionService
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
-        $this->hostedTransactionService = $hostedTransactionService;
+        $this->transactionService = $transactionService;
     }
 
     /**
      * @return ResponseInterface|Json|ResultInterface
      * @throws LocalizedException
      * @throws NoSuchEntityException
+     * @throws \Exception
      */
     public function execute()
     {
         $quote = $this->checkoutSession->getQuote();
-        return $this->hostedTransactionService->process($quote);
+        return $this->transactionService->process($quote);
     }
 }
