@@ -97,7 +97,6 @@ define(
 
             processPayoneerPayment: function() {
                 var self = this;
-                var sdf = self.getCurrentPaymentMethod();
                 var integrationType = '';
                 if(this.isHostedIntegration()) {
                     integrationType = 'hosted';
