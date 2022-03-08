@@ -5,9 +5,11 @@ define(
         'jquery',
         'ko',
         'Magento_Checkout/js/view/payment/default',
+        'Magento_Checkout/js/checkout-data',
+        'Magento_Checkout/js/model/quote',
         'payoneerWidget'
     ],
-    function ($, ko, Component, payoneerWidget) {
+    function ($, ko, Component, checkoutData, quote, payoneerWidget) {
         'use strict';
 
         return Component.extend({
@@ -22,10 +24,22 @@ define(
                         shouldShowMessage: ko.observable(false),
                         isSuccessResponse: ko.observable(false)
                     });
+
                 this.shouldShowMessage.subscribe(function (newValue) {
                 });
+
                 this.isSuccessResponse.subscribe(function (newValue) {
                 });
+                var self=this;
+                quote.billingAddress.subscribe(
+                    function(newAddress) {
+                        if (newAddress){
+                            if (self.getCurrentPaymentMethod() == self.getCode()){
+                                self.processPayoneerPayment();
+                            }
+                        }
+                    }
+                );
                 return this;
             },
 
@@ -36,6 +50,10 @@ define(
 
             getCode: function() {
                 return 'payoneer';
+            },
+
+            getCurrentPaymentMethod: function() {
+                return checkoutData.getSelectedPaymentMethod();
             },
 
             getData: function() {
@@ -79,6 +97,7 @@ define(
 
             processPayoneerPayment: function() {
                 var self = this;
+                var sdf = self.getCurrentPaymentMethod();
                 var integrationType = '';
                 if(this.isHostedIntegration()) {
                     integrationType = 'hosted';
@@ -117,6 +136,7 @@ define(
 
                             // Run this function when window.jQuery is available.
                             self.deferUntilJqueryAvailable(function() {
+                                $('#paymentNetworks').empty();
                                 checkoutList('paymentNetworks',configObj);
                             });
 

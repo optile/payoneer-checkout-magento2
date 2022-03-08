@@ -16,7 +16,7 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @var Config
      */
-    protected $config;
+    private $config;
 
     /**
      * @var Helper

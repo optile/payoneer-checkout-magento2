@@ -12,6 +12,7 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
+use Payoneer\OpenPaymentGateway\Model\Helper;
 
 /**
  * Class Success
@@ -28,12 +29,12 @@ class Success implements HttpGetActionInterface
     /**
      * @var CartManagementInterface
      */
-    private $cartManagement;
+    protected $cartManagement;
 
     /**
      * @var CartRepositoryInterface
      */
-    private $cartRepository;
+    protected $cartRepository;
 
     /**
      * @var PageFactory
@@ -41,22 +42,30 @@ class Success implements HttpGetActionInterface
     protected $resultPageFactory;
 
     /**
+     * @var Helper
+     */
+    protected $helper;
+
+    /**
      * Success constructor.
      * @param Context $context
      * @param CartManagementInterface $cartManagement
      * @param CartRepositoryInterface $cartRepository
      * @param PageFactory $resultPageFactory
+     * @param Helper $helper
      */
     public function __construct(
         Context $context,
         CartManagementInterface $cartManagement,
         CartRepositoryInterface $cartRepository,
-        PageFactory $resultPageFactory
+        PageFactory $resultPageFactory,
+        Helper $helper
     ) {
         $this->context = $context;
         $this->cartManagement = $cartManagement;
         $this->cartRepository = $cartRepository;
         $this->resultPageFactory = $resultPageFactory;
+        $this->helper = $helper;
     }
 
     /**
@@ -65,25 +74,28 @@ class Success implements HttpGetActionInterface
      */
     public function execute()
     {
-        $cartId = $this->context->getRequest()->getParam('cart_id');
-        $listUrl = $this->context->getRequest()->getParam('listUrl', null);
-        $interactionCode = $this->context->getRequest()->getParam('interactionCode', null);
-        $token = $this->context->getRequest()->getParam('token', null);
-
+        $reqParams = $this->context->getRequest()->getParams();
         try {
-            if ($listUrl && $interactionCode == self::INTERACTION_CODE_PROCEED) {
-
+            if (isset($reqParams['listUrl']) &&
+                isset($reqParams['interactionCode']) &&
+                $reqParams['interactionCode'] == self::INTERACTION_CODE_PROCEED
+            ) {
+                $cartId = $reqParams['cart_id'];
                 /** @var Quote $quote */
                 $quote = $this->cartRepository->getActive($cartId);
                 $payment = $quote->getPayment();
 
-                if ($payment->getAdditionalInformation('token') != $token) {
-                    return $this->redirectToCart(__('Something went wrong while processing payment.'));
+                if (!isset($reqParams['token']) || $payment->getAdditionalInformation('token') != $reqParams['token']) {
+                    return $this->helper->redirectToCart(__('Something went wrong while processing payment.'));
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
                         $payment->setAdditionalInformation($key, $value);
                     }
                     $payment->save();
+                }
+
+                if (isset($reqParams['customerRegistrationId'])) {
+                    $this->helper->saveRegistrationId($reqParams['customerRegistrationId'], $quote->getCustomerId());
                 }
 
                 if (!$quote->getCustomerId()) {
@@ -92,22 +104,10 @@ class Success implements HttpGetActionInterface
                 $this->cartManagement->placeOrder($cartId);
                 return $this->resultPageFactory->create();
             } else {
-                return $this->redirectToCart(__('Something went wrong while processing payment.'));
+                return $this->helper->redirectToCart(__('Something went wrong while processing payment.'));
             }
         } catch (\Exception $e) {
-            return $this->redirectToCart($e->getMessage());
+            return $this->helper->redirectToCart($e->getMessage());
         }
-    }
-
-    /**
-     * Redirects to cart
-     *
-     * @param string $message
-     * @return Redirect
-     */
-    public function redirectToCart($message)
-    {
-        $this->context->getMessageManager()->addErrorMessage($message);
-        return $this->context->getResultRedirectFactory()->create()->setPath('checkout/cart');
     }
 }

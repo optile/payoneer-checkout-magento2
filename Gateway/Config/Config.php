@@ -96,6 +96,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const VERSION_V4            =   'v4';
     const TOKEN_ID              =   'token';
     const TXN_ID                =   'TXN_ID';
+    const REGISTRATION          =   'registration';
+    const ID                    =   'id';
 
     /**
      * @var StoreManagerInterface

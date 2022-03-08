@@ -29,9 +29,11 @@ class Fields implements OptionSourceInterface
     const BOLD                          =   'Bold';
     const LIGHTER                       =   'Lighter';
     const LEFT                          =   'Left';
-    const ALIGN_LEFT                    =   'left';
     const RIGHT                         =   'Right';
+    const CENTER                        =   'Center';
+    const ALIGN_LEFT                    =   'left';
     const ALIGN_RIGHT                   =   'right';
+    const ALIGN_CENTER                  =   'center';
 
     /**
      * Possible environment types
@@ -86,6 +88,10 @@ class Fields implements OptionSourceInterface
             [
                 'value' => self::ALIGN_RIGHT,
                 'label' => self::RIGHT
+            ],
+            [
+                'value' => self::ALIGN_CENTER,
+                'label' => self::CENTER
             ]
         ];
     }

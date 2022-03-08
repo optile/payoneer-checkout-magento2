@@ -55,7 +55,7 @@ class Style implements HttpGetActionInterface
     {
         $styleConfig = $this->config->getStyleConfig();
         $content = '.payment-networks-container{';
-        foreach ($styleConfig as $key=>$value) {
+        foreach ($styleConfig as $key => $value) {
             $content = $content . $key . ':' . $value . ';';
         }
         $content = $content . '}';

@@ -33,6 +33,7 @@
         </div>
         <!-- /ko -->
         <!-- ko ifnot: isHostedIntegration() -->
+        <!--<div data-bind="afterRender: function() {alert('afterRender')}"></div>-->
         <div data-bind="visible: isSuccessResponse" id="paymentNetworks" class="payment-networks-container"></div>
         <div data-bind="visible: isSuccessResponse" id="submitBtnContainer" class="submitBtn submit-buttons-container">
             <button
