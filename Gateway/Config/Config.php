@@ -19,19 +19,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const DEFAULT_PATH_PATTERN = 'payment/%s/%s';
 
     /**
-     * Style configuration path constants
-     */
-    const XML_PATH_BACKGROUND_COLOR     =   'payment/payoneer/widget_appearance/background_color';
-    const XML_PATH_BACKGROUND_TEXT      =   'payment/payoneer/widget_appearance/background_text';
-    const XML_PATH_PLACEHOLDERS_COLOR   =   'payment/payoneer/widget_appearance/placeholders_color';
-    const XML_PATH_FONT_SIZE            =   'payment/payoneer/widget_appearance/font_size';
-    const XML_PATH_FONT_WEIGHT          =   'payment/payoneer/widget_appearance/font_weight';
-    const XML_PATH_LETTER_SPACING       =   'payment/payoneer/widget_appearance/letter_spacing';
-    const XML_PATH_LINE_HEIGHT          =   'payment/payoneer/widget_appearance/line_height';
-    const XML_PATH_PADDING              =   'payment/payoneer/widget_appearance/padding';
-    const XML_PATH_ALIGN_TEXT           =   'payment/payoneer/widget_appearance/align_text';
-
-    /**
      * API method types
      */
     const METHOD_GET    = 'GET';
@@ -118,6 +105,20 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * @var string|null
      */
     private $pathPattern;
+
+    /**
+     * @var string[]
+     */
+    protected $styleConfigs = [
+        'background-color' => 'payment/payoneer/widget_appearance/background_color',
+        'color' => 'payment/payoneer/widget_appearance/color',
+        'font-size' => 'payment/payoneer/widget_appearance/font_size',
+        'font-weight' => 'payment/payoneer/widget_appearance/font_weight',
+        'letter-spacing' => 'payment/payoneer/widget_appearance/letter_spacing',
+        'line-height' => 'payment/payoneer/widget_appearance/line_height',
+        'padding' => 'payment/payoneer/widget_appearance/padding',
+        'text-align' => 'payment/payoneer/widget_appearance/text_align',
+    ];
 
     /**
      * Config constructor.
@@ -258,18 +259,17 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * Get style configuration values
-     * @return array <mixed>
+     * @return array
      */
     public function getStyleConfig()
     {
         $styleConfigValues = [];
-        $styleConfigValues['background-color'] = $this->scopeConfig->getValue(self::XML_PATH_BACKGROUND_COLOR);
-        $styleConfigValues['font-size'] = $this->scopeConfig->getValue(self::XML_PATH_FONT_SIZE);
-        $styleConfigValues['font-weight'] = $this->scopeConfig->getValue(self::XML_PATH_FONT_WEIGHT);
-        $styleConfigValues['letter-spacing'] = $this->scopeConfig->getValue(self::XML_PATH_LETTER_SPACING);
-        $styleConfigValues['line-height'] = $this->scopeConfig->getValue(self::XML_PATH_LINE_HEIGHT);
-        $styleConfigValues['padding'] = $this->scopeConfig->getValue(self::XML_PATH_PADDING);
-        $styleConfigValues['text-align'] = $this->scopeConfig->getValue(self::XML_PATH_ALIGN_TEXT);
+        foreach ($this->styleConfigs as $key => $path) {
+            $value = $this->scopeConfig->getValue($path);
+            if ($value) {
+                $styleConfigValues[$key] = $value;
+            }
+        }
         return $styleConfigValues;
     }
 }

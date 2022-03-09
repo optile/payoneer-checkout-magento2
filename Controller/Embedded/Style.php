@@ -54,15 +54,55 @@ class Style implements HttpGetActionInterface
     public function execute()
     {
         $styleConfig = $this->config->getStyleConfig();
-        $content = '.payment-networks-container{';
+        $containerCSS = $this->getContainerStyle($styleConfig);
+        $containerPlaceholderCSS = $this->getContainerPlaceholderStyle();
+        $checkoutCssConfig = $this->config->getValue('widget_appearance/checkout_css');
+
+        $widgetCSS = $containerCSS . $containerPlaceholderCSS;
+        if ($checkoutCssConfig) {
+            $widgetCSS = $widgetCSS . $checkoutCssConfig;
+        }
+
+        $resultRaw = $this->resultRawFactory->create();
+        $resultRaw->setHeader('Content-type', 'text/css');
+        $resultRaw->setContents($widgetCSS);
+
+        return $resultRaw;
+    }
+
+    /**
+     * Get formatted css for the container
+     * @param $styleConfig
+     * @return string
+     */
+    public function getContainerStyle($styleConfig)
+    {
+        $content = '#networkForm, .op-payment-widget-container {';
         foreach ($styleConfig as $key => $value) {
             $content = $content . $key . ':' . $value . ';';
         }
-        $content = $content . '}';
-        $resultRaw = $this->resultRawFactory->create();
-        $resultRaw->setHeader('Content-type', 'text/css');
-        $resultRaw->setContents($content);
+        return $content . '}';
+    }
 
-        return $resultRaw;
+    /**
+     * Get placeholder css
+     * @return string
+     */
+    public function getContainerPlaceholderStyle()
+    {
+        $inputStyle = '';
+        $placeholderValue = $this->config->getValue('widget_appearance/placeholders_color');
+        $phContent = '#networkForm ::placeholder, .op-payment-widget-container ::placeholder {';
+        $phContent = $phContent . 'opacity: 1;';
+        if ($placeholderValue) {
+            $phContent = $phContent . 'color:' . $placeholderValue . ';';
+            $inputStyle = '#networkForm ::-ms-input-placeholder, .op-payment-widget-container ::-ms-input-placeholder{'
+                . $phContent . '}';
+        }
+        $phContent = $phContent . '}';
+        if ($inputStyle) {
+            $phContent = $phContent . $inputStyle;
+        }
+        return $phContent;
     }
 }
