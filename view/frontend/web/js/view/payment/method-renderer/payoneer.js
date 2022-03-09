@@ -30,12 +30,17 @@ define(
 
                 this.isSuccessResponse.subscribe(function (newValue) {
                 });
-                var self=this;
+                let self=this;
+                /** @type {?Object} */
+                let prevAddress;
                 quote.billingAddress.subscribe(
                     function(newAddress) {
-                        if (newAddress){
-                            if (self.getCurrentPaymentMethod() == self.getCode()){
-                                self.processPayoneerPayment();
+                        if (!newAddress ^ !prevAddress || newAddress.getKey() !== prevAddress.getKey()) {
+                            prevAddress = newAddress;
+                            if (newAddress) {
+                                if (self.getCurrentPaymentMethod() == self.getCode()){
+                                    self.processPayoneerPayment();
+                                }
                             }
                         }
                     }
@@ -85,16 +90,6 @@ define(
                 return window.checkoutConfig.payment.payoneer.config.widgetCssUrl;
             },
 
-            deferUntilJqueryAvailable: function(fn) {
-                if (window.jQuery) {
-                    // If jquery is available, then run the function
-                    fn();
-                } else {
-                    // Check every 50ms until jQuery is available
-                    setTimeout(function() { defer(fn) }, 50);
-                }
-            },
-
             processPayoneerPayment: function() {
                 var self = this;
                 var integrationType = '';
@@ -132,12 +127,8 @@ define(
                                 fullPageLoading: false,
                                 widgetCssUrl: self.getWidgetCssUrl()
                             }
-
-                            // Run this function when window.jQuery is available.
-                            self.deferUntilJqueryAvailable(function() {
-                                $('#paymentNetworks').empty();
-                                checkoutList('paymentNetworks',configObj);
-                            });
+                            $('#paymentNetworks').empty();
+                            checkoutList('paymentNetworks',configObj);
 
                             self.isSuccessResponse(true);
                         } else{
