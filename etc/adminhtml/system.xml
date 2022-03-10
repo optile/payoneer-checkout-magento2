@@ -101,7 +101,7 @@
                         <comment><![CDATA[Color of payment widget background.]]></comment>
                         <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ColorPicker</frontend_model>
                     </field>
-                    <field id="background_text" translate="label" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="color" translate="label" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Text Color</label>
                         <comment>Color of payment widget text.</comment>
                         <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ColorPicker</frontend_model>
@@ -132,7 +132,7 @@
                         <label>Padding</label>
                         <comment>Padding in the payment widget.</comment>
                     </field>
-                    <field id="align_text" translate="label" type="select" sortOrder="260" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="text_align" translate="label" type="select" sortOrder="260" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Align Text</label>
                         <comment>Text alignment in the payment widget.</comment>
                         <source_model>Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields::alignText</source_model>
