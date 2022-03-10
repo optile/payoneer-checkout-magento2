@@ -52,9 +52,10 @@ class StyleDataBuilder implements BuilderInterface
         } else {
             $styleDataValues = $this->config->getStyleConfig();
             $styleData[Config::STYLE]['resolution'] = Config::RESOLUTION_1X;
-            $styleData[Config::STYLE]['primaryColor'] = $styleDataValues['background-color'];
+            if (isset($styleDataValues['background-color'])) {
+                $styleData[Config::STYLE]['primaryColor'] = $styleDataValues['background-color'];
+            }
             $styleData[Config::STYLE]['cssOverride'] =
-              //"https://payoneer.local.tryzens.net/static/version1646060873/frontend/Magento/luma/en_US/Payoneer_OpenPaymentGateway/css/test.css";
             $this->urlBuilder->getUrl(Config::EMBEDDED_STYLE_PATH);
         }
 
