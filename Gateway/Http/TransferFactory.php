@@ -1,29 +1,39 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
+
 namespace Payoneer\OpenPaymentGateway\Gateway\Http;
 
 use Magento\Payment\Gateway\Http\TransferBuilder;
 use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use Payoneer\OpenPaymentGateway\Gateway\Request\MockDataRequest;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
+/**
+ * Class TransferFactory
+ *
+ * Builds gateway transfer object
+ */
 class TransferFactory implements TransferFactoryInterface
 {
     /**
      * @var TransferBuilder
      */
-    private $transferBuilder;
+    protected $transferBuilder;
+
+    /**
+     * @var Config
+     */
+    protected $config;
 
     /**
      * @param TransferBuilder $transferBuilder
+     * @param Config $config
      */
     public function __construct(
-        TransferBuilder $transferBuilder
+        TransferBuilder $transferBuilder,
+        Config $config
     ) {
         $this->transferBuilder = $transferBuilder;
+        $this->config = $config;
     }
 
     /**
@@ -34,15 +44,17 @@ class TransferFactory implements TransferFactoryInterface
      */
     public function create(array $request)
     {
+        $merchantCode = $this->config->getValue('merchant_gateway_key');
+        $apiKey = $this->config->getCredentials('api_key');
+
         return $this->transferBuilder
             ->setBody($request)
-            ->setMethod('POST')
+            ->setAuthUsername($merchantCode)
+            ->setAuthPassword($apiKey)
+            ->setMethod(Config::METHOD_POST)
+            ->setUri(Config::END_POINT)
             ->setHeaders(
-                [
-                    'force_result' => isset($request[MockDataRequest::FORCE_RESULT])
-                        ? $request[MockDataRequest::FORCE_RESULT]
-                        : null
-                ]
+                $this->config->prepareHeaders($merchantCode, $apiKey)
             )
             ->build();
     }

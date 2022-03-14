@@ -1,19 +1,40 @@
 <?php
-/**
- * Copyright © 2016 Magento. All rights reserved.
- * See COPYING.txt for license details.
- */
+
 namespace Payoneer\OpenPaymentGateway\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
-use Payoneer\OpenPaymentGateway\Gateway\Http\Client\ClientMock;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Payoneer\OpenPaymentGateway\Model\Helper;
 
 /**
- * Class ConfigProvider
+ * Class ConfigProvider - Payoneer configuration class
  */
-final class ConfigProvider implements ConfigProviderInterface
+class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'payoneer';
+
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * @var Helper
+     */
+    private $helper;
+
+    /**
+     * ConfigProvider constructor.
+     * @param Config $config
+     * @param Helper $helper
+     */
+    public function __construct(
+        Config $config,
+        Helper $helper
+    ) {
+        $this->config = $config;
+        $this->helper = $helper;
+    }
 
     /**
      * Retrieve assoc array of checkout configuration
@@ -25,12 +46,28 @@ final class ConfigProvider implements ConfigProviderInterface
         return [
             'payment' => [
                 self::CODE => [
-                    'transactionResults' => [
-                        ClientMock::SUCCESS => __('Success'),
-                        ClientMock::FAILURE => __('Fraud')
+                    'config' => [
+                        'active' => (bool)$this->config->getValue('active'),
+                        'payment_flow' => $this->config->getValue('payment_flow'),
+                        'widgetCssUrl' => $this->getStaticFilePath()
                     ]
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get the widget css file path
+     * @return string
+     */
+    public function getStaticFilePath()
+    {
+        $fileId = 'Payoneer_OpenPaymentGateway::css/widget.min.css';
+
+        $params = [
+            'area' => 'frontend'
+        ];
+
+        return $this->helper->getStaticFilePath($fileId, $params);
     }
 }
