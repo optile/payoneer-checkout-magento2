@@ -9,5 +9,5 @@ var config = {
         payoneerWidget: {
             deps: ['jquery']
         }
-    },
+    }
 };

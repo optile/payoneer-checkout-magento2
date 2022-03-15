@@ -91,17 +91,20 @@ class Style implements HttpGetActionInterface
     public function getContainerPlaceholderStyle()
     {
         $inputStyle = '';
+        $selectStyle = '';
         $placeholderValue = $this->config->getValue('widget_appearance/placeholders_color');
-        $phContent = '#networkForm ::placeholder, .op-payment-widget-container ::placeholder {';
-        $phContent = $phContent . 'opacity: 1;';
+        $phContentClass = '#networkForm ::placeholder, .op-payment-widget-container ::placeholder {';
+        $phContent = $phContentClass . 'opacity: 1;';
         if ($placeholderValue) {
-            $phContent = $phContent . 'color:' . $placeholderValue . ';';
+            $phColor = 'color:' . $placeholderValue . ';';
+            $phContent = $phContent . $phColor;
             $inputStyle = '#networkForm ::-ms-input-placeholder, .op-payment-widget-container ::-ms-input-placeholder{'
-                . $phContent . '}';
+                . $phColor . '}';
+            $selectStyle = '#networkForm select {' . $phColor . '}';
         }
         $phContent = $phContent . '}';
         if ($inputStyle) {
-            $phContent = $phContent . $inputStyle;
+            $phContent = $phContent . $inputStyle . $selectStyle;
         }
         return $phContent;
     }

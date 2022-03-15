@@ -4,6 +4,7 @@ namespace Payoneer\OpenPaymentGateway\Controller\Integration;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
@@ -16,7 +17,7 @@ use Payoneer\OpenPaymentGateway\Model\TransactionService;
  * Class ProcessPayment
  * Process List request for hosted payment
  */
-class ProcessPayment implements HttpGetActionInterface
+class ProcessPayment implements ActionInterface
 {
     /**
      * @var JsonFactory

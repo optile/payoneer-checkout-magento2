@@ -4,6 +4,7 @@
         <policy id="script-src">
             <values>
                 <value id="api-sandbox-script" type="host">https://api.sandbox.oscato.com</value>
+                <value id="assets-optile-script" type="host">https://assets.optile.net</value>
             </values>
         </policy>
         <policy id="connect-src">

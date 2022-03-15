@@ -36,10 +36,10 @@ class PaymentDataBuilder implements BuilderInterface
 
         return [
             Config::PAYMENT => [
-                Config::AMOUNT => $buildSubject[Config::AMOUNT],
-                Config::CURRENCY => $order->getCurrencyCode(),
-                Config::REFERENCE => $this->config->getValue('order_reference_message'),
-                Config::INVOICE_ID=> $order->getId()
+                Config::AMOUNT      => $buildSubject[Config::AMOUNT],
+                Config::CURRENCY    => $order->getCurrencyCode(),
+                Config::REFERENCE   => $this->config->getValue('order_reference_message'),
+                Config::INVOICE_ID  => $order->getId()
             ]
         ];
     }

@@ -40,6 +40,39 @@ class Client implements ClientInterface
     protected $operation;
 
     /**
+     * Mandatory request fields
+     * @var string[]
+     */
+    protected $mandatoryFields = [
+        'transactionId',
+        'country',
+        'customer',
+        'payment',
+        'callback'
+    ];
+
+    /**
+     * Mandatory request fields for 'payment' object
+     * @var string[]
+     */
+    protected $mandatoryFieldsPayment = [
+        'amount',
+        'currency',
+        'reference',
+        'invoiceId'
+    ];
+
+    /**
+     * Mandatory request fields for 'customer' object
+     * @var string[]
+     */
+    protected $mandatoryFieldsCustomer = [
+        'number'
+    ];
+
+    protected $requestData = [];
+
+    /**
      * @param Logger $logger
      * @param Request $request
      * @param Config $config
@@ -64,10 +97,16 @@ class Client implements ClientInterface
     public function placeRequest(TransferInterface $transferObject)
     {
         $response = [];
+        $this->requestData = $transferObject->getBody();
 
         switch ($this->operation) {
             case self::LIST:
-                $responseObj = $this->processListRequest($transferObject);
+                $isRequestValid = $this->validateRequest();
+                if ($isRequestValid) {
+                    $responseObj = $this->processListRequest($transferObject);
+                } else {
+                    $this->logData(['request' => $this->requestData]);
+                }
                 break;
             case self::AUTHORIZE:
             case self::CAPTURE:
@@ -80,9 +119,8 @@ class Client implements ClientInterface
         $response['response'] = $responseObj->getData('response') ?: '';
         $response['status'] = $responseObj->getData('status') ?: '';
         $response['reason'] = $responseObj->getData('reason') ?: '';
-        if ((bool)$this->config->getValue('debug') == true) {
-            $this->logger->debug(['response' => $response]);
-        }
+
+        $this->logData($response);
 
         return $response;
     }
@@ -135,5 +173,62 @@ class Client implements ClientInterface
         }
 
         return [];
+    }
+
+    /**
+     * Validate payoneer request data
+     * @return bool
+     */
+    public function validateRequest()
+    {
+        $isValid = true;
+        foreach ($this->mandatoryFields as $mandatoryField) {
+            switch ($mandatoryField) {
+                case 'payment':
+                    $isValid = $this->mandatoryFieldsExists($this->mandatoryFieldsPayment, 'payment');
+                    break;
+                case 'customer':
+                    $isValid = $this->mandatoryFieldsExists($this->mandatoryFieldsCustomer, 'customer');
+                    break;
+                default:
+                    if (!isset($this->requestData[$mandatoryField]) ||
+                        (isset($this->requestData[$mandatoryField]) && $this->requestData[$mandatoryField] == "")) {
+                        $this->logData([$mandatoryField . ' must not be empty']);
+                        return false;
+                    }
+            }
+            if (!$isValid) {
+                return false;
+            }
+        }
+        return $isValid;
+    }
+
+    /**
+     * Check if mandatory fields exists
+     * @param array <mixed> $mandatoryFields
+     * @param string $objectName
+     * @return bool
+     */
+    public function mandatoryFieldsExists($mandatoryFields, $objectName)
+    {
+        foreach ($mandatoryFields as $mandatoryField) {
+            if (!isset($this->requestData[$objectName][$mandatoryField])) {
+                $this->logData([$objectName . '.' . $mandatoryField . ' must not be empty']);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Log data to payoneer.log
+     * @param array <mixed> $resutl
+     */
+    public function logData($resutl)
+    {
+        if ((bool)$this->config->getValue('debug') == true) {
+            $this->logger->debug([$resutl]);
+        }
     }
 }

@@ -32,12 +32,18 @@ class BaseRequestDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
+        $countryId = '';
         $payment = SubjectReader::readPayment($buildSubject);
+
+        if (isset($buildSubject['address']['countryId'])) {
+            $countryId = $buildSubject['address']['countryId'];
+        }
+
         return [
             Config::TRANSACTION_ID => $payment->getPayment()->getAdditionalInformation('transaction_id') ?:
                 $payment->getOrder()->getOrderIncrementId(),
-            Config::COUNTRY => $payment->getOrder()->getBillingAddress()->getCountryId(),
-            Config::INTEGRATION=> $this->config->getValue('payment_flow'),
+            Config::COUNTRY => $countryId ?: $payment->getOrder()->getBillingAddress()->getCountryId(),
+            Config::INTEGRATION => $this->config->getValue('payment_flow'),
             Config::DIVISION => $this->config->getValue('environment') == Fields::ENVIRONMENT_SANDBOX_VALUE ?
                 $this->config->getValue('sandbox_store_code') :
                 $this->config->getValue('live_store_code')

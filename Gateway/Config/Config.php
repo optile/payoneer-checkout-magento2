@@ -63,9 +63,12 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const STREET                =   'street';
     const HOUSE_NUMBER          =   'houseNumber';
     const ZIP                   =   'zip';
+    const POSTCODE              =   'postcode';
     const CITY                  =   'city';
     const STATE                 =   'state';
+    const REGION                =   'region';
     const COUNTRY               =   'country';
+    const COUNTRY_ID            =   'countryId';
     const TRANSACTION_ID        =   'transactionId';
     const INTEGRATION           =   'integration';
     const DIVISION              =   'division';

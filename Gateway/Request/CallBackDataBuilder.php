@@ -62,7 +62,10 @@ class CallBackDataBuilder implements BuilderInterface
             Config::CALLBACK => [
                 Config::RETURN_URL => $this->urlBuilder->getUrl(Config::RETURN_URL_PATH, $successParams),
                 Config::CANCEL_URL => $this->urlBuilder->getUrl(Config::CANCEL_URL_PATH, $cancelParams),
-                Config::NOTIFICATION_URL => $this->urlBuilder->getUrl(Config::NOTIFICATION_URL_PATH, $notificationParams)
+                Config::NOTIFICATION_URL => $this->urlBuilder->getUrl(
+                    Config::NOTIFICATION_URL_PATH,
+                    $notificationParams
+                )
             ]
         ];
     }

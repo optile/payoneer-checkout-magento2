@@ -31,15 +31,14 @@ define(
                 this.isSuccessResponse.subscribe(function (newValue) {
                 });
                 let self=this;
-                /** @type {?Object} */
                 let prevAddress;
                 quote.billingAddress.subscribe(
                     function(newAddress) {
                         if (!newAddress ^ !prevAddress || newAddress.getKey() !== prevAddress.getKey()) {
                             prevAddress = newAddress;
                             if (newAddress) {
-                                if (self.getCurrentPaymentMethod() == self.getCode()){
-                                    self.processPayoneerPayment();
+                                if (self.getCurrentPaymentMethod() === self.getCode()){
+                                    self.processPayoneerPayment(newAddress);
                                 }
                             }
                         }
@@ -68,9 +67,7 @@ define(
             },
 
             selectPaymentMethod: function () {
-                if (!this.isHostedIntegration()) {
-                    this.processPayoneerPayment();
-                }
+                this.processPayoneerPayment('');
                 return this._super();
             },
 
@@ -79,44 +76,64 @@ define(
             },
 
             isHostedIntegration: function() {
-                return window.checkoutConfig.payment.payoneer.config.payment_flow == 'HOSTED';
+                return window.checkoutConfig.payment.payoneer.config.payment_flow === 'HOSTED';
             },
 
             getErrorMessage: function() {
                 return 'Something went wrong while processing payment';
             },
 
+            /**
+             * Get widget css url
+             * @returns {*}
+             */
             getWidgetCssUrl: function() {
                 return window.checkoutConfig.payment.payoneer.config.widgetCssUrl;
             },
 
-            processPayoneerPayment: function() {
-                var self = this;
-                var integrationType = '';
+            /**
+             * Proceed to hosted page
+             */
+            proceedToPayoneer: function() {
+                if (window.checkoutConfig.payment.payoneer.config.redirectURL !== undefined) {
+                    window.location.href = window.checkoutConfig.payment.payoneer.config.redirectURL;
+                } else {
+                    self.shouldShowMessage(true);
+                }
+            },
+
+            /**
+             * Process Payoneer payment
+             */
+            processPayoneerPayment: function(newAddress) {
+                let self = this;
+                let integrationType = '';
+                let changedAddress = newAddress;
                 if(this.isHostedIntegration()) {
                     integrationType = 'hosted';
                 } else {
                     integrationType = 'embedded';
                 }
                 $('.payoneer.message.error').hide();
-                var endpoint = '/payoneer/integration/processpayment';
+                let endpoint = '/payoneer/integration/processpayment';
                 $('body').trigger('processStart');
                 self.shouldShowMessage(false);
                 $.ajax({
                     url: endpoint,
-                    type: "GET",
+                    type: "POST",
                     data: {
-                        integration: integrationType
+                        integration : integrationType,
+                        address: JSON.stringify(changedAddress)
                     },
                     dataType: 'json'
                 }).done(function (response) {
                     if(integrationType === 'hosted') {
                         if (response.redirectURL) {
-                            window.location.href = response.redirectURL;
+                            window.checkoutConfig.payment.payoneer.config.redirectURL = response.redirectURL;
                         } else {
-                            $('body').trigger('processStop');
                             self.shouldShowMessage(true);
                         }
+                        $('body').trigger('processStop');
                     } else{
                         if (response.links) {
                             var configObj = {
@@ -129,7 +146,6 @@ define(
                             }
                             $('#paymentNetworks').empty();
                             checkoutList('paymentNetworks',configObj);
-
                             self.isSuccessResponse(true);
                         } else{
                             self.shouldShowMessage(true);

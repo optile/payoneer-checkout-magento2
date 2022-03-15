@@ -99,13 +99,15 @@ class TransactionService
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
         try {
-            $params = $this->request->getParams();
-            $integration = $params['integration'];
+            $integration = $this->request->getParam('integration');
+            $address = $this->request->getParam('address');
+            $address = json_decode($address, true);
 
             $isHostedIntegration = $integration == self::HOSTED;
             $result = $this->commandPool->get($integration)->execute([
                 'payment' => $paymentDataObject,
-                'amount' => $quote->getGrandTotal()
+                'amount' => $quote->getGrandTotal(),
+                'address' => $address
             ]);
 
             if ($isHostedIntegration) {
