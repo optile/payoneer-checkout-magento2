@@ -10,6 +10,7 @@ use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Quote\Model\Quote;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
  * Class GetPayoneerTransactionService
@@ -94,7 +95,9 @@ class TransactionService
         $token = strtotime('now') . uniqid();
 
         $payment = $quote->getPayment();
-        $payment->setAdditionalInformation('token', $token);
+        $transactionId = $payment->getId() . strtotime('now');
+        $payment->setAdditionalInformation(Config::TOKEN, $token);
+        $payment->setAdditionalInformation(Config::TXN_ID, $transactionId);
         $payment->save();
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);

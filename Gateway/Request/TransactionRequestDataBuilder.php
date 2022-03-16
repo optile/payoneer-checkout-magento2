@@ -21,10 +21,9 @@ class TransactionRequestDataBuilder implements BuilderInterface
     public function build(array $buildSubject)
     {
         $payment = SubjectReader::readPayment($buildSubject);
-        $order = $payment->getOrder();
 
         return [
-            Config::TXN_ID => $order->getOrderIncrementId()
+            Config::TXN_ID => $payment->getPayment()->getAdditionalInformation(Config::TXN_ID)
         ];
     }
 }
