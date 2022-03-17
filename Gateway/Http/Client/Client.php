@@ -70,16 +70,13 @@ class Client implements ClientInterface
         'number'
     ];
 
-    /**
-     * @var array <mixed>
-     */
     protected $requestData = [];
 
     /**
      * @param Logger $logger
      * @param Request $request
      * @param Config $config
-     * @param string $operation
+     * @param $operation
      */
     public function __construct(
         Logger $logger,
@@ -96,12 +93,10 @@ class Client implements ClientInterface
     /**
      * @param TransferInterface $transferObject
      * @return array|DataObject
-     * @return array <mixed>
      */
     public function placeRequest(TransferInterface $transferObject)
     {
         $response = [];
-        /** @phpstan-ignore-next-line */
         $this->requestData = $transferObject->getBody();
 
         switch ($this->operation) {
@@ -121,11 +116,9 @@ class Client implements ClientInterface
                 throw new \InvalidArgumentException(sprintf('Unknown operation [%s]', $this->operation));
         }
 
-        if ($responseObj instanceof DataObject) {
-            $response['response'] = $responseObj->getData('response') ?: '';
-            $response['status'] = $responseObj->getData('status') ?: '';
-            $response['reason'] = $responseObj->getData('reason') ?: '';
-        }
+        $response['response'] = $responseObj->getData('response') ?: '';
+        $response['status'] = $responseObj->getData('status') ?: '';
+        $response['reason'] = $responseObj->getData('reason') ?: '';
 
         $this->logData($response);
 
@@ -134,7 +127,7 @@ class Client implements ClientInterface
 
     /**
      * @param TransferInterface $transferObject
-     * @return DataObject <mixed> | DataObject
+     * @return array|DataObject
      */
     public function processListRequest($transferObject)
     {
@@ -230,13 +223,12 @@ class Client implements ClientInterface
 
     /**
      * Log data to payoneer.log
-     * @param array <mixed> $result
-     * @return void
+     * @param array <mixed> $resutl
      */
-    public function logData($result)
+    public function logData($resutl)
     {
         if ((bool)$this->config->getValue('debug') == true) {
-            $this->logger->debug([$result]);
+            $this->logger->debug([$resutl]);
         }
     }
 }

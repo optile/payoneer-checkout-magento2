@@ -38,7 +38,7 @@ class Fields implements OptionSourceInterface
     /**
      * Possible environment types
      *
-     * @return array <mixed>
+     * @return array
      */
     public function toOptionArray(): array
     {
@@ -55,7 +55,7 @@ class Fields implements OptionSourceInterface
     }
 
     /**
-     * @return array <mixed>
+     * @return array|\string[][]
      */
     public function fontWeight(): array
     {
@@ -76,7 +76,7 @@ class Fields implements OptionSourceInterface
     }
 
     /**
-     * @return array <mixed>
+     * @return array|\string[][]
      */
     public function alignText(): array
     {
@@ -97,7 +97,7 @@ class Fields implements OptionSourceInterface
     }
 
     /**
-     * @return array <mixed>
+     * @return array|array[]
      */
     public function paymentAction(): array
     {
@@ -114,7 +114,7 @@ class Fields implements OptionSourceInterface
     }
 
     /**
-     * @return array <mixed>
+     * @return array|array[]
      */
     public function paymentFlow(): array
     {

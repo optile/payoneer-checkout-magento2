@@ -38,10 +38,9 @@ class CallBackDataBuilder implements BuilderInterface
     }
 
     /**
-     * Builds callback data
-     *
-     * @param array <mixed> $buildSubject
-     * @return array <mixed>
+     * Builds callback array
+     * @param array $buildSubject
+     * @return array
      */
     public function build(array $buildSubject)
     {

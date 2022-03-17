@@ -31,10 +31,7 @@ class ItemsDataBuilder implements BuilderInterface
     }
 
     /**
-     * Builds items data
-     *
-     * @param array <mixed> $buildSubject
-     * @return array <mixed>
+     * @inheritdoc
      */
     public function build(array $buildSubject)
     {
@@ -55,8 +52,8 @@ class ItemsDataBuilder implements BuilderInterface
     /**
      * Build items
      *
-     * @param OrderAdapterInterface $order
-     * @return array <mixed>
+     * @param $order OrderAdapterInterface
+     * @return array
      */
     protected function buildItems($order)
     {

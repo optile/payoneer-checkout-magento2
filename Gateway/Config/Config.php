@@ -103,12 +103,12 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /**
      * @var string|null
      */
-    private $methodCode;/** @phpstan-ignore-line */
+    private $methodCode;
 
     /**
      * @var string|null
      */
-    private $pathPattern;/** @phpstan-ignore-line */
+    private $pathPattern;
 
     /**
      * @var string[]
@@ -182,7 +182,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getCurrentCurrency(): string
     {
-        return $this->storeManager->getStore()->getCurrentCurrencyCode();/** @phpstan-ignore-line */
+        return $this->storeManager->getStore()->getCurrentCurrencyCode();
     }
 
     /**
@@ -213,7 +213,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      *
      * @param null $merchantCode
      * @param null $appKey
-     * @return array <mixed>
+     * @return array
      */
     public function prepareHeaders(
         $merchantCode = null,
@@ -263,7 +263,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     /**
      * Get style configuration values
-     * @return array <mixed>
+     * @return array
      */
     public function getStyleConfig()
     {

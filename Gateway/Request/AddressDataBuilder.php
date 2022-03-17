@@ -19,8 +19,8 @@ class AddressDataBuilder implements BuilderInterface
     const FIRST_NAME = 'firstname';
     const LAST_NAME = 'lastname';
     const MIDDLE_NAME = 'middlename';
-    const EMPTY_STRING = '';
 
+    const EMPTY_STRING = '';
     /**
      * Builds address data
      *
@@ -45,7 +45,7 @@ class AddressDataBuilder implements BuilderInterface
         return [
             Config::CUSTOMER => [
                 Config::ADDRESSES => [
-                    Config::SHIPPING => $shippingAddress ? $this->getAddressData($shippingAddress) : [],
+                    Config::SHIPPING => $this->getAddressData($shippingAddress),
                     Config::BILLING => $billingAddressChanged ?
                         $this->getNewBillingAddress($billingAddress) :
                         $this->getAddressData($billingAddress)
@@ -57,7 +57,7 @@ class AddressDataBuilder implements BuilderInterface
     /**
      * Gets address details
      *
-     * @param AddressAdapterInterface $address
+     * @param AddressAdapterInterface|array $address
      * @return array <mixed>
      */
     public function getAddressData($address)

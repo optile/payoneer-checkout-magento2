@@ -68,7 +68,7 @@ class Helper
     /**
      * Get the static file's path
      * @param string $fileId
-     * @param array <mixed> $params
+     * @param array $params
      * @return string
      */
     public function getStaticFilePath($fileId, $params)
@@ -80,7 +80,6 @@ class Helper
      * Save customer registration id
      * @param string $registrationId
      * @param int $customerId
-     * @return void
      */
     public function saveRegistrationId($registrationId, $customerId)
     {

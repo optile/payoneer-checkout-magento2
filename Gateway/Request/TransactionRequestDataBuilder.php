@@ -7,16 +7,16 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
- * Class TransactionIDDataBuilder
+ * Class TransactionRequestDataBuilder
  * Builds magento transaction request
  */
-class TransactionIDDataBuilder implements BuilderInterface
+class TransactionRequestDataBuilder implements BuilderInterface
 {
     /**
-     * Builds transaction id
+     * Builds ENV request
      *
-     * @param array <mixed> $buildSubject
-     * @return array <mixed>
+     * @param array $buildSubject
+     * @return array
      */
     public function build(array $buildSubject)
     {

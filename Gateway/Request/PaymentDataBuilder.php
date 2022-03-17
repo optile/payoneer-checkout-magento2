@@ -27,10 +27,7 @@ class PaymentDataBuilder implements BuilderInterface
     }
 
     /**
-     * Builds payment data
-     *
-     * @param array <mixed> $buildSubject
-     * @return array <mixed>
+     * @inheritdoc
      */
     public function build(array $buildSubject)
     {

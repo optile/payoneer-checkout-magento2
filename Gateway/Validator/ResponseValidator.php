@@ -15,7 +15,7 @@ class ResponseValidator extends AbstractValidator
     /**
      * Performs domain-related validation for business object
      *
-     * @param array <mixed> $validationSubject
+     * @param array $validationSubject
      * @return ResultInterface
      */
     public function validate(array $validationSubject): ResultInterface
