@@ -2,6 +2,7 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
+use Magento\Checkout\Model\Session;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
@@ -19,12 +20,20 @@ class CustomerDataBuilder implements BuilderInterface
     private $helper;
 
     /**
+     * @var Session
+     */
+    private $checkoutSession;
+
+    /**
      * @param Helper $helper
+     * @param Session $checkoutSession
      */
     public function __construct(
-        Helper $helper
+        Helper $helper,
+        Session $checkoutSession
     ) {
         $this->helper = $helper;
+        $this->checkoutSession = $checkoutSession;
     }
     /**
      * @inheritdoc
@@ -42,10 +51,15 @@ class CustomerDataBuilder implements BuilderInterface
             $registrationId = $this->helper->getRegistrationId($customerId);
         }
 
+        $customerEmail = $billingAddress->getEmail();
+        if (!$customerEmail) {
+            $customerEmail = $this->checkoutSession->getPayoneerCustomerEmail();
+        }
+
         $customerData = [
             Config::CUSTOMER    => [
                 Config::NUMBER  => $billingAddress->getTelephone(),
-                Config::EMAIL   => $billingAddress->getEmail(),
+                Config::EMAIL   => $customerEmail ,
                 Config::COMPANY => [
                     Config::NAME    => $billingAddress->getCompany(),
                 ],

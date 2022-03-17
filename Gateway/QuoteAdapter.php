@@ -10,6 +10,7 @@ use Magento\Payment\Gateway\Data\Quote\QuoteAdapter as MagentoQuoteAdapter;
 
 /**
  * Class QuoteAdapter
+ * Gets the details from quote
  */
 class QuoteAdapter extends MagentoQuoteAdapter
 {

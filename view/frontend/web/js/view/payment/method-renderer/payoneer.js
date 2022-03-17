@@ -67,8 +67,11 @@ define(
             },
 
             selectPaymentMethod: function () {
-                this.processPayoneerPayment('');
-                return this._super();
+                let isSelected = this._super();
+                if (isSelected) {
+                    this.processPayoneerPayment('');
+                }
+                return isSelected;
             },
 
             isActive: function() {
