@@ -35,7 +35,10 @@ class StyleDataBuilder implements BuilderInterface
     }
 
     /**
-     * @inheritdoc
+     * Builds style data
+     *
+     * @param array <mixed> $buildSubject
+     * @return array <mixed>
      */
     public function build(array $buildSubject)
     {

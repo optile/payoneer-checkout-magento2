@@ -34,8 +34,10 @@ class PreselectionBuilder implements BuilderInterface
     }
 
     /**
-     * @param array $buildSubject
-     * @return array
+     * Builds preselection data
+     *
+     * @param array <mixed> $buildSubject
+     * @return array <mixed>
      */
     public function build(array $buildSubject)
     {

@@ -39,7 +39,7 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * Retrieve assoc array of checkout configuration
      *
-     * @return array
+     * @return array <mixed>
      */
     public function getConfig()
     {

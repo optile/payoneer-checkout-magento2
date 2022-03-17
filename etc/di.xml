@@ -106,7 +106,9 @@
     <!-- Authorize command -->
     <virtualType name="PayoneerAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Request\TransactionRequestDataBuilder</argument>
+            <argument name="requestBuilder" xsi:type="object">
+                Payoneer\OpenPaymentGateway\Gateway\Request\TransactionIDDataBuilder
+            </argument>
             <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\MagentoTransferFactory</argument>
             <argument name="client" xsi:type="object">PayoneerClientAuthorize</argument>
             <argument name="handler" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Response\ResponseHandler</argument>
@@ -117,7 +119,9 @@
     <!-- Capture command -->
     <virtualType name="PayoneerCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Request\TransactionRequestDataBuilder</argument>
+            <argument name="requestBuilder" xsi:type="object">
+                Payoneer\OpenPaymentGateway\Gateway\Request\TransactionIDDataBuilder
+            </argument>
             <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\MagentoTransferFactory</argument>
             <argument name="client" xsi:type="object">PayoneerClientAuthorizeCapture</argument>
             <argument name="handler" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Response\ResponseHandler</argument>

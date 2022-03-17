@@ -36,17 +36,17 @@ class Request
     }
 
     /**
-     * @param string $method
+     * @param int|string $method
      * @param string $endPoint
-     * @param $credentials
-     * @param array<mixed> $data
+     * @param array <mixed> $credentials
+     * @param array <mixed>|string $data
      * @return DataObject
      */
     public function send(
         $method,
         $endPoint,
         $credentials,
-        array $data = []
+        $data
     ): DataObject {
         $options = [];
         if ($method == WebRequest::HTTP_METHOD_GET) {

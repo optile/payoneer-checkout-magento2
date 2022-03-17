@@ -35,8 +35,12 @@ class CustomerDataBuilder implements BuilderInterface
         $this->helper = $helper;
         $this->checkoutSession = $checkoutSession;
     }
+
     /**
-     * @inheritdoc
+     * Builds customer data
+     *
+     * @param array <mixed> $buildSubject
+     * @return array <mixed>
      */
     public function build(array $buildSubject)
     {
@@ -58,15 +62,15 @@ class CustomerDataBuilder implements BuilderInterface
 
         $customerData = [
             Config::CUSTOMER    => [
-                Config::NUMBER  => $billingAddress->getTelephone(),
-                Config::EMAIL   => $customerEmail ,
+                Config::NUMBER  => $billingAddress ? $billingAddress->getTelephone() : null,
+                Config::EMAIL   => $customerEmail,
                 Config::COMPANY => [
-                    Config::NAME    => $billingAddress->getCompany(),
+                    Config::NAME    => $billingAddress ? $billingAddress->getCompany() : null,
                 ],
                 Config::NAME    => [
-                    Config::FIRST_NAME  => $billingAddress->getFirstname(),
-                    Config::MIDDLE_NAME => $billingAddress->getMiddlename(),
-                    Config::LAST_NAME   => $billingAddress->getLastname()
+                    Config::FIRST_NAME  => $billingAddress ? $billingAddress->getFirstname() : null,
+                    Config::MIDDLE_NAME => $billingAddress ? $billingAddress->getMiddlename() : null,
+                    Config::LAST_NAME   => $billingAddress ? $billingAddress->getLastname() : null
                 ]
             ]
         ];

@@ -44,10 +44,10 @@ class PayoneerClient
     }
 
     /**
-     * @param string $method
-     * @param $hostname
-     * @param $endpoint
-     * @param array<mixed> $options
+     * @param int|string $method
+     * @param string $hostname
+     * @param string $endpoint
+     * @param array <mixed> $options
      * @return mixed
      */
     public function send(
@@ -69,16 +69,16 @@ class PayoneerClient
     /**
      * Do API request with provided params
      *
-     * @param $hostname
-     * @param $endpoint
-     * @param array<mixed> $options
-     * @param string $requestMethod *
+     * @param string $hostname
+     * @param string $endpoint
+     * @param array <mixed> $options
+     * @param string|int $requestMethod
      * @return mixed
      */
     private function doRequest(
         $hostname,
         $endpoint,
-        array $options = [],
+        $options = [],
         $requestMethod = Request::HTTP_METHOD_GET
     ) {
         try {
@@ -88,7 +88,7 @@ class PayoneerClient
             ]]);
 
             $response = $client->request(
-                $requestMethod,
+                (string)$requestMethod,
                 $uriEndpoint,
                 $options
             );

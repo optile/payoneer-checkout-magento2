@@ -31,8 +31,8 @@ class ResponseHandler implements HandlerInterface
     /**
      * Handles response
      *
-     * @param array $handlingSubject
-     * @param array $response
+     * @param array <mixed> $handlingSubject
+     * @param array <mixed> $response
      * @return void
      */
     public function handle(array $handlingSubject, array $response)
