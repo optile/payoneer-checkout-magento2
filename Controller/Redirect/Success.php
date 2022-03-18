@@ -2,6 +2,7 @@
 
 namespace Payoneer\OpenPaymentGateway\Controller\Redirect;
 
+use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ResponseInterface;
@@ -47,25 +48,33 @@ class Success implements HttpGetActionInterface
     protected $helper;
 
     /**
+     * @var Session
+     */
+    private $checkoutSession;
+
+    /**
      * Success constructor.
      * @param Context $context
      * @param CartManagementInterface $cartManagement
      * @param CartRepositoryInterface $cartRepository
      * @param PageFactory $resultPageFactory
      * @param Helper $helper
+     * @param Session $checkoutSession
      */
     public function __construct(
         Context $context,
         CartManagementInterface $cartManagement,
         CartRepositoryInterface $cartRepository,
         PageFactory $resultPageFactory,
-        Helper $helper
+        Helper $helper,
+        Session $checkoutSession
     ) {
         $this->context = $context;
         $this->cartManagement = $cartManagement;
         $this->cartRepository = $cartRepository;
         $this->resultPageFactory = $resultPageFactory;
         $this->helper = $helper;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -100,7 +109,13 @@ class Success implements HttpGetActionInterface
 
                 if (!$quote->getCustomerId()) {
                     $quote->setCheckoutMethod(CartManagementInterface::METHOD_GUEST);
+                    if (!$quote->getCustomerEmail() && !$quote->getBillingAddress()->getEmail()) {
+                        $quote->setCustomerEmail($this->checkoutSession->getPayoneerCustomerEmail());
+                    }
                 }
+
+                $this->unsetCustomCheckoutSession();
+
                 $this->cartManagement->placeOrder($cartId);
                 return $this->resultPageFactory->create();
             } else {
@@ -108,6 +123,17 @@ class Success implements HttpGetActionInterface
             }
         } catch (\Exception $e) {
             return $this->helper->redirectToCart($e->getMessage());
+        }
+    }
+
+    /**
+     * Unset custom checkout session variable
+     * @return void
+     */
+    public function unsetCustomCheckoutSession()
+    {
+        if ($this->checkoutSession->getPayoneerCustomerEmail()) {
+            $this->checkoutSession->unsPayoneerCustomerEmail();
         }
     }
 }
