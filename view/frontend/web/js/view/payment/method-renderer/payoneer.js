@@ -22,7 +22,8 @@ define(
                 this._super()
                     .observe({
                         shouldShowMessage: ko.observable(false),
-                        isSuccessResponse: ko.observable(false)
+                        isSuccessResponse: ko.observable(false),
+                        isPaymentProcessed: ko.observable(false)
                     });
 
                 this.shouldShowMessage.subscribe(function (newValue) {
@@ -38,12 +39,22 @@ define(
                             prevAddress = newAddress;
                             if (newAddress) {
                                 if (self.getCurrentPaymentMethod() === self.getCode()){
+                                    self.isPaymentProcessed(true);
                                     self.processPayoneerPayment(newAddress);
                                 }
                             }
                         }
                     }
                 );
+
+                quote.totals.subscribe(function (totals) {
+                    if (!self.isPaymentProcessed()){
+                        if (self.getCurrentPaymentMethod() === self.getCode()) {
+                            self.processPayoneerPayment('');
+                        }
+                    }
+                    self.isPaymentProcessed(false);
+                });
                 return this;
             },
 
@@ -69,6 +80,7 @@ define(
             selectPaymentMethod: function () {
                 let isSelected = this._super();
                 if (isSelected) {
+                    this.isPaymentProcessed(true);
                     this.processPayoneerPayment('');
                 }
                 return isSelected;
@@ -136,7 +148,6 @@ define(
                         } else {
                             self.shouldShowMessage(true);
                         }
-                        $('body').trigger('processStop');
                     } else{
                         if (response.links) {
                             var configObj = {
@@ -153,11 +164,11 @@ define(
                         } else{
                             self.shouldShowMessage(true);
                         }
-                        $('body').trigger('processStop');
                     }
-                }).fail(function (response) {
                     $('body').trigger('processStop');
+                }).fail(function (response) {
                     $('.payoneer.message.error').show();
+                    $('body').trigger('processStop');
                     self.shouldShowMessage(true);
                 });
             }
