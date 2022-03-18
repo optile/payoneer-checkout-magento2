@@ -37,7 +37,7 @@ class ValidateCredentials extends Field
             $website = $this->_storeManager->getWebsite($this->getRequest()->getParam('website'));
             if ($website->getId()) {
                 /** @var Store $store */
-                $store = $website->getDefaultStore();
+                $store = $website->getDefaultStore();/** @phpstan-ignore-line */
                 $storeId = $store->getStoreId();
             }
         }

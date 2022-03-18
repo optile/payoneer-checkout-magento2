@@ -11,9 +11,14 @@ use Magento\Framework\Logger\Handler\Base as BaseHandler;
 class Handler extends BaseHandler
 {
     /**
+     * @var string
+     */
+    protected $fileName;
+
+    /**
      * Handler constructor.
      * @param DriverInterface $filesystem
-     * @param $fileName
+     * @param string $fileName
      * @param null $filePath
      * @throws \Exception
      */

@@ -3,7 +3,6 @@
 namespace Payoneer\OpenPaymentGateway\Controller\Integration;
 
 use Magento\Checkout\Model\Session;
-use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Json;

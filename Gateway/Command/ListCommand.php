@@ -75,7 +75,7 @@ class ListCommand extends GatewayCommand
 
     /**
      * @param array $commandSubject
-     * @return array|void
+     * @return array <mixed>|void
      * @throws ClientException
      * @throws ConverterException
      */

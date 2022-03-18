@@ -25,7 +25,7 @@ class QuoteAdapter extends MagentoQuoteAdapter
     public function __construct(CartInterface $quote, AddressAdapterFactory $addressAdapterFactory)
     {
         parent::__construct($quote, $addressAdapterFactory);
-        $this->quote = $quote;
+        $this->quote = $quote;/** @phpstan-ignore-line */
     }
 
     /**

@@ -90,8 +90,8 @@ class ValidateCredentials extends Action
 
     /**
      * Set the field values
-     * @param $environment
-     * @param $storeId
+     * @param string $environment
+     * @param mixed $storeId
      * @return void
      */
     public function setFieldValues($environment, $storeId)

@@ -79,7 +79,7 @@ class ValidateCredentialsObserver implements ObserverInterface
         $sharedFields = ['environment', 'merchant_gateway_key'];
         $sandboxFields = ['sandbox_api_key', 'sandbox_host_name', 'sandbox_store_code'];
         $liveFields = ['live_api_key', 'live_host_name', 'live_store_code'];
-
+        /** @phpstan-ignore-next-line */
         $groups = $this->context->getRequest()->getPost('groups');
         $payoneerGroup = $groups['payoneer'];
 
@@ -121,8 +121,10 @@ class ValidateCredentialsObserver implements ObserverInterface
     }
 
     /**
+     * Prepare config values
      * @param array <mixed> $fields
      * @param array <mixed> $group
+     * @return void
      */
     public function prepareConfigValues($fields, $group)
     {

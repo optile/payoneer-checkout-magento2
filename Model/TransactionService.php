@@ -11,6 +11,8 @@ use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Quote\Model\Quote;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Payment\Gateway\Command\ResultInterface;
 
 /**
  * Class GetPayoneerTransactionService
@@ -51,6 +53,11 @@ class TransactionService
     protected $request;
 
     /**
+     * @var CartRepositoryInterface
+     */
+    protected $quoteRepository;
+
+    /**
      * GetPayoneerTransactionService constructor.
      * @param CommandPoolInterface $commandPool
      * @param PaymentDataObjectFactory $paymentDataObjectFactory
@@ -58,6 +65,7 @@ class TransactionService
      * @param ConfigInterface $config
      * @param ManagerInterface $messageManager
      * @param Request $request
+     * @param CartRepositoryInterface $quoteRepository
      */
     public function __construct(
         CommandPoolInterface $commandPool,
@@ -65,7 +73,8 @@ class TransactionService
         JsonFactory $resultJsonFactory,
         ConfigInterface $config,
         ManagerInterface $messageManager,
-        Request $request
+        Request $request,
+        CartRepositoryInterface $quoteRepository
     ) {
         $this->commandPool = $commandPool;
         $this->paymentDataObjectFactory = $paymentDataObjectFactory;
@@ -73,6 +82,7 @@ class TransactionService
         $this->config = $config;
         $this->messageManager = $messageManager;
         $this->request = $request;
+        $this->quoteRepository = $quoteRepository;
     }
 
     /**
@@ -89,7 +99,8 @@ class TransactionService
         }
 
         if (!$quote->getReservedOrderId()) {
-            $quote->reserveOrderId()->save();
+            $quote = $quote->reserveOrderId();
+            $this->quoteRepository->save($quote);
         }
 
         $token = strtotime('now') . uniqid();
@@ -129,13 +140,14 @@ class TransactionService
 
     /**
      * Process response of hosted integration
-     * @param array <mixed> $result
+     * @param array <mixed>|ResultInterface|null $result
      * @return array <mixed>
      */
     public function processHostedResponse($result)
     {
         $jsonData = [];
-        if (isset($result['response']['redirect'])) {
+        /** @phpstan-ignore-next-line */
+        if ($result && isset($result['response']['redirect'])) {
             $jsonData = [
                 'redirectURL' => $result['response']['redirect']['url']
             ];
@@ -147,13 +159,14 @@ class TransactionService
 
     /**
      * Process response of embedded integration
-     * @param array <mixed> $result
+     * @param array <mixed>|ResultInterface|null $result
      * @return array <mixed>
      */
     public function processEmbeddedResponse($result)
     {
         $jsonData = [];
-        if (isset($result['response']['links'])) {
+        /** @phpstan-ignore-next-line */
+        if ($result && isset($result['response']['links'])) {
             $jsonData = [
                 'links' => $result['response']['links']
             ];

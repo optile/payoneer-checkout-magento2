@@ -7,7 +7,6 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Raw;
 use Magento\Framework\Controller\Result\RawFactory;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\UrlInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
@@ -22,11 +21,6 @@ class Style implements HttpGetActionInterface
     protected $resultRawFactory;
 
     /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-
-    /**
      * @var Config
      */
     protected $config;
@@ -34,16 +28,13 @@ class Style implements HttpGetActionInterface
     /**
      * Style constructor.
      * @param RawFactory $resultRawFactory
-     * @param UrlInterface $urlBuilder
      * @param Config $config
      */
     public function __construct(
         RawFactory $resultRawFactory,
-        UrlInterface $urlBuilder,
         Config $config
     ) {
         $this->resultRawFactory = $resultRawFactory;
-        $this->urlBuilder = $urlBuilder;
         $this->config = $config;
     }
 
@@ -72,7 +63,7 @@ class Style implements HttpGetActionInterface
 
     /**
      * Get formatted css for the container
-     * @param $styleConfig
+     * @param array <mixed> $styleConfig
      * @return string
      */
     public function getContainerStyle($styleConfig)
