@@ -7,9 +7,18 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/full-screen-loader',
         'payoneerWidget'
     ],
-    function ($, ko, Component, checkoutData, quote, payoneerWidget) {
+    function (
+        $,
+        ko,
+        Component,
+        checkoutData,
+        quote,
+        fullScreenLoader,
+        payoneerWidget
+    ) {
         'use strict';
 
         return Component.extend({
@@ -166,10 +175,12 @@ define(
                         }
                     }
                     $('body').trigger('processStop');
+                    fullScreenLoader.stopLoader();
                 }).fail(function (response) {
                     $('.payoneer.message.error').show();
                     $('body').trigger('processStop');
                     self.shouldShowMessage(true);
+                    fullScreenLoader.stopLoader();
                 });
             }
         });
