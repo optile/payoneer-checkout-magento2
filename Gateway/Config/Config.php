@@ -72,6 +72,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const TRANSACTION_ID        =   'transactionId';
     const INTEGRATION           =   'integration';
     const DIVISION              =   'division';
+    const ALLOW_DELETE          =   'allowDelete';
     const PRODUCTS              =   'products';
     const SKU                   =   'code';
     const QUANTITY              =   'quantity';

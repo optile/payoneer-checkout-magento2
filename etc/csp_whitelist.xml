@@ -21,6 +21,7 @@
         <policy id="img-src">
             <values>
                 <value id="api-sandbox-resource-image" type="host">https://resources.sandbox.oscato.com</value>
+                <value id="sandbox-paypal-image" type="host">https://hnd.stats.paypal.com</value>
             </values>
         </policy>
     </policies>
