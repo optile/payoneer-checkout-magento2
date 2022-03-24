@@ -14,7 +14,7 @@ use Payoneer\OpenPaymentGateway\Gateway\QuoteAdapter as PayoneerQuoteAdapter;
  */
 class ItemsDataBuilder implements BuilderInterface
 {
-    const SHIPPING = 'Shipping charge';
+    const ADJUSTMENTS = 'Total Adjustments';
 
     /**
      * @var Config
@@ -76,13 +76,21 @@ class ItemsDataBuilder implements BuilderInterface
             ];
         }
         if ($order instanceof PayoneerQuoteAdapter) {
-            if ($order->getShippingAmount() > 0) {
+            $totalAdjustments = 0.00;
+            if ($order->getShippingAmountInclTax() > 0) {
+                $totalAdjustments += $order->getShippingAmountInclTax();
+            }
+            if ($order->getDiscountAmount() < 0) {
+                $totalAdjustments += $order->getDiscountAmount();
+            }
+            if ($totalAdjustments > 0) {
                 $result[] = [
-                    Config::NAME    =>  self::SHIPPING,
-                    Config::AMOUNT  =>  $order->getShippingAmount()
+                    Config::NAME => self::ADJUSTMENTS,
+                    Config::AMOUNT => $totalAdjustments
                 ];
             }
         }
+
         return $result;
     }
 }
