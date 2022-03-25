@@ -103,7 +103,7 @@ class Success implements HttpGetActionInterface
                     $payment->save();
                 }
 
-                if (isset($reqParams['customerRegistrationId'])) {
+                if ($quote->getCustomerId() && isset($reqParams['customerRegistrationId'])) {
                     $this->helper->saveRegistrationId($reqParams['customerRegistrationId'], $quote->getCustomerId());
                 }
 
