@@ -3,9 +3,9 @@
 namespace Payoneer\OpenPaymentGateway\Gateway\Http;
 
 use Magento\Payment\Gateway\Http\TransferBuilder;
-use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 
 /**
  * Class TransferFactory
@@ -40,22 +40,42 @@ class TransferFactory implements TransferFactoryInterface
      * Builds gateway transfer object
      *
      * @param array <mixed> $request
+     * @param PaymentDataObjectInterface $payment
      * @return TransferInterface
      */
-    public function create(array $request)
+    public function create(array $request, PaymentDataObjectInterface $payment)
     {
         $merchantCode = $this->config->getValue('merchant_gateway_key');
         $apiKey = $this->config->getCredentials('api_key');
 
         return $this->transferBuilder
             ->setBody($request)
-            ->setAuthUsername($merchantCode)
-            ->setAuthPassword($apiKey)
-            ->setMethod(Config::METHOD_POST)
-            ->setUri(Config::END_POINT)
+            ->setMethod($this->getMethod())
+            ->setUri($this->getApiUri($payment))
             ->setHeaders(
                 $this->config->prepareHeaders($merchantCode, $apiKey)
             )
             ->build();
+    }
+
+    /**
+     * Return the api uri
+     *
+     * @param PaymentDataObjectInterface $payment
+     * @return string
+     */
+    protected function getApiUri(PaymentDataObjectInterface $payment)
+    {
+        return Config::END_POINT;
+    }
+
+    /**
+     * Return the method
+     *
+     * @return string
+     */
+    protected function getMethod()
+    {
+        return Config::METHOD_POST;
     }
 }

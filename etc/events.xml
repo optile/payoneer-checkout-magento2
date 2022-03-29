@@ -4,4 +4,7 @@
     <event name="payment_method_assign_data">
         <observer name="payoneer_payment_gateway_data_assign" instance="Payoneer\OpenPaymentGateway\Observer\DataAssignObserver" />
     </event>
+    <event name="sales_order_invoice_save_after">
+        <observer name="payoneer_payment_gateway_capture" instance="Payoneer\OpenPaymentGateway\Observer\InvoiceSaveAfterObserver" />
+    </event>
 </config>

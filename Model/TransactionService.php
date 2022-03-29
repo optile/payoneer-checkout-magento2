@@ -12,7 +12,6 @@ use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Quote\Model\Quote;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Payment\Gateway\Command\ResultInterface;
 
 /**
  * Class GetPayoneerTransactionService

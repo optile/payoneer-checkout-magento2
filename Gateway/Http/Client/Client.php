@@ -15,9 +15,10 @@ use Payoneer\OpenPaymentGateway\Model\Api\Request;
  */
 class Client implements ClientInterface
 {
-    const AUTHORIZE = 'authorize';
-    const LIST      = 'list';
-    const CAPTURE   = 'authorize_capture';
+    const AUTHORIZE     = 'authorize';
+    const LIST          = 'list';
+    const CAPTURE       = 'authorize_capture';
+    const LIST_CAPTURE  = 'list_capture';
 
     /**
      * @var Logger
@@ -101,9 +102,10 @@ class Client implements ClientInterface
     public function placeRequest(TransferInterface $transferObject)
     {
         $response = [];
+        $responseObj = null;
         /** @phpstan-ignore-next-line */
         $this->requestData = $transferObject->getBody();
-
+        $this->logData(['operation' => $this->operation]);
         switch ($this->operation) {
             case self::LIST:
                 $isRequestValid = $this->validateRequest();
@@ -116,6 +118,9 @@ class Client implements ClientInterface
             case self::AUTHORIZE:
             case self::CAPTURE:
                 $responseObj = $this->processAuthRequest($transferObject);
+                break;
+            case self::LIST_CAPTURE:
+                $responseObj = $this->processListRequest($transferObject);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unknown operation [%s]', $this->operation));
@@ -147,10 +152,9 @@ class Client implements ClientInterface
         if ((bool)$this->config->getValue('debug') == true) {
             $this->logger->debug(['request' => $data]);
         }
-
         return $this->request->send(
             $transferObject->getMethod(),
-            Config::END_POINT,
+            $transferObject->getUri(),
             $credentials,
             $data
         );
@@ -163,7 +167,7 @@ class Client implements ClientInterface
     protected function processAuthRequest($transferObject)
     {
         $responseObject = new \Magento\Framework\DataObject();
-        $responseObject->setData('response', $this->getResultCode($transferObject));
+        $responseObject->setData('response', $this->getResponseData($transferObject));
         return $responseObject;
     }
 
@@ -171,7 +175,7 @@ class Client implements ClientInterface
      * @param TransferInterface $transfer
      * @return array|mixed
      */
-    private function getResultCode(TransferInterface $transfer)
+    private function getResponseData(TransferInterface $transfer)
     {
         $headers = $transfer->getHeaders();
 

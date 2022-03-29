@@ -62,7 +62,6 @@ define(
                             self.processPayoneerPayment('');
                         }
                     }
-                    self.isPaymentProcessed(false);
                 });
                 return this;
             },

@@ -7,4 +7,7 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="payoneer_action_buttons" type="Payoneer\OpenPaymentGateway\Plugin\Adminhtml\OrderViewPlugin"/>
+    </type>
 </config>

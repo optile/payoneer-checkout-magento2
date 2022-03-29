@@ -27,7 +27,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     /**
      * API endpoints
      */
-    const END_POINT = 'api/lists';
+    const END_POINT = 'api/lists/';
+    const LIST_CAPTURE = 'list_capture';
 
     /**
      * API Request constants
@@ -260,6 +261,15 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function isHostedIntegration()
     {
         return $this->getValue('payment_flow') == AdminFields::HOSTED;
+    }
+
+    /**
+     * Check if Payoneer module is enabled
+     * @return mixed|null
+     */
+    public function isPayoneerEnabled()
+    {
+        return $this->getValue('active');
     }
 
     /**

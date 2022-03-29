@@ -95,7 +95,6 @@ class PayoneerClient
             $responseBody = $response->getBody();
             $responseBody->rewind();
         } catch (GuzzleException $exception) {
-            /** @var Response $response */
             $response = $this->responseFactory->create([
                 'status' => $exception->getCode(),
                 'reason' => $exception->getMessage()
