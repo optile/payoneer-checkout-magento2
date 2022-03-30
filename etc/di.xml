@@ -54,8 +54,8 @@
             <argument name="commands" xsi:type="array">
                 <item name="authorize" xsi:type="string">PayoneerAuthorizeCommand</item>
                 <item name="capture" xsi:type="string">PayoneerCaptureCommand</item>
-                <item name="hosted" xsi:type="string">PayoneerHostedCommand</item>
-                <item name="embedded" xsi:type="string">PayoneerEmbeddedCommand</item>
+                <item name="hosted" xsi:type="string">PayoneerListCommand</item>
+                <item name="embedded" xsi:type="string">PayoneerListCommand</item>
                 <item name="list_capture" xsi:type="string">PayoneerListCaptureCommand</item>
             </argument>
         </arguments>
@@ -79,41 +79,17 @@
         </arguments>
     </virtualType>
 
-    <!-- Hosted List command -->
-    <virtualType name="PayoneerHostedCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
+    <!-- List command -->
+    <virtualType name="PayoneerListCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">PayoneerHostedListRequest</argument>
+            <argument name="requestBuilder" xsi:type="object">PayoneerListRequestBuilder</argument>
             <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
             <argument name="client" xsi:type="object">PayoneerClientList</argument>
         </arguments>
     </virtualType>
 
-    <!-- Hosted List Request -->
-    <virtualType name="PayoneerHostedListRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
-        <arguments>
-            <argument name="builders" xsi:type="array">
-                <item name="base_request" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\BaseRequestDataBuilder</item>
-                <item name="customer" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\CustomerDataBuilder</item>
-                <item name="addresses" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AddressDataBuilder</item>
-                <item name="items" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\ItemsDataBuilder</item>
-                <item name="payment" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\PaymentDataBuilder</item>
-                <item name="style" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\StyleDataBuilder</item>
-                <item name="callback" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\CallBackDataBuilder</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <!-- Embedded List command -->
-    <virtualType name="PayoneerEmbeddedCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
-        <arguments>
-            <argument name="requestBuilder" xsi:type="object">PayoneerEmbeddedListRequest</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">PayoneerClientList</argument>
-        </arguments>
-    </virtualType>
-
-    <!-- Embedded List Request-->
-    <virtualType name="PayoneerEmbeddedListRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    <!-- List Request -->
+    <virtualType name="PayoneerListRequestBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
                 <item name="base_request" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\BaseRequestDataBuilder</item>

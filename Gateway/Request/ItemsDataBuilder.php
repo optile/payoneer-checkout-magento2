@@ -69,10 +69,10 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::NAME            =>  $item->getName(),
                 Config::QUANTITY        =>  $item->getData('qty'),
                 Config::CURRENCY        =>  $order->getCurrencyCode(),
-                Config::AMOUNT          =>  $item->getBasePrice(),
-                Config::NET_AMOUNT      =>  $item->getBaseRowTotalInclTax(),
-                Config::TAX_AMOUNT      =>  $item->getBaseTaxAmount(),
-                Config::TAX_PERCENT     =>  $item->getBaseRowTotalInclTax()
+                Config::AMOUNT          =>  number_format($item->getBaseRowTotal(), 2),
+                Config::NET_AMOUNT      =>  number_format($item->getBaseRowTotal(), 2),
+                Config::TAX_AMOUNT      =>  number_format($item->getBaseTaxAmount(), 2),
+                Config::TAX_PERCENT     =>  number_format($item->getBaseRowTotalInclTax(), 2)
             ];
         }
         if ($order instanceof PayoneerQuoteAdapter) {
@@ -83,10 +83,13 @@ class ItemsDataBuilder implements BuilderInterface
             if ($order->getDiscountAmount() < 0) {
                 $totalAdjustments += $order->getDiscountAmount();
             }
+            if ($order->getTaxAmount() > 0) {
+                $totalAdjustments += $order->getTaxAmount();
+            }
             if ($totalAdjustments > 0) {
                 $result[] = [
                     Config::NAME => self::ADJUSTMENTS,
-                    Config::AMOUNT => $totalAdjustments
+                    Config::AMOUNT => number_format($totalAdjustments, 2)
                 ];
             }
         }

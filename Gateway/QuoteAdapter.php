@@ -47,6 +47,15 @@ class QuoteAdapter extends MagentoQuoteAdapter
     }
 
     /**
+     * Get tax amount
+     * @return float
+     */
+    public function getTaxAmount()
+    {
+        return $this->getAddressModel()->getTaxAmount();
+    }
+
+    /**
      * Get shipping amount inclusive tax
      * @return float
      */
