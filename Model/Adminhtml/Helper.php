@@ -24,6 +24,7 @@ use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
 class Helper
 {
     const AUTHORIZATION = 'authorization';
+    const CAPTURE = 'capture';
     const CHARGED = 'charged';
     const DEBITED = 'debited';
 
@@ -132,8 +133,16 @@ class Helper
                     return false;
                 }
                 $transactionType = $this->getTransactionType($payment);
-                if ($transactionType && $transactionType == self::AUTHORIZATION) {
-                    return true;
+                switch ($transactionType) {
+                    case self::AUTHORIZATION:
+                        return true;
+                    case self::CAPTURE:
+                        $additionalInformation = $payment->getAdditionalInformation();
+                        if (!isset($additionalInformation['payoneerCapture'])) {
+                            return true;
+                        } else {
+                            return false;
+                        }
                 }
             }
         }
@@ -183,7 +192,7 @@ class Helper
 
             $this->showSuccessMessage('Payoneer capture transaction has been completed successfully.');
         } else {
-            $this->showErrorMessage(__('Something went wrong with the transaction. '));
+            $this->showErrorMessage(__('Payoneer capture transaction failed. Check the payoneer.log for details.'));
         }
     }
 

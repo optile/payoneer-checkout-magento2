@@ -4,6 +4,7 @@ namespace Payoneer\OpenPaymentGateway\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Model\Order;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
@@ -49,6 +50,7 @@ class InvoiceSaveAfterObserver implements ObserverInterface
      *
      * @param Observer $observer
      * @return $this
+     * @throws LocalizedException
      */
     public function execute(Observer $observer)
     {
@@ -60,7 +62,10 @@ class InvoiceSaveAfterObserver implements ObserverInterface
             $additionalInformation = $order->getPayment()->getAdditionalInformation();
 
             if (!isset($additionalInformation['payoneerCapture'])) {
-                $this->listCapture->process($order);
+                $result = $this->listCapture->process($order);
+                if ($result) {
+                    $this->helper->processCaptureResponse($result, $order);
+                }
             }
         }
         return $this;

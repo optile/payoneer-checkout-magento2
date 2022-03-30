@@ -13,6 +13,8 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields as AdminFields;
 use Payoneer\OpenPaymentGateway\Model\Helper;
 
 /**
@@ -53,6 +55,11 @@ class Success implements HttpGetActionInterface
     private $checkoutSession;
 
     /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
      * Success constructor.
      * @param Context $context
      * @param CartManagementInterface $cartManagement
@@ -67,7 +74,8 @@ class Success implements HttpGetActionInterface
         CartRepositoryInterface $cartRepository,
         PageFactory $resultPageFactory,
         Helper $helper,
-        Session $checkoutSession
+        Session $checkoutSession,
+        Config $config
     ) {
         $this->context = $context;
         $this->cartManagement = $cartManagement;
@@ -75,6 +83,7 @@ class Success implements HttpGetActionInterface
         $this->resultPageFactory = $resultPageFactory;
         $this->helper = $helper;
         $this->checkoutSession = $checkoutSession;
+        $this->config = $config;
     }
 
     /**
@@ -99,6 +108,9 @@ class Success implements HttpGetActionInterface
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
                         $payment->setAdditionalInformation($key, $value);
+                    }
+                    if ($this->config->getValue('payment_action') == AdminFields::CAPTURE) {
+                        $payment->setAdditionalInformation('payoneerCapture', 'Success');
                     }
                     $payment->save();
                 }
