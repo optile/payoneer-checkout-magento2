@@ -50,9 +50,13 @@ class CustomerDataBuilder implements BuilderInterface
         $billingAddress = $order->getBillingAddress();
 
         $registrationId = null;
+        $number = null;
         $customerId = $order->getCustomerId();
         if ($customerId) {
             $registrationId = $this->helper->getRegistrationId($customerId);
+            $number = $customerId;
+        } else {
+            $number = $billingAddress ? $billingAddress->getTelephone() : null;
         }
 
         $customerEmail = $billingAddress ? $billingAddress->getEmail() : null;
@@ -62,7 +66,7 @@ class CustomerDataBuilder implements BuilderInterface
 
         $customerData = [
             Config::CUSTOMER    => [
-                Config::NUMBER  => $billingAddress ? $billingAddress->getTelephone() : null,
+                Config::NUMBER  => $number,
                 Config::EMAIL   => $customerEmail,
                 Config::COMPANY => [
                     Config::NAME    => $billingAddress ? $billingAddress->getCompany() : null,
