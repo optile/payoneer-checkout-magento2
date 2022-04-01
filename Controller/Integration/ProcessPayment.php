@@ -50,7 +50,7 @@ class ProcessPayment implements ActionInterface
     }
 
     /**
-     * @return ResponseInterface|Json|ResultInterface
+     * @return Json | array <mixed>
      * @throws LocalizedException
      * @throws NoSuchEntityException
      * @throws \Exception

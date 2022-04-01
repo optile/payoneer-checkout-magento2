@@ -115,4 +115,14 @@ class Helper
         );
         return $connection->fetchOne($query);
     }
+
+    /**
+     * Format amount to 2 decimal points
+     * @param float|null $amount
+     * @return string|null
+     */
+    public function formatNumber($amount)
+    {
+        return $amount ? number_format($amount, 2, '.', '') : null;
+    }
 }

@@ -7,6 +7,7 @@ use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Sales\Model\Order\Item;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Gateway\QuoteAdapter as PayoneerQuoteAdapter;
+use Payoneer\OpenPaymentGateway\Model\Helper;
 
 /**
  * Class ItemsDataBuilder
@@ -22,12 +23,19 @@ class ItemsDataBuilder implements BuilderInterface
     protected $config;
 
     /**
+     * @var Helper
+     */
+    protected $helper;
+
+    /**
      * @param Config $config
      */
     public function __construct(
-        Config $config
+        Config $config,
+        Helper $helper
     ) {
         $this->config = $config;
+        $this->helper = $helper;
     }
 
     /**
@@ -69,10 +77,10 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::NAME            =>  $item->getName(),
                 Config::QUANTITY        =>  $item->getData('qty'),
                 Config::CURRENCY        =>  $order->getCurrencyCode(),
-                Config::AMOUNT          =>  number_format($item->getBaseRowTotal(), 2),
-                Config::NET_AMOUNT      =>  number_format($item->getBaseRowTotal(), 2),
-                Config::TAX_AMOUNT      =>  number_format($item->getBaseTaxAmount(), 2),
-                Config::TAX_PERCENT     =>  number_format($item->getBaseRowTotalInclTax(), 2)
+                Config::AMOUNT          =>  $this->helper->formatNumber($item->getBaseRowTotal()),
+                Config::NET_AMOUNT      =>  $this->helper->formatNumber($item->getBaseRowTotal()),
+                Config::TAX_AMOUNT      =>  $this->helper->formatNumber($item->getBaseTaxAmount()),
+                Config::TAX_PERCENT     =>  $this->helper->formatNumber($item->getBaseRowTotalInclTax())
             ];
         }
         if ($order instanceof PayoneerQuoteAdapter) {
@@ -86,12 +94,11 @@ class ItemsDataBuilder implements BuilderInterface
             if ($order->getTaxAmount() > 0) {
                 $totalAdjustments += $order->getTaxAmount();
             }
-            if ($totalAdjustments > 0) {
-                $result[] = [
-                    Config::NAME => self::ADJUSTMENTS,
-                    Config::AMOUNT => number_format($totalAdjustments, 2)
-                ];
-            }
+            $result[] = [
+                Config::NAME => self::ADJUSTMENTS,
+                Config::AMOUNT => number_format($totalAdjustments, 2)
+            ];
+
         }
 
         return $result;

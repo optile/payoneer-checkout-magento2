@@ -46,14 +46,14 @@ class ListCaptureTransactionService
     public function process(Order $order)
     {
         $payment = $order->getPayment();
+
         if ($payment) {
             try {
                 $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
-                $result = $this->commandPool->get('list_capture')->execute([
+                return $this->commandPool->get('list_capture')->execute([
                     'payment' => $paymentDataObject,
                     'amount' => $payment->getAmountAuthorized()
                 ]);
-                return $result;
             } catch (Exception $e) {
                 return false;
             }

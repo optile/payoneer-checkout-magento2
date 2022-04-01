@@ -53,7 +53,7 @@ class GatewayCommand implements CommandInterface
     protected $validator;
 
     /**
-     * @var ErrorMessageMapperInterface
+     * @var ErrorMessageMapperInterface|null
      */
     private $errorMessageMapper;
 
@@ -91,7 +91,7 @@ class GatewayCommand implements CommandInterface
     /**
      * Executes command basing on business object
      *
-     * @param array $commandSubject
+     * @param array <mixed> $commandSubject
      * @return array <mixed>
      * @throws CommandException
      * @throws ClientException

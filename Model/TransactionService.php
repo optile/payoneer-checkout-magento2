@@ -108,7 +108,9 @@ class TransactionService
         $transactionId = $payment->getId() . strtotime('now');
         $payment->setAdditionalInformation(Config::TOKEN, $token);
         $payment->setAdditionalInformation(Config::TXN_ID, $transactionId);
-        $payment->save();
+
+        $quote->setPayment($payment);
+        $this->quoteRepository->save($quote);
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
         try {
@@ -117,6 +119,7 @@ class TransactionService
             $address = json_decode($address, true);
 
             $isHostedIntegration = $integration == self::HOSTED;
+            /** @var array <mixed> $result */
             $result = $this->commandPool->get($integration)->execute([
                 'payment' => $paymentDataObject,
                 'amount' => $quote->getGrandTotal(),
@@ -139,13 +142,12 @@ class TransactionService
 
     /**
      * Process response of hosted integration
-     * @param array <mixed>|ResultInterface|null $result
+     * @param array <mixed> $result
      * @return array <mixed>
      */
     public function processHostedResponse($result)
     {
         $jsonData = [];
-        /** @phpstan-ignore-next-line */
         if ($result && isset($result['response']['redirect'])) {
             $jsonData = [
                 'redirectURL' => $result['response']['redirect']['url']
@@ -158,13 +160,12 @@ class TransactionService
 
     /**
      * Process response of embedded integration
-     * @param array <mixed>|ResultInterface|null $result
+     * @param array <mixed> $result
      * @return array <mixed>
      */
     public function processEmbeddedResponse($result)
     {
         $jsonData = [];
-        /** @phpstan-ignore-next-line */
         if ($result && isset($result['response']['links'])) {
             $jsonData = [
                 'links' => $result['response']['links']

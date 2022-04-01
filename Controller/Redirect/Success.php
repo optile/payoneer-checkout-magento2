@@ -112,7 +112,7 @@ class Success implements HttpGetActionInterface
                     if ($this->config->getValue('payment_action') == AdminFields::CAPTURE) {
                         $payment->setAdditionalInformation('payoneerCapture', 'Success');
                     }
-                    $payment->save();
+                    $quote->setPayment($payment);
                 }
 
                 if ($quote->getCustomerId() && isset($reqParams['customerRegistrationId'])) {
@@ -121,10 +121,12 @@ class Success implements HttpGetActionInterface
 
                 if (!$quote->getCustomerId()) {
                     $quote->setCheckoutMethod(CartManagementInterface::METHOD_GUEST);
-                    if (!$quote->getCustomerEmail() && !$quote->getBillingAddress()->getEmail()) {
+                    $customerEmail =  $quote->getCustomerEmail() ?: $quote->getBillingAddress()->getEmail();
+                    if (!$customerEmail) {
                         $quote->setCustomerEmail($this->checkoutSession->getPayoneerCustomerEmail());
                     }
                 }
+                $this->cartRepository->save($quote);
 
                 $this->unsetCustomCheckoutSession();
 

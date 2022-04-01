@@ -64,6 +64,7 @@ class InvoiceSaveAfterObserver implements ObserverInterface
             if (!isset($additionalInformation['payoneerCapture'])) {
                 $result = $this->listCapture->process($order);
                 if ($result) {
+                    /** @phpstan-ignore-next-line */
                     $this->helper->processCaptureResponse($result, $order);
                 }
             }

@@ -57,6 +57,7 @@ class Capture extends Action
             try {
                 /** @var Order $order */
                 $order = $this->helper->getOrder($orderId);
+                /** @var array <mixed> $result */
                 $result = $this->listCapture->process($order);
 
                 if ($result) {
