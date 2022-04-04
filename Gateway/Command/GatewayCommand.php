@@ -14,6 +14,7 @@ use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ValidatorInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactoryInterface;
 use Psr\Log\LoggerInterface;
+use Magento\Payment\Gateway\Command\ResultInterface as CommandResultInterface;
 
 /**
  * Class GatewayCommand
@@ -92,7 +93,7 @@ class GatewayCommand implements CommandInterface
      * Executes command basing on business object
      *
      * @param array <mixed> $commandSubject
-     * @return array <mixed>
+     * @return CommandResultInterface | array <mixed>
      * @throws CommandException
      * @throws ClientException
      * @throws ConverterException

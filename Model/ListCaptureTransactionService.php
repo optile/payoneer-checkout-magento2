@@ -1,11 +1,14 @@
 <?php
+
 namespace Payoneer\OpenPaymentGateway\Model;
 
 use Exception;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Command\ResultInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
+use Magento\Payment\Model\InfoInterface;
 use Magento\Sales\Model\Order;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
  * Class ListCaptureTransactionService
@@ -43,21 +46,18 @@ class ListCaptureTransactionService
      * @param Order $order
      * @return ResultInterface|null|bool
      */
-    public function process(Order $order)
+    public function process($order)
     {
+        /** @var InfoInterface $payment*/
         $payment = $order->getPayment();
 
-        if ($payment) {
-            try {
-                $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
-                return $this->commandPool->get('list_capture')->execute([
-                    'payment' => $paymentDataObject,
-                    'amount' => $payment->getAmountAuthorized()
+        try {
+            $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
+            return $this->commandPool->get(Config::LIST_CAPTURE)->execute([
+                    'payment' => $paymentDataObject
                 ]);
-            } catch (Exception $e) {
-                return false;
-            }
+        } catch (Exception $e) {
+            return false;
         }
-        return false;
     }
 }
