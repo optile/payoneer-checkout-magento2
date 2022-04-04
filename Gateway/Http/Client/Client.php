@@ -5,9 +5,9 @@ namespace Payoneer\OpenPaymentGateway\Gateway\Http\Client;
 use Magento\Framework\DataObject;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
-use Magento\Payment\Model\Method\Logger;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Api\Request;
+use Payoneer\OpenPaymentGateway\Model\Method\Logger;
 
 /**
  * Class Client
