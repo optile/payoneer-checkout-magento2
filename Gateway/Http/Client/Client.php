@@ -72,9 +72,9 @@ class Client implements ClientInterface
     ];
 
     /**
-     * @var array <mixed>
+     * @var array <mixed> | string
      */
-    protected $requestData = [];
+    protected $requestData;
 
     /**
      * @param Logger $logger
@@ -103,7 +103,6 @@ class Client implements ClientInterface
     {
         $response = [];
         $responseObj = null;
-        /** @phpstan-ignore-next-line */
         $this->requestData = $transferObject->getBody();
         $this->logData(['operation' => $this->operation]);
         switch ($this->operation) {
@@ -202,8 +201,10 @@ class Client implements ClientInterface
                     $isValid = $this->mandatoryFieldsExists($this->mandatoryFieldsCustomer, 'customer');
                     break;
                 default:
-                    if (!isset($this->requestData[$mandatoryField]) ||
-                        (isset($this->requestData[$mandatoryField]) && $this->requestData[$mandatoryField] == "")) {
+                    if (is_array($this->requestData) && !isset($this->requestData[$mandatoryField]) ||
+                        (is_array($this->requestData)
+                            && isset($this->requestData[$mandatoryField])
+                            && $this->requestData[$mandatoryField] == '')) {
                         $this->logData([$mandatoryField . ' must not be empty']);
                         return false;
                     }
@@ -224,7 +225,7 @@ class Client implements ClientInterface
     public function mandatoryFieldsExists($mandatoryFields, $objectName)
     {
         foreach ($mandatoryFields as $mandatoryField) {
-            if (!isset($this->requestData[$objectName][$mandatoryField])) {
+            if (is_array($this->requestData) && !isset($this->requestData[$objectName][$mandatoryField])) {
                 $this->logData([$objectName . '.' . $mandatoryField . ' must not be empty']);
                 return false;
             }

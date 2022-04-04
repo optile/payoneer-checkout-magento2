@@ -107,7 +107,7 @@ class Helper
         $transactions =
             $this->transactions/** @phpstan-ignore-line */
             ->create()
-                ->addPaymentIdFilter($payment->getEntityId());
+            ->addPaymentIdFilter($payment->getEntityId());
         $transactionItems = $transactions->getItems();
         foreach ($transactionItems as $transaction) {
             $transactionType = $transaction->getData('txn_type');

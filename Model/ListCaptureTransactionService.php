@@ -44,20 +44,23 @@ class ListCaptureTransactionService
      * Process Api request
      *
      * @param Order $order
-     * @return ResultInterface|null|bool
+     * @return ResultInterface|null|array <mixed>
      */
     public function process($order)
     {
+        $result = [];
         /** @var InfoInterface $payment*/
         $payment = $order->getPayment();
 
         try {
             $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
-            return $this->commandPool->get(Config::LIST_CAPTURE)->execute([
-                    'payment' => $paymentDataObject
-                ]);
+            /** @var array <mixed> $result */
+            $result = $this->commandPool->get(Config::LIST_CAPTURE)->execute([
+                'payment' => $paymentDataObject
+            ]);
+            return $result;
         } catch (Exception $e) {
-            return false;
+            return $result;
         }
     }
 }
