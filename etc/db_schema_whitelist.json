@@ -1,0 +1,14 @@
+{
+    "payoneer_payment_transaction": {
+        "column": {
+            "transaction_id": true,
+            "customer_id": true,
+            "registration_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "PAYONEER_PAYMENT_TRANSACTION_CSTR_ID_CSTR_ENTT_ENTT_ID": true,
+            "PAYONEER_PAYMENT_TRANSACTION_CUSTOMER_ID": true
+        }
+    }
+}

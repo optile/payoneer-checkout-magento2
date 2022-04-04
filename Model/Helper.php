@@ -4,6 +4,7 @@ namespace Payoneer\OpenPaymentGateway\Model;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 
@@ -35,22 +36,30 @@ class Helper
     protected $resourceConnection;
 
     /**
+     * @var PayoneerTransactionRepository
+     */
+    protected $payoneerTransactionRepository;
+
+    /**
      * Helper constructor.
      * @param RedirectFactory $resultRedirectFactory
      * @param ManagerInterface $messageManager
      * @param AssetRepository $assetRepository
      * @param ResourceConnection $resourceConnection
+     * @param PayoneerTransactionRepository $payoneerTransactionRepository
      */
     public function __construct(
         RedirectFactory $resultRedirectFactory,
         ManagerInterface $messageManager,
         AssetRepository $assetRepository,
-        ResourceConnection $resourceConnection
+        ResourceConnection $resourceConnection,
+        PayoneerTransactionRepository $payoneerTransactionRepository
     ) {
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->messageManager = $messageManager;
         $this->assetRepository = $assetRepository;
         $this->resourceConnection = $resourceConnection;
+        $this->payoneerTransactionRepository = $payoneerTransactionRepository;
     }
 
     /**
@@ -81,39 +90,28 @@ class Helper
      * @param string $registrationId
      * @param int $customerId
      * @return void
+     * @throws CouldNotSaveException
      */
     public function saveRegistrationId($registrationId, $customerId)
     {
         $regId = $this->getRegistrationId($customerId);
         if (!$regId) {
-            $data = [
-                    'customer_id' => $customerId,
-                    'registration_id' => $registrationId
-                    ];
-            $connection = $this->resourceConnection->getConnection();
-            $connection->insertOnDuplicate(
-                $this->resourceConnection->getTableName('payoneer_payment_transaction'),
-                $data
-            );
+            $payoneerTransactionModel = $this->payoneerTransactionRepository->create();
+            $payoneerTransactionModel->setCustomerId($customerId);
+            $payoneerTransactionModel->setRegistrationId($registrationId);
+            $this->payoneerTransactionRepository->save($payoneerTransactionModel);
         }
     }
 
     /**
      * Get customer registration id
      * @param int $customerId
-     * @return string
+     * @return string | null
      */
     public function getRegistrationId($customerId)
     {
-        $connection = $this->resourceConnection->getConnection();
-        $query = $connection->select()->from(
-            ['e' => $this->resourceConnection->getTableName('payoneer_payment_transaction')],
-            'e.registration_id'
-        )->where(
-            $connection->quoteIdentifier('e.customer_id') . ' = ?',
-            $customerId
-        );
-        return $connection->fetchOne($query);
+        $payoneerTransaction = $this->payoneerTransactionRepository->getByCustomerId($customerId);
+        return $payoneerTransaction ? $payoneerTransaction->getRegistrationId() : null;
     }
 
     /**
