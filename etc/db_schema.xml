@@ -8,6 +8,10 @@
         <column xsi:type="int" name="customer_id" unsigned="true" nullable="false" comment="Customer ID"/>
         <column xsi:type="varchar" name="registration_id" nullable="true" length="255"
                 comment="Registration Id"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Update Time"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="transaction_id"/>
         </constraint>
@@ -17,5 +21,25 @@
         <constraint xsi:type="unique" referenceId="PAYONEER_PAYMENT_TRANSACTION_CUSTOMER_ID">
             <column name="customer_id"/>
         </constraint>
+    </table>
+    <table name="payoneer_notification" resource="default" engine="innodb" comment="payoneer notification Table">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" padding="10" identity="true" comment="Entity Id"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <column xsi:type="varchar" name="transactionId" nullable="true" length="255"
+                comment="transaction Id"/>
+        <column xsi:type="varchar" name="longId" nullable="true" length="255"
+                comment="long Id"/>
+        <column xsi:type="varchar" name="order_id" nullable="true" length="255"
+                comment="Order increment id"/>
+        <column xsi:type="longtext" name="content" nullable="true"
+                comment="notification content"/>
+        <column xsi:type="varchar" name="cron_status" nullable="true" length="255"
+                comment="cron status"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Update Time"/>
     </table>
 </schema>

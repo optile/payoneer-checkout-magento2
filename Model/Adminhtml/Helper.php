@@ -1,4 +1,5 @@
 <?php
+
 namespace Payoneer\OpenPaymentGateway\Model\Adminhtml;
 
 use Magento\Framework\DB\Transaction;
@@ -15,6 +16,7 @@ use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Service\InvoiceService;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
+use Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler;
 
 /**
  * Class Helper
@@ -105,9 +107,10 @@ class Helper
     {
         $transactionType = null;
         $transactions =
-            $this->transactions/** @phpstan-ignore-line */
+            $this->transactions
+            /** @phpstan-ignore-line */
             ->create()
-                ->addPaymentIdFilter($payment->getEntityId());
+            ->addPaymentIdFilter($payment->getEntityId());
         $transactionItems = $transactions->getItems();
         foreach ($transactionItems as $transaction) {
             $transactionType = $transaction->getData('txn_type');
@@ -150,6 +153,27 @@ class Helper
     }
 
     /**
+     * Check if payment id done via Payoneer gateway
+     *
+     * @param OrderInterface $order
+     * @return bool
+     */
+    public function isPayoneerOrder(OrderInterface $order)
+    {
+        if (!$this->isPayoneerEnabled()) {
+            return false;
+        } else {
+            $payment = $order->getPayment();
+            if ($payment) {
+                if ($payment->getMethod() !== ConfigProvider::CODE) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * @param int $orderId
      * @return OrderInterface|null
      */
@@ -174,7 +198,8 @@ class Helper
      */
     public function processCaptureResponse($result, $order)
     {
-        if ($result
+        if (
+            $result
             && $result['response']['status']['code'] == self::CHARGED
             && $result['response']['status']['reason'] == self::DEBITED
             && $result['status'] == 200
@@ -193,6 +218,24 @@ class Helper
             $this->showSuccessMessage('Payoneer capture transaction has been completed successfully.');
         } else {
             $this->showErrorMessage(__('Payoneer capture transaction failed. Check the payoneer.log for details.'));
+        }
+    }
+
+    /**
+     * Process capture response
+     * @param array <mixed> $result
+     * @param Order $order
+     * @return void
+     * @throws LocalizedException
+     */
+    public function processFetchResponse($result, $order)
+    {
+        if (
+            $result && $result['status'] == 200
+        ) {
+            $this->showSuccessMessage('Payoneer fetch transaction has been completed successfully.');
+        } else {
+            $this->showErrorMessage(__('Payoneer fetch api failed. Check the payoneer.log for details.'));
         }
     }
 
@@ -227,8 +270,8 @@ class Helper
 
             $transactionSave =
                 $this->transaction
-                    ->addObject($invoice)
-                    ->addObject($invoice->getOrder());
+                ->addObject($invoice)
+                ->addObject($invoice->getOrder());
             $transactionSave->save();
 
             try {
@@ -273,5 +316,26 @@ class Helper
     {
         $this->messageManager
             ->addErrorMessage(__($message));
+    }
+
+    /**
+     * Check if the order is authorized only order.
+     *
+     * @param Order $order
+     * @return bool
+     */
+    public function canCancelAuthorization($order)
+    {
+        if (!$this->canShowCaptureBtn($order)) {
+            return false;
+        }
+        $payment = $order->getPayment();
+        $authCancelResponse = $payment->getAdditionalInformation(
+            PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE
+        );
+        if (isset($authCancelResponse['auth_cancel_status']) && $authCancelResponse['auth_cancel_status'] == 'success') {
+            return false;
+        }
+        return true;
     }
 }

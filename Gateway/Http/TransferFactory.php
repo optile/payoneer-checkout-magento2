@@ -47,14 +47,17 @@ class TransferFactory implements TransferFactoryInterface
     {
         $merchantCode = $this->config->getValue('merchant_gateway_key');
         $apiKey = $this->config->getCredentials('api_key');
+        $hostName = $this->config->getCredentials('host_name');
 
         return $this->transferBuilder
             ->setBody($request)
+            ->setAuthUsername($merchantCode)
+            ->setAuthPassword($apiKey)
             ->setMethod($this->getMethod())
             ->setUri($this->getApiUri($payment))
             ->setHeaders(
                 $this->config->prepareHeaders($merchantCode, $apiKey)
-            )
+            )->setClientConfig(['host_name' => $hostName])
             ->build();
     }
 

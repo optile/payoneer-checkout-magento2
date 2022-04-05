@@ -5,13 +5,19 @@ use Exception;
 use Magento\Framework\App\RequestInterface as Request;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
+use Magento\Payment\Gateway\Command\ResultInterface;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Quote\Model\Quote;
+use Magento\Sales\Model\Order;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client;
+use Magento\Payment\Model\InfoInterface;
 
 /**
  * Class GetPayoneerTransactionService
@@ -174,5 +180,25 @@ class TransactionService
             $this->messageManager->addErrorMessage(__('Something went wrong while processing payment.'));
         }
         return $jsonData;
+    }
+
+    /**
+     * Initiate the authorization cancellation request.
+     *
+     * @param Order $order
+     * @return ResultInterface|void|null|array <mixed>
+     * @throws NotFoundException
+     * @throws CommandException
+     */
+    public function processAuthCancel($order)
+    {
+        /** @var InfoInterface $payment */
+        $payment = $order->getPayment();
+        $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
+
+        return $this->commandPool->get(Client::AUTHORIZATION_CANCEL)->execute([
+            'payment' => $paymentDataObject,
+            'order' => $order
+        ]);
     }
 }

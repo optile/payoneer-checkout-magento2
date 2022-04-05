@@ -19,6 +19,10 @@ class Client implements ClientInterface
     const LIST          = 'list';
     const CAPTURE       = 'authorize_capture';
     const LIST_CAPTURE  = 'list_capture';
+    const AUTHORIZATION_CANCEL   = 'authorize_cancel';
+    const REFUND        = 'refund';
+    const VOID          = 'void';
+    const LIST_FETCH    = 'list_fetch';
 
     /**
      * @var Logger
@@ -77,10 +81,13 @@ class Client implements ClientInterface
     protected $requestData = [];
 
     /**
+     * Client construct
+     *
      * @param Logger $logger
      * @param Request $request
      * @param Config $config
      * @param string $operation
+     * @return void
      */
     public function __construct(
         Logger $logger,
@@ -110,7 +117,7 @@ class Client implements ClientInterface
             case self::LIST:
                 $isRequestValid = $this->validateRequest();
                 if ($isRequestValid) {
-                    $responseObj = $this->processListRequest($transferObject);
+                    $responseObj = $this->processRequest($transferObject);
                 } else {
                     $this->logData(['request' => $this->requestData]);
                 }
@@ -119,8 +126,13 @@ class Client implements ClientInterface
             case self::CAPTURE:
                 $responseObj = $this->processAuthRequest($transferObject);
                 break;
+            case self::REFUND:
+            case self::AUTHORIZATION_CANCEL:
+                $responseObj = $this->processRequest($transferObject);
+                break;
             case self::LIST_CAPTURE:
-                $responseObj = $this->processListRequest($transferObject);
+            case self::LIST_FETCH:
+                $responseObj = $this->processRequest($transferObject);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unknown operation [%s]', $this->operation));
@@ -135,29 +147,6 @@ class Client implements ClientInterface
         $this->logData($response);
 
         return $response;
-    }
-
-    /**
-     * @param TransferInterface $transferObject
-     * @return DataObject <mixed> | DataObject
-     */
-    public function processListRequest($transferObject)
-    {
-        $credentials['merchantCode'] = $this->config->getValue('merchant_gateway_key');
-        $credentials['apiKey'] = $this->config->getCredentials('api_key');
-        $credentials['hostName'] = $this->config->getCredentials('host_name');
-
-        $data = $transferObject->getBody();
-
-        if ((bool)$this->config->getValue('debug') == true) {
-            $this->logger->debug(['request' => $data]);
-        }
-        return $this->request->send(
-            $transferObject->getMethod(),
-            $transferObject->getUri(),
-            $credentials,
-            $data
-        );
     }
 
     /**
@@ -242,5 +231,34 @@ class Client implements ClientInterface
         if ((bool)$this->config->getValue('debug') == true) {
             $this->logger->debug([$result]);
         }
+    }
+
+    /**
+     * Process the api request.
+     *
+     * @param TransferInterface $transferObject
+     * @return DataObject <mixed> | DataObject
+     */
+    public function processRequest($transferObject)
+    {
+        $credentials = [];
+        $credentials['merchantCode'] = $transferObject->getAuthUsername();
+        $credentials['apiKey'] = $transferObject->getAuthPassword();
+
+        $clientConfigs = $transferObject->getClientConfig();
+        $credentials['hostName'] = $clientConfigs['host_name'];
+
+        $data = $transferObject->getBody();
+
+        if ((bool)$this->config->getValue('debug') == true) {
+            $this->logger->debug(['request' => $data]);
+        }
+
+        return $this->request->send(
+            $transferObject->getMethod(),
+            $transferObject->getUri(),
+            $credentials,
+            $data
+        );
     }
 }

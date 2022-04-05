@@ -1,21 +1,18 @@
 <?php
-
-namespace Payoneer\OpenPaymentGateway\Model;
+namespace Payoneer\OpenPaymentGateway\Model\Adminhtml;
 
 use Exception;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Command\ResultInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
-use Magento\Payment\Model\InfoInterface;
 use Magento\Sales\Model\Order;
-use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
- * Class ListCaptureTransactionService
+ * Class TransactionService
  *
- * Process List capture api request
+ * Process admin transactions api requests
  */
-class ListCaptureTransactionService
+class TransactionService
 {
     /**
      * @var CommandPoolInterface
@@ -28,7 +25,7 @@ class ListCaptureTransactionService
     protected $paymentDataObjectFactory;
 
     /**
-     * ListCaptureTransactionService constructor.
+     * TransactionService constructor.
      * @param CommandPoolInterface $commandPool
      * @param PaymentDataObjectFactory $paymentDataObjectFactory
      */
@@ -44,20 +41,23 @@ class ListCaptureTransactionService
      * Process Api request
      *
      * @param Order $order
-     * @return ResultInterface|null|bool
+     * @param string $command
+     * @return ResultInterface|null|bool|array <mixed>
      */
-    public function process($order)
+    public function process(Order $order, $command)
     {
-        /** @var InfoInterface $payment*/
         $payment = $order->getPayment();
-
-        try {
-            $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
-            return $this->commandPool->get(Config::LIST_CAPTURE)->execute([
-                    'payment' => $paymentDataObject
+        if ($payment) {
+            try {
+                $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
+                return $this->commandPool->get($command)->execute([
+                    'payment' => $paymentDataObject,
+                    'amount' => $payment->getAmountAuthorized()
                 ]);
-        } catch (Exception $e) {
-            return false;
+            } catch (Exception $e) {
+                return false;
+            }
         }
+        return false;
     }
 }
