@@ -47,6 +47,17 @@ class OrderViewPlugin
                     ]
                 );
             }
+            if ($this->helper->isPayoneerOrder($order)) {
+                $subject->addButton(
+                    'payoneer_fetch',
+                    [
+                        'label' => __('Payoneer Fetch'),
+                        'class' => __('action-default scalable'),
+                        'id' => 'order-view-payoneer-fetch-button',
+                        'onclick' => 'setLocation(\'' . $this->getFetchUrl($subject) . '\')'
+                    ]
+                );
+            }
         }
     }
 
@@ -59,5 +70,16 @@ class OrderViewPlugin
     protected function getCaptureUrl($subject)
     {
         return $subject->getUrl('payoneer/gateway/capture/order_id/' . $subject->getOrderId());
+    }
+
+    /**
+     * Get URL for Payoneer Fetch
+     *
+     * @param OrderView $subject
+     * @return mixed
+     */
+    protected function getFetchUrl($subject)
+    {
+        return $subject->getUrl('payoneer/gateway/fetch/order_id/' . $subject->getOrderId());
     }
 }

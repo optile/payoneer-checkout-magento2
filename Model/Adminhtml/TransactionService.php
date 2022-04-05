@@ -1,21 +1,19 @@
 <?php
-
-namespace Payoneer\OpenPaymentGateway\Model;
+namespace Payoneer\OpenPaymentGateway\Model\Adminhtml;
 
 use Exception;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Command\ResultInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
-use Magento\Payment\Model\InfoInterface;
 use Magento\Sales\Model\Order;
-use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Magento\Payment\Model\InfoInterface;
 
 /**
- * Class ListCaptureTransactionService
+ * Class TransactionService
  *
- * Process List capture api request
+ * Process admin transactions api requests
  */
-class ListCaptureTransactionService
+class TransactionService
 {
     /**
      * @var CommandPoolInterface
@@ -28,7 +26,7 @@ class ListCaptureTransactionService
     protected $paymentDataObjectFactory;
 
     /**
-     * ListCaptureTransactionService constructor.
+     * TransactionService constructor.
      * @param CommandPoolInterface $commandPool
      * @param PaymentDataObjectFactory $paymentDataObjectFactory
      */
@@ -44,9 +42,10 @@ class ListCaptureTransactionService
      * Process Api request
      *
      * @param Order $order
-     * @return ResultInterface|null|array <mixed>
+     * @param string $command
+     * @return ResultInterface|null|bool|array <mixed>
      */
-    public function process($order)
+    public function process(Order $order, $command)
     {
         $result = [];
         /** @var InfoInterface $payment*/
@@ -55,7 +54,7 @@ class ListCaptureTransactionService
         try {
             $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
             /** @var array <mixed> $result */
-            $result = $this->commandPool->get(Config::LIST_CAPTURE)->execute([
+            $result = $this->commandPool->get($command)->execute([
                 'payment' => $paymentDataObject
             ]);
             return $result;

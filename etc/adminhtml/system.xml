@@ -117,7 +117,7 @@
                     </field>
                     <field id="font_weight" translate="label" type="select" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Font Weight</label>
-                        <comment>Font weight in the payment widget.</comment>
+                        <comment>Font weight in the payment widget. eg format: 14px</comment>
                         <source_model>Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields::fontWeight</source_model>
                     </field>
                     <field id="letter_spacing" translate="label" type="text" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="1">

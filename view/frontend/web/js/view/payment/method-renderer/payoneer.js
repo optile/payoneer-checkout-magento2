@@ -156,6 +156,7 @@ define(
                         } else {
                             self.shouldShowMessage(true);
                         }
+                        $('body').trigger('processStop');
                     } else{
                         if (response.links) {
                             var configObj = {

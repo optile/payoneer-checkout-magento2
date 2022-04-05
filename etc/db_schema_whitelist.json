@@ -3,12 +3,29 @@
         "column": {
             "transaction_id": true,
             "customer_id": true,
-            "registration_id": true
+            "registration_id": true,
+            "created_at": true,
+            "updated_at": true
         },
         "constraint": {
             "PRIMARY": true,
             "PAYONEER_PAYMENT_TRANSACTION_CSTR_ID_CSTR_ENTT_ENTT_ID": true,
             "PAYONEER_PAYMENT_TRANSACTION_CUSTOMER_ID": true
+        }
+    },
+    "payoneer_notification": {
+        "column": {
+            "id": true,
+            "transactionId": true,
+            "longId": true,
+            "order_id": true,
+            "content": true,
+            "cron_status": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
         }
     }
 }

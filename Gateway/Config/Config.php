@@ -23,12 +23,20 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     const METHOD_GET    = 'GET';
     const METHOD_POST   = 'POST';
+    const METHOD_DELETE   = 'DELETE';
 
     /**
      * API endpoints
      */
-    const END_POINT = 'api/lists/';
+    const END_POINT = 'api/lists';
+    const REFUND_END_POINT = "api/charges/%s/payout"; //api/charges/{longId}/payout
+    const AUTHORIZATION_CANCEL_END_POINT = 'api/charges/%s'; //api/charges/{longId}
+
+    /**
+     * List operation constants
+     */
     const LIST_CAPTURE = 'list_capture';
+    const LIST_FETCH = 'list_fetch';
 
     /**
      * API Request constants
@@ -91,6 +99,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const REGISTRATION          =   'registration';
     const ID                    =   'id';
     const TOKEN                 =   'token';
+
+    const ENTITY_PAYMENT        =   'payment';
 
     /**
      * @var StoreManagerInterface

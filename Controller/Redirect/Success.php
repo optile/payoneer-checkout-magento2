@@ -129,7 +129,6 @@ class Success implements HttpGetActionInterface
                 $this->cartRepository->save($quote);
 
                 $this->unsetCustomCheckoutSession();
-
                 $this->cartManagement->placeOrder($cartId);
                 return $this->resultPageFactory->create();
             } else {

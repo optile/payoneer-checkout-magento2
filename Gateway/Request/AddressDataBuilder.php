@@ -57,7 +57,7 @@ class AddressDataBuilder implements BuilderInterface
     /**
      * Gets address details
      *
-     * @param AddressAdapterInterface $address
+     * @param AddressAdapterInterface|array $address
      * @return array <mixed>
      */
     public function getAddressData($address)

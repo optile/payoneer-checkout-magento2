@@ -7,20 +7,19 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Redirect;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Sales\Model\Order;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
-use Payoneer\OpenPaymentGateway\Model\ListCaptureTransactionService;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\TransactionService as AdminTransactionService;
 
 /**
  * Class Capture
- * Process Payoneer List Capture request
+ *
+ * Process Payoneer Capture request
  */
 class Capture extends Action
 {
-    const CHARGED = 'charged';
-    const DEBITED = 'debited';
-
     /**
-     * @var ListCaptureTransactionService
+     * @var AdminTransactionService
      */
     protected $listCapture;
 
@@ -31,22 +30,24 @@ class Capture extends Action
 
     /**
      * Capture constructor.
+     *
      * @param Action\Context $context
-     * @param ListCaptureTransactionService $listCapture
+     * @param AdminTransactionService $listCapture
      * @param Helper $helper
      */
     public function __construct(
         Action\Context $context,
-        ListCaptureTransactionService $listCapture,
+        AdminTransactionService $listCapture,
         Helper $helper
     ) {
         parent::__construct($context);
         $this->listCapture = $listCapture;
-        $this->helper=$helper;
+        $this->helper = $helper;
     }
 
     /**
      * Process Payoneer capture
+     *
      * @return ResponseInterface|Redirect|ResultInterface
      */
     public function execute()
@@ -57,8 +58,8 @@ class Capture extends Action
             try {
                 /** @var Order $order */
                 $order = $this->helper->getOrder($orderId);
-                /** @var array <mixed> $result */
-                $result = $this->listCapture->process($order);
+                /** @var string[] $result */
+                $result = $this->listCapture->process($order, Config::LIST_CAPTURE);
 
                 if ($result) {
                     $this->helper->processCaptureResponse($result, $order);

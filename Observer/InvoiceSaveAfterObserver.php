@@ -7,8 +7,9 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Model\Order;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
-use Payoneer\OpenPaymentGateway\Model\ListCaptureTransactionService;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\TransactionService;
 
 /**
  * Class InvoiceSaveAfterObserver
@@ -22,7 +23,7 @@ class InvoiceSaveAfterObserver implements ObserverInterface
     protected $messageManager;
 
     /**
-     * @var ListCaptureTransactionService
+     * @var TransactionService
      */
     protected $listCapture;
 
@@ -32,12 +33,12 @@ class InvoiceSaveAfterObserver implements ObserverInterface
     protected $helper;
 
     /**
-     * Capture constructor.
-     * @param ListCaptureTransactionService $listCapture
+     * InvoiceSaveAfterObserver constructor.
+     * @param TransactionService $listCapture
      * @param Helper $helper
      */
     public function __construct(
-        ListCaptureTransactionService $listCapture,
+        TransactionService $listCapture,
         Helper $helper
     ) {
         $this->listCapture = $listCapture;
@@ -62,9 +63,13 @@ class InvoiceSaveAfterObserver implements ObserverInterface
             $additionalInformation = $order->getPayment()->getAdditionalInformation();
 
             if (!isset($additionalInformation['payoneerCapture'])) {
-                $result = $this->listCapture->process($order);
+                $result = $this->listCapture->process($order, Config::LIST_CAPTURE);
                 if ($result && is_array($result)) {
-                    $this->helper->processCaptureResponse($result, $order);
+                    $result = $this->listCapture->process($order, Config::LIST_CAPTURE);
+                    if ($result) {
+                        /** @phpstan-ignore-next-line */
+                        $this->helper->processCaptureResponse($result, $order);
+                    }
                 }
             }
         }
