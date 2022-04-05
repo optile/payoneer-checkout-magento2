@@ -412,30 +412,32 @@ class TransactionOrderUpdater
     {
         try {
             $payment = $order->getPayment();
-            $payment->setLastTransId($data['additional_info']['transaction_id']);
-            $payment->setTransactionId($data['additional_info']['transaction_id']);
-            $payment->setAdditionalInformation(
-                $data['additional_info_key'],
-                $data['additional_info']
-            );
-            $payment->setIsTransactionClosed($data['is_transaction_closed']);
-            $transaction = $this->buildTransactionObject(
-                $order,
-                $payment,
-                $data['additional_info'],
-                $data['transaction_type']
-            );
+            if ($payment) {
+                $payment->setLastTransId($data['additional_info']['transaction_id']);
+                $payment->setTransactionId($data['additional_info']['transaction_id']);
+                $payment->setAdditionalInformation(
+                    $data['additional_info_key'],
+                    $data['additional_info']
+                );
+                $payment->setIsTransactionClosed($data['is_transaction_closed']);
+                $transaction = $this->buildTransactionObject(
+                    $order,
+                    $payment,
+                    $data['additional_info'],
+                    $data['transaction_type']
+                );
 
-            $payment->addTransactionCommentsToOrder(
-                $transaction,
-                $data['order_comment']
-            );
-            $payment->setParentTransactionId($data['parent_txn_id']);
+                $payment->addTransactionCommentsToOrder(
+                    $transaction,
+                    $data['order_comment']
+                );
+                $payment->setParentTransactionId($data['parent_txn_id']);
 
-            $payment->save();
-            $this->orderRepository->save($order);
+                $payment->save();
+                $this->orderRepository->save($order);
 
-            $this->transactionRepository->save($transaction);
+                $this->transactionRepository->save($transaction);
+            }
             return;
         } catch (\Exception $e) {
             throw new LocalizedException(

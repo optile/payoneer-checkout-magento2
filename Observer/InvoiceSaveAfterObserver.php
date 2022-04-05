@@ -25,7 +25,7 @@ class InvoiceSaveAfterObserver implements ObserverInterface
     /**
      * @var TransactionService
      */
-    protected $listCapture;
+    protected $transactionService;
 
     /**
      * @var Helper
@@ -34,14 +34,14 @@ class InvoiceSaveAfterObserver implements ObserverInterface
 
     /**
      * InvoiceSaveAfterObserver constructor.
-     * @param TransactionService $listCapture
+     * @param TransactionService $transactionService
      * @param Helper $helper
      */
     public function __construct(
-        TransactionService $listCapture,
+        TransactionService $transactionService,
         Helper $helper
     ) {
-        $this->listCapture = $listCapture;
+        $this->transactionService = $transactionService;
         $this->helper=$helper;
     }
 
@@ -63,9 +63,9 @@ class InvoiceSaveAfterObserver implements ObserverInterface
             $additionalInformation = $order->getPayment()->getAdditionalInformation();
 
             if (!isset($additionalInformation['payoneerCapture'])) {
-                $result = $this->listCapture->process($order, Config::LIST_CAPTURE);
+                $result = $this->transactionService->process($order, Config::LIST_CAPTURE);
                 if ($result && is_array($result)) {
-                    $result = $this->listCapture->process($order, Config::LIST_CAPTURE);
+                    $result = $this->transactionService->process($order, Config::LIST_CAPTURE);
                     if ($result) {
                         /** @phpstan-ignore-next-line */
                         $this->helper->processCaptureResponse($result, $order);

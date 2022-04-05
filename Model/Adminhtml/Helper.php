@@ -107,8 +107,7 @@ class Helper
     {
         $transactionType = null;
         $transactions =
-            $this->transactions
-            /** @phpstan-ignore-line */
+            $this->transactions/** @phpstan-ignore-line */
             ->create()
             ->addPaymentIdFilter($payment->getEntityId());
         $transactionItems = $transactions->getItems();
@@ -198,8 +197,7 @@ class Helper
      */
     public function processCaptureResponse($result, $order)
     {
-        if (
-            $result
+        if ($result
             && $result['response']['status']['code'] == self::CHARGED
             && $result['response']['status']['reason'] == self::DEBITED
             && $result['status'] == 200
@@ -230,9 +228,7 @@ class Helper
      */
     public function processFetchResponse($result, $order)
     {
-        if (
-            $result && $result['status'] == 200
-        ) {
+        if ($result && $result['status'] == 200) {
             $this->showSuccessMessage('Payoneer fetch transaction has been completed successfully.');
         } else {
             $this->showErrorMessage(__('Payoneer fetch api failed. Check the payoneer.log for details.'));
@@ -330,11 +326,14 @@ class Helper
             return false;
         }
         $payment = $order->getPayment();
-        $authCancelResponse = $payment->getAdditionalInformation(
-            PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE
-        );
-        if (isset($authCancelResponse['auth_cancel_status']) && $authCancelResponse['auth_cancel_status'] == 'success') {
-            return false;
+        if ($payment) {
+            $authCancelResponse = $payment->getAdditionalInformation(
+                PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE
+            );
+            if (isset($authCancelResponse['auth_cancel_status'])
+                && $authCancelResponse['auth_cancel_status'] == 'success') {
+                return false;
+            }
         }
         return true;
     }
