@@ -180,7 +180,6 @@ class TransactionOrderUpdater
             case [Helper::CHARGED, Helper::DEBITED]:
                 return $this->checkAndCaptureOrder($order, $response);
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_CREDITED]:
-                return $this->checkAndRefundOrder($order, $response);
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_PAID_OUT_STATUS]:
                 return $this->checkAndRefundOrder($order, $response);
             case [ResponseValidator::AUTH_CANCEL_PENDING_STATUS, ResponseValidator::CANCELLATION_REQUESTED]:
