@@ -63,7 +63,7 @@ class CreditmemoCreator
             $creditmemo = $this->creditmemoFactory->createByOrder($order);
             $creditmemo->setData('invoice', $invoice);
 
-            $this->creditmemoService->refund($creditmemo);
+            $this->creditmemoService->refund($creditmemo, true);
             return true;
         } catch (\Exception $e) {
             throw new LocalizedException(

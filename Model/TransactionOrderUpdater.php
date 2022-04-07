@@ -2,25 +2,27 @@
 
 namespace Payoneer\OpenPaymentGateway\Model;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Api\Data\TransactionInterface;
+use Magento\Sales\Api\OrderManagementInterface;
+use Magento\Sales\Api\OrderPaymentRepositoryInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Api\TransactionRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
+use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory as OrderTransactionCollectionFactory;
-use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
-use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client;
-use Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator;
-use Payoneer\OpenPaymentGateway\Model\Creditmemo\CreditmemoCreator;
 use Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler;
-use Magento\Sales\Api\OrderManagementInterface;
-use Magento\Sales\Model\Order\Payment\Transaction;
-use Magento\Framework\DataObject;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\TransactionRepositoryInterface;
-use Magento\Sales\Api\Data\TransactionInterface;
+use Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
+use Payoneer\OpenPaymentGateway\Model\Creditmemo\CreditmemoCreator;
 
 /**
  * TransactionOrderUpdater class
@@ -79,6 +81,11 @@ class TransactionOrderUpdater
     protected $transactionRepository;
 
     /**
+     * @var OrderPaymentRepositoryInterface
+     */
+    protected $orderPaymentRepository;
+
+    /**
      * TransactionOrderUpdater construct function
      *
      * @param OrderCollectionFactory $orderCollectionFactory
@@ -90,6 +97,7 @@ class TransactionOrderUpdater
      * @param OrderRepositoryInterface $orderRepository
      * @param SearchCriteriaBuilder $searchCriteria
      * @param TransactionRepositoryInterface $transactionRepository
+     * @param OrderPaymentRepositoryInterface $orderPaymentRepository
      * @return void
      */
     public function __construct(
@@ -101,7 +109,8 @@ class TransactionOrderUpdater
         OrderManagementInterface $orderManager,
         OrderRepositoryInterface $orderRepository,
         SearchCriteriaBuilder $searchCriteria,
-        TransactionRepositoryInterface $transactionRepository
+        TransactionRepositoryInterface $transactionRepository,
+        OrderPaymentRepositoryInterface $orderPaymentRepository
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderTransactionCollectionFactory = $orderTransactionCollectionFactory;
@@ -112,6 +121,7 @@ class TransactionOrderUpdater
         $this->orderRepository = $orderRepository;
         $this->searchCriteria = $searchCriteria;
         $this->transactionRepository = $transactionRepository;
+        $this->orderPaymentRepository = $orderPaymentRepository;
     }
 
     /**
@@ -170,6 +180,7 @@ class TransactionOrderUpdater
             case [Helper::CHARGED, Helper::DEBITED]:
                 return $this->checkAndCaptureOrder($order, $response);
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_CREDITED]:
+            case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_PAID_OUT_STATUS]:
                 return $this->checkAndRefundOrder($order, $response);
             case [ResponseValidator::AUTH_CANCEL_PENDING_STATUS, ResponseValidator::CANCELLATION_REQUESTED]:
                 return $this->checkAndVoidOrder($order, $response);
@@ -411,33 +422,34 @@ class TransactionOrderUpdater
     private function addNewTransactionEntry($order, $data)
     {
         try {
+            /** @var Payment $payment */
             $payment = $order->getPayment();
-            if ($payment) {
-                $payment->setLastTransId($data['additional_info']['transaction_id']);
-                $payment->setTransactionId($data['additional_info']['transaction_id']);
-                $payment->setAdditionalInformation(
-                    $data['additional_info_key'],
-                    $data['additional_info']
-                );
-                $payment->setIsTransactionClosed($data['is_transaction_closed']);
-                $transaction = $this->buildTransactionObject(
-                    $order,
-                    $payment,
-                    $data['additional_info'],
-                    $data['transaction_type']
-                );
+            $payment->setLastTransId($data['additional_info']['transaction_id']);
+            $payment->setTransactionId($data['additional_info']['transaction_id']);
+            $payment->setAdditionalInformation(
+                $data['additional_info_key'],
+                $data['additional_info']
+            );
+            $payment->setIsTransactionClosed($data['is_transaction_closed']);
+            /** @var Transaction $transaction */
+            $transaction = $this->buildTransactionObject(
+                $order,
+                $payment,
+                $data['additional_info'],
+                $data['transaction_type']
+            );
 
-                $payment->addTransactionCommentsToOrder(
-                    $transaction,
-                    $data['order_comment']
-                );
-                $payment->setParentTransactionId($data['parent_txn_id']);
+            $payment->addTransactionCommentsToOrder(
+                $transaction,
+                $data['order_comment']
+            );
+            $payment->setParentTransactionId($data['parent_txn_id']);
 
-                $payment->save();
-                $this->orderRepository->save($order);
+            $this->orderPaymentRepository->save($payment);
 
-                $this->transactionRepository->save($transaction);
-            }
+            $this->orderRepository->save($order);
+
+            $this->transactionRepository->save($transaction);
             return;
         } catch (\Exception $e) {
             throw new LocalizedException(
@@ -458,11 +470,12 @@ class TransactionOrderUpdater
      */
     private function buildTransactionObject($order, $payment, $additionalInfo, $type)
     {
+        $txnId = $this->getFinalTransactionId($additionalInfo['transaction_id'], $type);
         return $this->paymentTransactionBuilder->setPayment($payment)
             ->setOrder($order)
-            ->setTransactionId($additionalInfo['transaction_id'])
+            ->setTransactionId($txnId)
             ->setAdditionalInformation(
-                $additionalInfo
+                [Transaction::RAW_DETAILS => $additionalInfo]
             )->setFailSafe(true)
             ->build($type);
     }
@@ -481,5 +494,21 @@ class TransactionOrderUpdater
         $order->setStatus(Order::STATE_PROCESSING);
         $this->orderRepository->save($order);
         return true;
+    }
+
+    /**
+     * Get the final txn id for the payment transaction
+     * table.
+     *
+     * @param string $txnId
+     * @param string $txnType
+     * @return string
+     */
+    private function getFinalTransactionId($txnId, $txnType)
+    {
+        if (in_array($txnType, [Client::REFUND, Client::VOID])) {
+            return $txnId . '-' . $txnType;
+        }
+        return $txnId;
     }
 }
