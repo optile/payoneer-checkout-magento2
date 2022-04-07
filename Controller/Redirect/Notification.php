@@ -2,20 +2,20 @@
 
 namespace Payoneer\OpenPaymentGateway\Controller\Redirect;
 
+use Exception;
 use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\Request\Http;
+use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
-use Payoneer\OpenPaymentGateway\Model\PayoneerNotificationFactory;
-use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\Request\InvalidRequestException;
-use Magento\Framework\App\Request\Http;
-use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use Payoneer\OpenPaymentGateway\Api\PayoneerNotificationRepositoryInterface;
 use Payoneer\OpenPaymentGateway\Api\Data\NotificationInterfaceFactory;
+use Payoneer\OpenPaymentGateway\Api\PayoneerNotificationRepositoryInterface;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\PayoneerNotification;
+use Payoneer\OpenPaymentGateway\Model\PayoneerNotificationFactory;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Payoneer\OpenPaymentGateway\Logger\NotificationLogger;
-use Exception;
 
 /**
  * Class Notification
@@ -63,7 +63,6 @@ class Notification implements CsrfAwareActionInterface
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param NotificationLogger $notificationLogger
      * @param Http $request
-     * @return void
      */
     public function __construct(
         PayoneerNotificationFactory $payoneerNotification,
@@ -85,7 +84,7 @@ class Notification implements CsrfAwareActionInterface
      * Listen notification from payoneer side and save to db.
      *
      * @return ResponseInterface|ResultInterface|void|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute()
     {
@@ -110,7 +109,7 @@ class Notification implements CsrfAwareActionInterface
                 $e->getMessage()
             );
         }
-        exit;
+        exit;// @codingStandardsIgnoreLine
     }
 
     /**

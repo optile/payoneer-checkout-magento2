@@ -7,9 +7,9 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Model\Order;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\TransactionService;
-use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
  * Class InvoiceSaveAfterObserver
@@ -25,7 +25,7 @@ class InvoiceSaveAfterObserver implements ObserverInterface
     /**
      * @var TransactionService
      */
-    protected $listCapture;
+    protected $transactionService;
 
     /**
      * @var Helper
@@ -33,15 +33,15 @@ class InvoiceSaveAfterObserver implements ObserverInterface
     protected $helper;
 
     /**
-     * Capture constructor.
-     * @param TransactionService $listCapture
+     * InvoiceSaveAfterObserver constructor.
+     * @param TransactionService $transactionService
      * @param Helper $helper
      */
     public function __construct(
-        TransactionService $listCapture,
+        TransactionService $transactionService,
         Helper $helper
     ) {
-        $this->listCapture = $listCapture;
+        $this->transactionService = $transactionService;
         $this->helper=$helper;
     }
 
@@ -63,10 +63,13 @@ class InvoiceSaveAfterObserver implements ObserverInterface
             $additionalInformation = $order->getPayment()->getAdditionalInformation();
 
             if (!isset($additionalInformation['payoneerCapture'])) {
-                $result = $this->listCapture->process($order, Config::LIST_CAPTURE);
-                if ($result) {
-                    /** @phpstan-ignore-next-line */
-                    $this->helper->processCaptureResponse($result, $order);
+                $result = $this->transactionService->process($order, Config::LIST_CAPTURE);
+                if ($result && is_array($result)) {
+                    $result = $this->transactionService->process($order, Config::LIST_CAPTURE);
+                    if ($result) {
+                        /** @phpstan-ignore-next-line */
+                        $this->helper->processCaptureResponse($result, $order);
+                    }
                 }
             }
         }

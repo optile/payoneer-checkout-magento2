@@ -103,8 +103,11 @@ class Success implements HttpGetActionInterface
                 $quote = $this->cartRepository->getActive($cartId);
                 $payment = $quote->getPayment();
 
-                if (!isset($reqParams['token']) || $payment->getAdditionalInformation('token') != $reqParams['token']) {
-                    return $this->helper->redirectToCart(__('Something went wrong while processing payment. Invalid token.'));
+                if (!isset($reqParams['token'])
+                    || $payment->getAdditionalInformation('token') != $reqParams['token']) {
+                    return $this->helper->redirectToCart(
+                        __('Something went wrong while processing payment. Invalid token.')
+                    );
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
                         $payment->setAdditionalInformation($key, $value);

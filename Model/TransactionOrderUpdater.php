@@ -2,27 +2,27 @@
 
 namespace Payoneer\OpenPaymentGateway\Model;
 
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
-use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory as OrderTransactionCollectionFactory;
-use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
-use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
-use Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client;
-use Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator;
-use Payoneer\OpenPaymentGateway\Model\Creditmemo\CreditmemoCreator;
-use Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Sales\Api\Data\TransactionInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderPaymentRepositoryInterface;
-use Magento\Sales\Model\Order\Payment\Transaction;
-use Magento\Framework\DataObject;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
-use Magento\Sales\Api\Data\TransactionInterface;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
+use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory as OrderTransactionCollectionFactory;
+use Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client;
+use Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler;
+use Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
+use Payoneer\OpenPaymentGateway\Model\Creditmemo\CreditmemoCreator;
 
 /**
  * TransactionOrderUpdater class
@@ -79,7 +79,7 @@ class TransactionOrderUpdater
      * @var TransactionRepositoryInterface
      */
     protected $transactionRepository;
-    
+
     /**
      * @var OrderPaymentRepositoryInterface
      */
@@ -446,7 +446,7 @@ class TransactionOrderUpdater
             $payment->setParentTransactionId($data['parent_txn_id']);
 
             $this->orderPaymentRepository->save($payment);
-            
+
             $this->orderRepository->save($order);
 
             $this->transactionRepository->save($transaction);

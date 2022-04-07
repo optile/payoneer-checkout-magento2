@@ -6,6 +6,7 @@ use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Command\ResultInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Sales\Model\Order;
+use Magento\Payment\Model\InfoInterface;
 
 /**
  * Class TransactionService
@@ -46,18 +47,19 @@ class TransactionService
      */
     public function process(Order $order, $command)
     {
+        $result = [];
+        /** @var InfoInterface $payment*/
         $payment = $order->getPayment();
-        if ($payment) {
-            try {
-                $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
-                return $this->commandPool->get($command)->execute([
-                    'payment' => $paymentDataObject,
-                    'amount' => $payment->getAmountAuthorized()
-                ]);
-            } catch (Exception $e) {
-                return false;
-            }
+
+        try {
+            $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
+            /** @var array <mixed> $result */
+            $result = $this->commandPool->get($command)->execute([
+                'payment' => $paymentDataObject
+            ]);
+            return $result;
+        } catch (Exception $e) {
+            return $result;
         }
-        return false;
     }
 }
