@@ -104,7 +104,7 @@ class Success implements HttpGetActionInterface
                 $payment = $quote->getPayment();
 
                 if (!isset($reqParams['token']) || $payment->getAdditionalInformation('token') != $reqParams['token']) {
-                    return $this->helper->redirectToCart(__('Something went wrong while processing payment.'));
+                    return $this->helper->redirectToCart(__('Something went wrong while processing payment. Invalid token.'));
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
                         $payment->setAdditionalInformation($key, $value);
@@ -132,7 +132,9 @@ class Success implements HttpGetActionInterface
                 $this->cartManagement->placeOrder($cartId);
                 return $this->resultPageFactory->create();
             } else {
-                return $this->helper->redirectToCart(__('Something went wrong while processing payment.'));
+                return $this->helper->redirectToCart(
+                    __('Something went wrong while processing payment. Invalid response from Payoneer')
+                );
             }
         } catch (\Exception $e) {
             return $this->helper->redirectToCart($e->getMessage());
