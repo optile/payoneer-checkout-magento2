@@ -7,6 +7,8 @@ use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Module\ModuleListInterface;
 
 /**
  * Class Helper
@@ -15,6 +17,8 @@ use Magento\Framework\View\Asset\Repository as AssetRepository;
  */
 class Helper
 {
+    const MODULE_NAME = 'Payoneer_OpenPaymentGateway';
+
     /**
      * @var RedirectFactory
      */
@@ -41,25 +45,41 @@ class Helper
     protected $payoneerTransactionRepository;
 
     /**
+     * @var ProductMetadataInterface
+     */
+    protected $productMetadata;
+
+    /**
+     * @var ModuleListInterface
+     */
+    protected $moduleList;
+
+    /**
      * Helper constructor.
      * @param RedirectFactory $resultRedirectFactory
      * @param ManagerInterface $messageManager
      * @param AssetRepository $assetRepository
      * @param ResourceConnection $resourceConnection
      * @param PayoneerTransactionRepository $payoneerTransactionRepository
+     * @param ProductMetadataInterface $productMetadata
+     * @param ModuleListInterface $moduleList
      */
     public function __construct(
         RedirectFactory $resultRedirectFactory,
         ManagerInterface $messageManager,
         AssetRepository $assetRepository,
         ResourceConnection $resourceConnection,
-        PayoneerTransactionRepository $payoneerTransactionRepository
+        PayoneerTransactionRepository $payoneerTransactionRepository,
+        ProductMetadataInterface $productMetadata,
+        ModuleListInterface $moduleList
     ) {
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->messageManager = $messageManager;
         $this->assetRepository = $assetRepository;
         $this->resourceConnection = $resourceConnection;
         $this->payoneerTransactionRepository = $payoneerTransactionRepository;
+        $this->productMetadata = $productMetadata;
+        $this->moduleList = $moduleList;
     }
 
     /**
@@ -122,5 +142,30 @@ class Helper
     public function formatNumber($amount)
     {
         return $amount ? number_format($amount, 2, '.', '') : null;
+    }
+
+    /**
+     * Get Magento application product metadata
+     *
+     * @return array <mixed>
+     */
+    public function getProductMetaData()
+    {
+        return [
+            'magentoVersion'    =>  $this->productMetadata->getVersion(),
+            'magentoEdition'    =>  $this->productMetadata->getEdition(),
+            'moduleVersion'     =>  $this->getModuleVersion()
+        ];
+    }
+
+    /**
+     * Find the installed module version
+     *
+     * @return mixed
+     */
+    public function getModuleVersion()
+    {
+        $module = $this->moduleList->getOne(self::MODULE_NAME);
+        return $module ? $module ['setup_version'] : null;
     }
 }
