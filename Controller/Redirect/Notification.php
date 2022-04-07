@@ -109,7 +109,7 @@ class Notification implements CsrfAwareActionInterface
                 $e->getMessage()
             );
         }
-        exit;
+        exit;// @codingStandardsIgnoreLine
     }
 
     /**
