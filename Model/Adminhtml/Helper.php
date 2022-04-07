@@ -13,6 +13,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Service\InvoiceService;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
@@ -327,6 +328,7 @@ class Helper
         }
         $payment = $order->getPayment();
         if ($payment) {
+            /** @var Payment $payment */
             $authCancelResponse = $payment->getAdditionalInformation(
                 PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE
             );
