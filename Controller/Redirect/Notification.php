@@ -117,7 +117,7 @@ class Notification implements CsrfAwareActionInterface
      * Get the token from the order payment additional info.
      *
      * @param string $orderId
-     * @return string|false
+     * @return string|null
      */
     private function getTokenFromOrder($orderId)
     {
@@ -128,7 +128,7 @@ class Notification implements CsrfAwareActionInterface
             $payment = $order->getPayment();
             return $payment->getAdditionalInformation('token');
         }
-        return false;
+        return null;
     }
 
     /**
