@@ -13,6 +13,8 @@ use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Api\PayoneerNotificationRepositoryInterface;
 use Payoneer\OpenPaymentGateway\Api\Data\NotificationInterfaceFactory;
 use Payoneer\OpenPaymentGateway\Model\PayoneerNotification;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Payoneer\OpenPaymentGateway\Logger\NotificationLogger;
 use Exception;
 
 /**
@@ -43,9 +45,23 @@ class Notification implements CsrfAwareActionInterface
     protected $notificationFactory;
 
     /**
+     * @var OrderCollectionFactory
+     */
+    protected $orderCollectionFactory;
+
+    /**
+     * @var NotificationLogger
+     */
+    protected $notificationLogger;
+
+    /**
      * Notification constructor.
      *
      * @param PayoneerNotificationFactory $payoneerNotification
+     * @param PayoneerNotificationRepositoryInterface $notificationRepository
+     * @param NotificationInterfaceFactory $notificationFactory
+     * @param OrderCollectionFactory $orderCollectionFactory
+     * @param NotificationLogger $notificationLogger
      * @param Http $request
      * @return void
      */
@@ -53,12 +69,16 @@ class Notification implements CsrfAwareActionInterface
         PayoneerNotificationFactory $payoneerNotification,
         PayoneerNotificationRepositoryInterface $notificationRepository,
         NotificationInterfaceFactory $notificationFactory,
+        OrderCollectionFactory $orderCollectionFactory,
+        NotificationLogger $notificationLogger,
         Http $request
     ) {
         $this->payoneerNotification = $payoneerNotification;
         $this->notificationRepository = $notificationRepository;
         $this->notificationFactory = $notificationFactory;
         $this->request = $request;
+        $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->notificationLogger = $notificationLogger;
     }
 
     /**
@@ -86,7 +106,27 @@ class Notification implements CsrfAwareActionInterface
                 $this->notificationRepository->save($notification);
             }
         } catch (Exception $e) {
-            // log error
+            $this->notificationLogger->addError(
+                $e->getMessage()
+            );
+        }
+        exit;
+    }
+
+    /**
+     * Get the token from the order payment additional info.
+     *
+     * @param string $orderId
+     * @return string|null
+     */
+    private function getTokenFromOrder($orderId)
+    {
+        $collection = $this->orderCollectionFactory->create();
+        $collection->addFieldToFilter('increment_id', ['eq' => $orderId]);
+        if ($collection->getSize()) {
+            $order = $collection->getFirstItem();
+            $payment = $order->getPayment();
+            return $payment->getAdditionalInformation('token');
         }
         return null;
     }
@@ -106,6 +146,20 @@ class Notification implements CsrfAwareActionInterface
      */
     public function validateForCsrf(RequestInterface $request): ?bool
     {
+        $orderId = $request->getParam('order_id');
+        $notificationToken = $request->getParam('token');
+        $orderToken = $this->getTokenFromOrder($orderId);
+        if ($notificationToken != $orderToken) {
+            $this->notificationLogger->addError(
+                __(
+                    'Invalid token for order #%1, order token = %2, received token = %3',
+                    $orderId,
+                    $orderToken,
+                    $notificationToken
+                )
+            );
+            return false;
+        }
         return true;
     }
 }
