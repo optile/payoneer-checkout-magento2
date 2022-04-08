@@ -30,6 +30,7 @@ class Helper
     const CAPTURE = 'capture';
     const CHARGED = 'charged';
     const DEBITED = 'debited';
+    const CAPTURE_CLOSED = 'closed';
 
     /**
      * @var TransactionSearchResultInterfaceFactory
