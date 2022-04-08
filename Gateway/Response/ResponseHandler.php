@@ -6,6 +6,7 @@ use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Payment;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use PayPal\Braintree\Gateway\Helper\SubjectReader;
+use Magento\Sales\Model\Order\Payment\Transaction;
 
 /**
  * Class ResponseHandler
@@ -44,5 +45,11 @@ class ResponseHandler implements HandlerInterface
 
         $orderPayment->setTransactionId($response['response'][Config::TXN_ID]);
         $orderPayment->setIsTransactionClosed(false);
+
+        $additionalInfo = $orderPayment->getAdditionalInformation();
+        $orderPayment->setTransactionAdditionalInfo(
+            Transaction::RAW_DETAILS,
+            $additionalInfo /** @phpstan-ignore-line */
+        );
     }
 }
