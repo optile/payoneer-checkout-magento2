@@ -5,6 +5,7 @@ namespace Payoneer\OpenPaymentGateway\Cron;
 use Payoneer\OpenPaymentGateway\Model\ResourceModel\PayoneerNotification\CollectionFactory;
 use Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater;
 use Payoneer\OpenPaymentGateway\Model\ResourceModel\PayoneerNotification\Collection;
+use Payoneer\OpenPaymentGateway\Logger\NotificationLogger;
 
 /**
  * Update order on running cron with notification data
@@ -22,18 +23,26 @@ class OrderUpdate
     protected $transactionOrderUpdater;
 
     /**
+     * @var NotificationLogger
+     */
+    protected $notificationLogger;
+
+    /**
      * OrderUpdate construct function
      *
      * @param CollectionFactory $notificationCollectionFactory
      * @param TransactionOrderUpdater $transactionOrderUpdater
+     * @param NotificationLogger $notificationLogger
      * @return void
      */
     public function __construct(
         CollectionFactory $notificationCollectionFactory,
-        TransactionOrderUpdater $transactionOrderUpdater
+        TransactionOrderUpdater $transactionOrderUpdater,
+        NotificationLogger $notificationLogger
     ) {
         $this->notificationCollectionFactory = $notificationCollectionFactory;
         $this->transactionOrderUpdater = $transactionOrderUpdater;
+        $this->notificationLogger = $notificationLogger;
     }
 
     /**
@@ -53,10 +62,20 @@ class OrderUpdate
                         $response
                     );
                 } catch (\Exception $e) {
+                    $this->notificationLogger->addError(
+                        __('CronProcess: #id=%1, Error = %2', $notification->getId(), $e->getMessage())
+                    );
                     continue;
                 }
-                $notification->setCronStatus(1);
-                $notification->save();
+                try {
+                    $notification->setCronStatus(1);
+                    $notification->save();
+                } catch (\Exception $e) {
+                    $this->notificationLogger->addError(
+                        __('CronNotificationnSave: #id=%1, Error = %2', $notification->getId(), $e->getMessage())
+                    );
+                    continue;
+                }
             }
         }
         return true;

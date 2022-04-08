@@ -297,4 +297,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         }
         return $styleConfigValues;
     }
+
+    /**
+     * Check if module debugging is enabled or not
+     *
+     * @return bool
+     */
+    public function isDebuggingEnabled()
+    {
+        return $this->getValue('debug');
+    }
 }
