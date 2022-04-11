@@ -17,7 +17,8 @@ class RefundTransferFactory extends TransferFactory
      */
     protected function getApiUri(PaymentDataObjectInterface $payment)
     {
-        $longId = $payment->getPayment()->getAdditionalInformation('longId');
+        $captureResponse = $payment->getPayment()->getAdditionalInformation('capture_response');
+        $longId = $captureResponse['longId'];
 
         return sprintf(
             Config::REFUND_END_POINT,

@@ -2,9 +2,9 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Validator;
 
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
-use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 
 /**
@@ -13,13 +13,11 @@ use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
  */
 class ResponseValidator extends AbstractValidator
 {
-    const REFUND_PAID_OUT_STATUS = 'paid_out';
-
-    const REFUND_CREDITED = 'refund_credited';
-
-    const AUTH_CANCEL_PENDING_STATUS = 'pending';
-
-    const CANCELLATION_REQUESTED = 'cancelation_requested';
+    const REFUND_PAID_OUT_STATUS        = 'paid_out';
+    const CAPTURE_STATUS                = 'charged';
+    const REFUND_CREDITED               = 'refund_credited';
+    const AUTH_CANCEL_PENDING_STATUS    = 'pending';
+    const CANCELLATION_REQUESTED        = 'cancelation_requested';
 
     /**
      * @var bool
@@ -62,12 +60,12 @@ class ResponseValidator extends AbstractValidator
         if ($response['status'] != 200) {
             return $this->createResult(false, [$response['reason']]);
         }
+
         if (isset($response['response']['status']['code']) &&
             $response['response']['status']['code'] != $this->successStatusCode
         ) {
             return $this->createResult(false, [$response['response']['resultInfo']]);
         }
-
-        return $this->createResult(true);
+        return $this ->createResult(true);
     }
 }
