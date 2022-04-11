@@ -245,8 +245,7 @@
 
     <virtualType name="PayoneerRefundResponseHandler" type="Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler">
         <arguments>
-            <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE</argument>
-            <argument name="actionSuccessResponseKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::AUTH_CANCEL_STATUS_NODE</argument>
+            <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE</argument>            
         </arguments>
     </virtualType>
 
@@ -279,6 +278,7 @@
     <virtualType name="PayoneerAuthCancelResponseHandler" type="Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler">
         <arguments>
             <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE</argument>
+            <argument name="actionSuccessResponseKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::AUTH_CANCEL_STATUS_NODE</argument>
         </arguments>
     </virtualType>
 

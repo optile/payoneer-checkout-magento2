@@ -23,6 +23,7 @@ class Client implements ClientInterface
     const REFUND        = 'refund';
     const VOID          = 'void';
     const LIST_FETCH    = 'list_fetch';
+    const PREAUTH_CANCEL    = 'preauth_cancel';
 
     /**
      * @var Logger

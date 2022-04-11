@@ -19,6 +19,10 @@ class ResponseValidator extends AbstractValidator
     const AUTH_CANCEL_PENDING_STATUS    = 'pending';
     const CANCELLATION_REQUESTED        = 'cancelation_requested';
 
+    const AUTH_CANCELLED_STATUS = 'canceled';
+
+    const PREAUTHORIZATION_CANCELLED = 'preauthorization_canceled';
+
     /**
      * @var bool
      */

@@ -6,6 +6,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Payment;
 use PayPal\Braintree\Gateway\Helper\SubjectReader;
+use Magento\Sales\Model\Order\Payment\Transaction;
 
 /**
  * Class PayoneerResponseHandler
@@ -68,9 +69,15 @@ class PayoneerResponseHandler implements HandlerInterface
 
         /** @var Payment $orderPayment */
         $orderPayment = $paymentDO->getPayment();
+
+        $additionalInfo = $this->buildAdditionalInfoDataFromResponse($response);
         $orderPayment->setAdditionalInformation(
             $this->additionalInfoKey,
-            $this->buildAdditionalInfoDataFromResponse($response)
+            $additionalInfo
+        );
+        $orderPayment->setTransactionAdditionalInfo(
+            Transaction::RAW_DETAILS,
+            $additionalInfo /** @phpstan-ignore-line */
         );
     }
 
