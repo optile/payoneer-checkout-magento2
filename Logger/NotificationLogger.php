@@ -5,6 +5,7 @@ namespace Payoneer\OpenPaymentGateway\Logger;
 use Payoneer\OpenPaymentGateway\Model\Helper;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
  * NotificationLogger class
@@ -23,9 +24,15 @@ class NotificationLogger extends Logger
     private $helper;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * NotificationLogger construct
      *
      * @param Helper $helper
+     * @param Config $config
      * @param string             $name       The logging channel
      * @param HandlerInterface[] $handlers   Optional stack of handlers
      * @param callable[]         $processors Optional array of processors
@@ -33,12 +40,14 @@ class NotificationLogger extends Logger
      */
     public function __construct(
         Helper $helper,
+        Config $config,
         $name,
         array $handlers = [],
         array $processors = []
     ) {
         parent::__construct($name, $handlers, $processors);
         $this->helper = $helper;
+        $this->config = $config;
     }
 
     /**
@@ -50,6 +59,9 @@ class NotificationLogger extends Logger
      */
     public function addError($message, array $context = [])
     {
+        if (!$this->config->isDebuggingEnabled()) {
+            return true;
+        }
         $this->prepareGeneralInfo();
         $message = $this->addGeneralInfoToMessage($message);
         return $this->addRecord(static::ERROR, $message, $context);
