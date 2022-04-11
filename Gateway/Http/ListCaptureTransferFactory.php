@@ -3,6 +3,7 @@
 namespace Payoneer\OpenPaymentGateway\Gateway\Http;
 
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
  * Class ListCaptureTransferFactory
@@ -19,6 +20,9 @@ class ListCaptureTransferFactory extends TransferFactory
         $additionalInformation = $payment->getPayment()->getAdditionalInformation();
         $longId = $additionalInformation['longId'];
 
-        return 'api/charges/' . $longId . '/closing';
+        return sprintf(
+            Config::CAPTURE_END_POINT,
+            $longId
+        );
     }
 }

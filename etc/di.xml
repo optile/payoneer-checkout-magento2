@@ -37,19 +37,22 @@
         </arguments>
     </type>
 
+    <!-- Payoneer Transaction Service -->
     <type name="Payoneer\OpenPaymentGateway\Model\TransactionService">
         <arguments>
             <argument name="config" xsi:type="object">PayoneerConfig</argument>
             <argument name="commandPool" xsi:type="object">PayoneerCommandPool</argument>
         </arguments>
     </type>
-    
+
+    <!-- Payoneer Transaction Order Updater -->
     <type name="Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater">
         <arguments>
             <argument name="commandPool" xsi:type="object">PayoneerCommandPool</argument>
         </arguments>
     </type>
 
+    <!-- Payoneer Adminhtml Transaction Service -->
     <type name="Payoneer\OpenPaymentGateway\Model\Adminhtml\TransactionService">
         <arguments>
             <argument name="commandPool" xsi:type="object">PayoneerCommandPool</argument>
@@ -72,43 +75,7 @@
         </arguments>
     </virtualType>
 
-    <!-- List Capture command -->
-    <virtualType name="PayoneerListCaptureCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
-        <arguments>
-            <argument name="requestBuilder" xsi:type="object">PayoneerListCaptureRequest</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\ListCaptureTransferFactory</argument>
-            <argument name="client" xsi:type="object">PayoneerClientListCapture</argument>
-        </arguments>
-    </virtualType>
-
-    <!-- List Fetch command -->
-    <virtualType name="PayoneerListFetchCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
-        <arguments>
-            <argument name="requestBuilder" xsi:type="object">PayoneerListFetchRequest</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\ListFetchTransferFactory</argument>
-            <argument name="client" xsi:type="object">PayoneerClientListFetch</argument>
-        </arguments>
-    </virtualType>
-
-    <!-- List Capture Request -->
-    <virtualType name="PayoneerListCaptureRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
-        <arguments>
-            <argument name="builders" xsi:type="array">
-                <item name="adminTransactionId" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AdminTransactionIDDataBuilder</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <!-- List Fetch Request -->
-    <virtualType name="PayoneerListFetchRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
-        <arguments>
-            <argument name="builders" xsi:type="array">
-                <item name="adminTransactionId" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AdminTransactionIDDataBuilder</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <!-- List command -->
+    <!-- Payoneer List command -->
     <virtualType name="PayoneerListCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">PayoneerListRequestBuilder</argument>
@@ -117,7 +84,7 @@
         </arguments>
     </virtualType>
 
-    <!-- List Request -->
+    <!-- Payoneer List Request -->
     <virtualType name="PayoneerListRequestBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
@@ -133,7 +100,57 @@
         </arguments>
     </virtualType>
 
-    <!-- Authorize command -->
+    <!-- Payoneer List Client -->
+    <virtualType name="PayoneerClientList" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
+        <arguments>
+            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::LIST</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Capture Command -->
+    <virtualType name="PayoneerListCaptureCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayoneerListCaptureRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\ListCaptureTransferFactory</argument>
+            <argument name="client" xsi:type="object">PayoneerClientListCapture</argument>
+            <argument name="handler" xsi:type="object">PayoneerCaptureResponseHandler</argument>
+            <argument name="validator" xsi:type="object">PayoneerListCaptureResponseValidator</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Capture Request -->
+    <virtualType name="PayoneerListCaptureRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="adminTransactionId" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AdminTransactionIDDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Capture Client -->
+    <virtualType name="PayoneerClientListCapture" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
+        <arguments>
+            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::LIST_CAPTURE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Capture Response Handler -->
+    <virtualType name="PayoneerCaptureResponseHandler" type="Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler">
+        <arguments>
+            <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_CAPTURE_RESPONSE</argument>
+            <argument name="actionSuccessResponseKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::AUTH_CAPTURE_STATUS_NODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Capture Response Validator -->
+    <virtualType name="PayoneerListCaptureResponseValidator" type="Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator">
+        <arguments>
+            <argument name="successStatusCode" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator::CAPTURE_STATUS</argument>
+            <argument name="skipValidation" xsi:type="boolean">false</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Magento Authorize Command -->
     <virtualType name="PayoneerAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Request\TransactionIDDataBuilder</argument>
@@ -144,7 +161,21 @@
         </arguments>
     </virtualType>
 
-    <!-- Capture command -->
+    <!-- Magento Authorize Client -->
+    <virtualType name="PayoneerClientAuthorize" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
+        <arguments>
+            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::AUTHORIZE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Magento Authorize Response Validator -->
+    <virtualType name="PayoneerAuthorizeResponseValidator" type="Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator">
+        <arguments>
+            <argument name="skipValidation" xsi:type="boolean">true</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Magento Capture Command -->
     <virtualType name="PayoneerCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Request\TransactionIDDataBuilder</argument>
@@ -155,92 +186,77 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="PayoneerAuthorizeResponseValidator" type="Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator">
-        <arguments>
-            <argument name="skipValidation" xsi:type="boolean">true</argument>
-        </arguments>
-    </virtualType>
-    
-    <virtualType name="PayoneerCaptureResponseValidator" type="Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator">
-        <arguments>
-            <argument name="skipValidation" xsi:type="boolean">true</argument>
-        </arguments>
-    </virtualType>
-    
-    <virtualType name="PayoneerClientList" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
-        <arguments>
-            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::LIST</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="PayoneerClientListCapture" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
-        <arguments>
-            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::LIST_CAPTURE</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="PayoneerClientListFetch" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
-        <arguments>
-            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::LIST_FETCH</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="PayoneerClientAuthorize" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
-        <arguments>
-            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::AUTHORIZE</argument>
-        </arguments>
-    </virtualType>
-
+    <!-- Magento Capture Client -->
     <virtualType name="PayoneerClientAuthorizeCapture" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
         <arguments>
             <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::CAPTURE</argument>
         </arguments>
     </virtualType>
 
-    <virtualType name="PayoneerClientListCapture" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
+    <!-- Magento Capture Response Validator -->
+    <virtualType name="PayoneerCaptureResponseValidator" type="Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator">
         <arguments>
-            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::LIST_CAPTURE</argument>
+            <argument name="skipValidation" xsi:type="boolean">true</argument>
         </arguments>
     </virtualType>
 
-    <!-- Refund command -->
+    <!-- Payoneer List Fetch command -->
+    <virtualType name="PayoneerListFetchCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayoneerListFetchRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\ListFetchTransferFactory</argument>
+            <argument name="client" xsi:type="object">PayoneerListFetchClient</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Fetch Request -->
+    <virtualType name="PayoneerListFetchRequest" type="PayoneerListCaptureRequest">
+    </virtualType>
+
+    <!-- Payoneer List Fetch Client -->
+    <virtualType name="PayoneerListFetchClient" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
+        <arguments>
+            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::LIST_FETCH</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer Refund command -->
     <virtualType name="PayoneerRefundCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
         <arguments>
-            <argument name="requestBuilder" xsi:type="object">PayoneerPaymentGatewayRefundRequest</argument>
+            <argument name="requestBuilder" xsi:type="object">PayoneerRefundRequest</argument>
             <argument name="validator" xsi:type="object">PayoneerRefundResponseValidator</argument>
             <argument name="handler" xsi:type="object">PayoneerRefundResponseHandler</argument>
             <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\RefundTransferFactory</argument>
-            <argument name="client" xsi:type="object">PayoneerClientRefund</argument>
+            <argument name="client" xsi:type="object">PayoneerRefundClient</argument>
         </arguments>
     </virtualType>
 
+    <!-- Payoneer Refund Response Validator -->
     <virtualType name="PayoneerRefundResponseValidator" type="Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator">
         <arguments>
             <argument name="successStatusCode" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator::REFUND_PAID_OUT_STATUS</argument>
         </arguments>
     </virtualType>
 
-    <virtualType name="PayoneerPaymentGatewayRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
-        <arguments>
-            <argument name="builders" xsi:type="array">
-                <item name="refund" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AdminTransactionIDDataBuilder</item>
-            </argument>
-        </arguments>
+    <!-- Payoneer Refund Request -->
+    <virtualType name="PayoneerRefundRequest" type="PayoneerListCaptureRequest">
     </virtualType>
 
-    <virtualType name="PayoneerClientRefund" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
+    <!-- Payoneer Refund Client -->
+    <virtualType name="PayoneerRefundClient" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
         <arguments>
             <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::REFUND</argument>
         </arguments>
     </virtualType>
 
+    <!-- Payoneer Refund Response Handler -->
     <virtualType name="PayoneerRefundResponseHandler" type="Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler">
         <arguments>
-            <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE</argument>            
+            <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE</argument>
         </arguments>
     </virtualType>
 
-    <!-- Cancel deferred(Authorization) command -->
+    <!-- Cancel deferred(Authorization) Command -->
     <virtualType name="PayoneerCancelAuthorizationCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Request\AdminTransactionIDDataBuilder</argument>
@@ -251,18 +267,21 @@
         </arguments>
     </virtualType>
 
+    <!-- Cancel Deferred(Authorization) Response Validator -->
     <virtualType name="PayoneerCancelAuthorizationResponseValidator" type="Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator">
         <arguments>
             <argument name="successStatusCode" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator::AUTH_CANCEL_PENDING_STATUS</argument>
         </arguments>
     </virtualType>
 
+    <!-- Cancel Deferred(Authorization) Client -->
     <virtualType name="PayoneerClientAuthorizationCancellation" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
         <arguments>
             <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::AUTHORIZATION_CANCEL</argument>
         </arguments>
     </virtualType>
 
+    <!-- Cancel Deferred(Authorization) Response Handler -->
     <virtualType name="PayoneerAuthCancelResponseHandler" type="Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler">
         <arguments>
             <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE</argument>
@@ -290,7 +309,7 @@
         </arguments>
     </virtualType>
 
-    <!-- Value handlers infrastructure -->
+    <!-- Value Handlers Infrastructure -->
     <virtualType name="PayoneerValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
