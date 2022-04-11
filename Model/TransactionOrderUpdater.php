@@ -178,12 +178,15 @@ class TransactionOrderUpdater
             case [self::PRE_AUTHORIZED_STATUS, self::PRE_AUTHORIZED_STATUS]:
                 return $this->checkAndAuthorizeOrder($order, $response);
             case [Helper::CHARGED, Helper::DEBITED]:
+            case [Helper::CHARGED, Helper::CAPTURE_CLOSED]:
                 return $this->checkAndCaptureOrder($order, $response);
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_CREDITED]:
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_PAID_OUT_STATUS]:
                 return $this->checkAndRefundOrder($order, $response);
             case [ResponseValidator::AUTH_CANCEL_PENDING_STATUS, ResponseValidator::CANCELLATION_REQUESTED]:
                 return $this->checkAndVoidOrder($order, $response);
+            case [ResponseValidator::AUTH_CANCELLED_STATUS, ResponseValidator::PREAUTHORIZATION_CANCELLED]:
+                return $this->checkAndVoidOrderOnPreAuthCancel($order, $response);
         }
     }
 
@@ -261,7 +264,8 @@ class TransactionOrderUpdater
                 'is_transaction_closed' => true,
                 'transaction_type' => Client::REFUND,
                 'order_comment' => __('Refunded amount of %1.', $orderTotal),
-                'parent_txn_id' => $response['transaction_id']
+                'parent_txn_id' => $response['transaction_id'],
+                'txn_id_post_text' => 'refund'
             ];
             $this->addNewTransactionEntry(
                 $orderObj,
@@ -292,27 +296,14 @@ class TransactionOrderUpdater
             $orderObj = $this->getOrder($order);
             $authTxn = $this->getTransaction($orderObj->getId(), Client::VOID);
             if ($authTxn != null && $authTxn->getTransactionId()) {
-                if ($orderObj->getState() != Order::STATE_CLOSED) {
+                if ($orderObj->getState() != Order::STATE_CANCELED) {
                     $this->orderManager->cancel($orderObj->getId());
                 }
                 return true;
             }
-            $this->orderManager->cancel($orderObj->getId());
-
-            $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
-                $orderObj->getGrandTotal()
-            );
-            $txnData = [
-                'additional_info' => $response,
-                'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE,
-                'is_transaction_closed' => true,
-                'transaction_type' => Client::VOID,
-                'order_comment' => __('Void amount of %1.', $orderTotal),
-                'parent_txn_id' => $response['transaction_id']
-            ];
-            $this->addNewTransactionEntry(
+            $this->cancelOrderAndAddNewVoidTransaction(
                 $orderObj,
-                $txnData
+                $response
             );
         } catch (LocalizedException $le) {
             throw new LocalizedException(
@@ -323,6 +314,82 @@ class TransactionOrderUpdater
                 __('Something went wrong while cancelling the authorization.')
             );
         }
+    }
+
+    /**
+     * Cancel the auth if not already cancelled.
+     *
+     * @param string|Order $order
+     * @param array <mixed> $response
+     * @return bool|void
+     * @throws LocalizedException
+     */
+    public function checkAndVoidOrderOnPreAuthCancel($order, $response)
+    {
+        try {
+            $orderObj = $this->getOrder($order);
+            $authTxn = $this->getTransaction($orderObj->getId(), Client::VOID);
+            if ($authTxn != null && $authTxn->getTransactionId()) {
+                if ($orderObj->getState() != Order::STATE_CANCELED) {
+                    $this->orderManager->cancel($orderObj->getId());
+                }
+                $authTxn->unsAdditionalInformation();
+                $authTxn->setAdditionalInformation(
+                    Transaction::RAW_DETAILS,
+                    $response
+                );
+                $this->transactionRepository->save($authTxn);
+                $orderObj->addCommentToStatusHistory(
+                    __('Payoneer status changed to preauthorization_canceled.')
+                );
+                $this->orderRepository->save($orderObj);
+
+                return true;
+            }
+            $this->cancelOrderAndAddNewVoidTransaction(
+                $orderObj,
+                $response
+            );
+        } catch (LocalizedException $le) {
+            throw new LocalizedException(
+                __($le->getMessage())
+            );
+        } catch (\Exception $e) {
+            throw new LocalizedException(
+                __('Something went wrong while cancelling the preauthorization.')
+            );
+        }
+    }
+
+    /**
+     * Cancel the order and add new void transaction entry.
+     *
+     * @param Order $orderObj
+     * @param array <mixed> $response
+     * @return bool
+     */
+    private function cancelOrderAndAddNewVoidTransaction($orderObj, $response)
+    {
+        $this->orderManager->cancel($orderObj->getId());
+
+        $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
+            $orderObj->getGrandTotal()
+        );
+        $txnData = [
+            'additional_info' => $response,
+            'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE,
+            'is_transaction_closed' => true,
+            'transaction_type' => Client::VOID,
+            'order_comment' => __('Void amount of %1.', $orderTotal),
+            'parent_txn_id' => $response['transaction_id'],
+            'txn_id_post_text' => 'void'
+        ];
+        $this->addNewTransactionEntry(
+            $orderObj,
+            $txnData
+        );
+
+        return true;
     }
 
     /**
@@ -392,10 +459,11 @@ class TransactionOrderUpdater
      * @param int $orderId
      * @param string $txnType
      * @param int $txnId
-     * @return Transaction|null|DataObject
+     * @return Transaction|null
      */
     private function getTransaction($orderId, $txnType = null, $txnId = null)
     {
+        $transaction = null;
         $collection = $this->orderTransactionCollectionFactory->create();
         $collection->addOrderIdFilter($orderId);
         if (!empty($txnType)) {
@@ -405,9 +473,10 @@ class TransactionOrderUpdater
             $collection->addFieldToFilter('transaction_id', ['eq' => $txnId]);
         }
         if ($collection->getSize()) {
-            return $collection->getFirstItem();
+            /** @var  Transaction $transaction */
+            $transaction = $collection->getFirstItem();
         }
-        return null;
+        return $transaction;
     }
 
     /**
@@ -435,8 +504,7 @@ class TransactionOrderUpdater
             $transaction = $this->buildTransactionObject(
                 $order,
                 $payment,
-                $data['additional_info'],
-                $data['transaction_type']
+                $data
             );
 
             $payment->addTransactionCommentsToOrder(
@@ -464,20 +532,19 @@ class TransactionOrderUpdater
      *
      * @param Order $order
      * @param Order\Payment|OrderPaymentInterface $payment
-     * @param array <mixed> $additionalInfo
-     * @param string $type
+     * @param array <mixed> $data
      * @return Transaction|TransactionInterface
      */
-    private function buildTransactionObject($order, $payment, $additionalInfo, $type)
+    private function buildTransactionObject($order, $payment, $data)
     {
-        $txnId = $this->getFinalTransactionId($additionalInfo['transaction_id'], $type);
+        $txnId = $this->getFinalTransactionId($data);
         return $this->paymentTransactionBuilder->setPayment($payment)
             ->setOrder($order)
             ->setTransactionId($txnId)
             ->setAdditionalInformation(
-                [Transaction::RAW_DETAILS => $additionalInfo]
+                [Transaction::RAW_DETAILS => $data['additional_info']]
             )->setFailSafe(true)
-            ->build($type);
+            ->build($data['transaction_type']);
     }
 
     /**
@@ -500,14 +567,14 @@ class TransactionOrderUpdater
      * Get the final txn id for the payment transaction
      * table.
      *
-     * @param string $txnId
-     * @param string $txnType
+     * @param array <mixed> $data
      * @return string
      */
-    private function getFinalTransactionId($txnId, $txnType)
+    private function getFinalTransactionId($data)
     {
-        if (in_array($txnType, [Client::REFUND, Client::VOID])) {
-            return $txnId . '-' . $txnType;
+        $txnId = $data['additional_info']['transaction_id'];
+        if (!empty($data['txn_id_post_text'])) {
+            return $txnId . '-' . $data['txn_id_post_text'];
         }
         return $txnId;
     }
