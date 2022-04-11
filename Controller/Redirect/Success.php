@@ -128,10 +128,11 @@ class Success implements HttpGetActionInterface
                     if (!$customerEmail) {
                         $quote->setCustomerEmail($this->checkoutSession->getPayoneerCustomerEmail());
                     }
+                } else {
+                    $this->unsetCustomCheckoutSession();
                 }
                 $this->cartRepository->save($quote);
 
-                $this->unsetCustomCheckoutSession();
                 $this->cartManagement->placeOrder($cartId);
                 return $this->resultPageFactory->create();
             } else {

@@ -49,7 +49,7 @@ class ResponseHandler implements HandlerInterface
         $additionalInfo = $orderPayment->getAdditionalInformation();
         $orderPayment->setTransactionAdditionalInfo(
             Transaction::RAW_DETAILS,
-            $additionalInfo /** @phpstan-ignore-line */
+            $additionalInfo
         );
     }
 }
