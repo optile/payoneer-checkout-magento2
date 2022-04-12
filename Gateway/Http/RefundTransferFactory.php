@@ -2,8 +2,8 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Http;
 
-use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
  * Class RefundTransferFactory
@@ -17,8 +17,13 @@ class RefundTransferFactory extends TransferFactory
      */
     protected function getApiUri(PaymentDataObjectInterface $payment)
     {
-        $captureResponse = $payment->getPayment()->getAdditionalInformation('capture_response');
-        $longId = $captureResponse['longId'];
+        $payment = $payment->getPayment();
+        $captureResponse = $payment->getAdditionalInformation('capture_response');
+        if ($captureResponse) {
+            $longId = $captureResponse['longId'];
+        } else {
+            $longId = $payment->getAdditionalInformation('longId');
+        }
 
         return sprintf(
             Config::REFUND_END_POINT,
