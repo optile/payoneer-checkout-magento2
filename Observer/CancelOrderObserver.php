@@ -2,18 +2,19 @@
 
 namespace Payoneer\OpenPaymentGateway\Observer;
 
+use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Payment\Gateway\Command\ResultInterface;
-use Payoneer\OpenPaymentGateway\Model\TransactionService;
-use Magento\Framework\Event\Observer;
+use Magento\Sales\Model\Order;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper as AdminHelper;
+use Payoneer\OpenPaymentGateway\Model\TransactionService;
 
 /**
  * CancelOrderObserver class
  *
- * Class will handle the payoneer side cancelation
+ * Class will handle the payoneer side cancellation
  * of the auth request if already created.
  */
 class CancelOrderObserver implements ObserverInterface
@@ -54,9 +55,17 @@ class CancelOrderObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
+        $cancellationDone = false;
+        /**@var Order $order */
         $order = $observer->getEvent()->getOrder();
-        if ($order->getState() == 'canceled' && $this->payoneerAdminHelper->canCancelAuthorization($order)) {
-            return $this->transactionService->processAuthCancel($order);
+        $additionalInformation = $order->getPayment()->getAdditionalInformation();
+        if ($additionalInformation && isset($additionalInformation['payoneerCancel'])) {
+            $cancellationDone = true;
+        }
+        if (!$cancellationDone) {
+            if ($order->getState() == 'canceled' && $this->payoneerAdminHelper->canCancelAuthorization($order)) {
+                return $this->transactionService->processAuthCancel($order);
+            }
         }
     }
 }
