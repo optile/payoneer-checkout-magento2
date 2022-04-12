@@ -3,7 +3,6 @@
 namespace Payoneer\OpenPaymentGateway\Model;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
@@ -29,7 +28,7 @@ use Payoneer\OpenPaymentGateway\Model\Creditmemo\CreditmemoCreator;
  *
  * Class will handle the order update based on the response
  * from payoneer side during the notification processing via
- * cronjob or after the fetch operation from admin side.
+ * cron job or after the fetch operation from admin side.
  */
 class TransactionOrderUpdater
 {
@@ -311,7 +310,7 @@ class TransactionOrderUpdater
             );
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while cancelling the authorization.')
+                __('Something went wrong while cancelling the authorization.' . $e->getMessage())
             );
         }
     }
@@ -367,9 +366,12 @@ class TransactionOrderUpdater
      * @param Order $orderObj
      * @param array <mixed> $response
      * @return bool
+     * @throws LocalizedException
      */
     private function cancelOrderAndAddNewVoidTransaction($orderObj, $response)
     {
+        $this->setAdditionalInformation($orderObj, 'payoneerCancel');
+
         $this->orderManager->cancel($orderObj->getId());
 
         $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
@@ -393,6 +395,21 @@ class TransactionOrderUpdater
     }
 
     /**
+     * @param Order $orderObj
+     * @param string $transactionType
+     * @return void
+     */
+    public function setAdditionalInformation($orderObj, $transactionType)
+    {
+        $payment = $orderObj->getPayment();
+        if ($payment) {
+            $additionalInformation = $payment->getAdditionalInformation();
+            $additionalInformation = array_merge($additionalInformation, [$transactionType => 'success']);
+            $payment->setAdditionalInformation($additionalInformation);
+        }
+    }
+
+    /**
      * Capture the order if it's not already captured.
      *
      * @param string|Order $order
@@ -409,12 +426,8 @@ class TransactionOrderUpdater
                 return $this->changeOrderToProcessing($orderObj);
             }
 
-            $payment = $orderObj->getPayment();
-            if ($payment) {
-                $additionalInformation = $payment->getAdditionalInformation();
-                $additionalInformation = array_merge($additionalInformation, ['payoneerCapture' => 'success']);
-                $payment->setAdditionalInformation($additionalInformation);
-            }
+            $this->setAdditionalInformation($orderObj, 'payoneerCapture');
+
             if ($orderObj->canInvoice()) {
                 $this->adminHelper->generateInvoice($orderObj);
             }
