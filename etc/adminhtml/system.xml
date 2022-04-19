@@ -71,7 +71,6 @@
                 </field>
                 <field id="notification_url" translate="label" type="text" sortOrder="113" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Notification URL</label>
-                    <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\Disable</frontend_model>
                 </field>
                 <field id="payment_action" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment Action</label>

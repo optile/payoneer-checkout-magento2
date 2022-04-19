@@ -18,23 +18,16 @@ class ItemsDataBuilder implements BuilderInterface
     const ADJUSTMENTS = 'Total Adjustments';
 
     /**
-     * @var Config
-     */
-    protected $config;
-
-    /**
      * @var Helper
      */
     protected $helper;
 
     /**
-     * @param Config $config
+     * @param Helper $helper
      */
     public function __construct(
-        Config $config,
         Helper $helper
     ) {
-        $this->config = $config;
         $this->helper = $helper;
     }
 
