@@ -10,8 +10,8 @@
                 <title>Payoneer Payment Gateway</title>
                 <live_host_name>https://api.live.oscato.com/</live_host_name>
                 <sandbox_host_name>https://api.sandbox.oscato.com/</sandbox_host_name>
-                <success_url>{{base_url}}redirect/success</success_url>
-                <cancel_url>{{base_url}}redirect/cancel</cancel_url>
+                <success_url>{{base_url}}payoneer/redirect/success</success_url>
+                <cancel_url>{{base_url}}payoneer/redirect/cancel</cancel_url>
                 <currency>USD</currency>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
