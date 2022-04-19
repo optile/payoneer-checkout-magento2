@@ -78,7 +78,7 @@ class CallBackDataBuilder implements BuilderInterface
     {
         $configUrl = $this->config->getValue('notification_url');
         if ($configUrl) {
-            $configUrl = $configUrl . '/order_id/' . $orderId . './token/' . $token;
+            $configUrl = $configUrl . '/order_id/' . $orderId . '/token/' . $token;
         } else {
             $configUrl =  $this->urlBuilder->getUrl(
                 Config::NOTIFICATION_URL_PATH,
