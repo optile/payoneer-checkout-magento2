@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
 	<group id="default">
 		<job instance="Payoneer\OpenPaymentGateway\Cron\OrderUpdate" method="execute" name="payoneer_openpaymentgateway_orderupdate">
-			<schedule>30/* * * * *</schedule>
+			<schedule>*/5 * * * *</schedule>
 		</job>
 	</group>
 </config>

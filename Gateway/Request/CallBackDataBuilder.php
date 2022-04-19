@@ -25,16 +25,24 @@ class CallBackDataBuilder implements BuilderInterface
     private $checkoutSession;
 
     /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
      * CallBackBuilder constructor.
      * @param UrlInterface $urlBuilder
      * @param Session $checkoutSession
+     * @param Config $config
      */
     public function __construct(
         UrlInterface $urlBuilder,
-        Session $checkoutSession
+        Session $checkoutSession,
+        Config $config
     ) {
         $this->urlBuilder = $urlBuilder;
         $this->checkoutSession = $checkoutSession;
+        $this->config = $config;
     }
 
     /**
@@ -49,25 +57,47 @@ class CallBackDataBuilder implements BuilderInterface
         $token = $payment->getPayment()->getAdditionalInformation('token');
         $orderId = $payment->getOrder()->getOrderIncrementId();
 
-        $successParams = [];
+        $successParams = ['cart_id' => $this->getQuoteIdFromSession(), 'token' => $token];
         $cancelParams = ['error' => true, 'token' => $token];
-
-        if ($this->checkoutSession->hasQuote()) {
-            $successParams['cart_id'] = $this->checkoutSession->getQuoteId();
-            $successParams['token'] = $token;
-        }
-
-        $notificationParams = ['order_id' => $orderId, 'token' => $token];
 
         return [
             Config::CALLBACK => [
                 Config::RETURN_URL => $this->urlBuilder->getUrl(Config::RETURN_URL_PATH, $successParams),
                 Config::CANCEL_URL => $this->urlBuilder->getUrl(Config::CANCEL_URL_PATH, $cancelParams),
-                Config::NOTIFICATION_URL => $this->urlBuilder->getUrl(
-                    Config::NOTIFICATION_URL_PATH,
-                    $notificationParams
-                )
+                Config::NOTIFICATION_URL => $this->getNotificationUrl($orderId, $token)
             ]
         ];
+    }
+
+    /**
+     * @param string $orderId
+     * @param mixed $token
+     * @return string
+     */
+    public function getNotificationUrl($orderId, $token)
+    {
+        $configUrl = $this->config->getValue('notification_url');
+        if ($configUrl) {
+            $configUrl = $configUrl . '/order_id/' . $orderId . '/token/' . $token;
+        } else {
+            $configUrl =  $this->urlBuilder->getUrl(
+                Config::NOTIFICATION_URL_PATH,
+                ['order_id' => $orderId, 'token' => $token]
+            );
+        }
+        return $configUrl;
+    }
+
+    /**
+     * Gets quote id from the checkout session
+     * @return int|null
+     */
+    public function getQuoteIdFromSession()
+    {
+        $quoteId = null;
+        if ($this->checkoutSession->hasQuote()) {
+            $quoteId = $this->checkoutSession->getQuoteId();
+        }
+        return $quoteId;
     }
 }
