@@ -138,6 +138,8 @@ class TransactionOrderUpdater
         $filteredResponse['status_code'] = $response['statusCode'];
         $filteredResponse['reason_code'] = $response['reasonCode'];
         $filteredResponse['long_id'] = $response['longId'];
+        $filteredResponse['interactionReason'] = $response['interactionReason'];
+        $filteredResponse['resultCode'] = $response['resultCode'];
 
         return $this->processResponse($orderId, $filteredResponse);
     }
@@ -175,17 +177,87 @@ class TransactionOrderUpdater
     {
         switch ([$response['status_code'], $response['reason_code']]) {
             case [self::PRE_AUTHORIZED_STATUS, self::PRE_AUTHORIZED_STATUS]:
-                return $this->checkAndAuthorizeOrder($order, $response);
+                if ($this->isValidOrder($order, $response)) {
+                    return $this->checkAndAuthorizeOrder($order, $response);
+                }
+                break;
             case [Helper::CHARGED, Helper::DEBITED]:
             case [Helper::CHARGED, Helper::CAPTURE_CLOSED]:
-                return $this->checkAndCaptureOrder($order, $response);
+                if ($this->isValidOrder($order, $response)) {
+                    return $this->checkAndCaptureOrder($order, $response);
+                }
+                break;
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_CREDITED]:
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_PAID_OUT_STATUS]:
-                return $this->checkAndRefundOrder($order, $response);
+                if ($this->isValidOrder($order, $response)) {
+                    return $this->checkAndRefundOrder($order, $response);
+                }
+                break;
             case [ResponseValidator::AUTH_CANCEL_PENDING_STATUS, ResponseValidator::CANCELLATION_REQUESTED]:
-                return $this->checkAndVoidOrder($order, $response);
+                if ($this->isValidOrder($order, $response)) {
+                    return $this->checkAndVoidOrder($order, $response);
+                }
+                break;
             case [ResponseValidator::AUTH_CANCELLED_STATUS, ResponseValidator::PREAUTHORIZATION_CANCELLED]:
-                return $this->checkAndVoidOrderOnPreAuthCancel($order, $response);
+                if ($this->isValidOrder($order, $response)) {
+                    return $this->checkAndVoidOrderOnPreAuthCancel($order, $response);
+                }
+                break;
+        }
+    }
+
+    /**
+     * @param Order|string $order
+     * @param array <mixed> $response
+     * @return bool
+     * @throws LocalizedException
+     */
+    public function isValidOrder($order, $response)
+    {
+        $orderObj = $this->getOrder($order);
+        $isValidData = $this->compareData($orderObj, $response);
+        if (!$isValidData) {
+            $this->updateOrderStatusToFraud($orderObj);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * @param Order $order
+     * @param array <mixed> $response
+     * @return bool
+     * @throws LocalizedException
+     */
+    public function compareData($order, $response)
+    {
+        if (!($order instanceof Order)) {
+            $orderObj = $this->getOrder($order);
+        } else {
+            $orderObj = $order;
+        }
+        $payment = $orderObj->getPayment();
+        $additionalInformation = $payment ? $payment->getAdditionalInformation() : [];
+
+        if (($response['interactionReason'] !== $additionalInformation['interactionReason'])
+            || ($response['resultCode'] !== $additionalInformation['resultCode'])) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @param Order|string $order
+     * @return void
+     * @throws LocalizedException
+     */
+    public function updateOrderStatusToFraud($order)
+    {
+        if (!($order instanceof Order)) {
+            $order = $this->getOrder($order);
+            $order->setState('payment_review')->setStatus('fraud');
+            $this->orderRepository->save($order);
         }
     }
 
@@ -443,7 +515,7 @@ class TransactionOrderUpdater
     }
 
     /**
-     * Get the order. If its an increment id then the coresponding
+     * Get the order. If its an increment id then the corresponding
      * model is loaded with the id and returned.
      *
      * @param Order|string $order
