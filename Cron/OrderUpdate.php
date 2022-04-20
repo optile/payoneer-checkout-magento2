@@ -59,7 +59,8 @@ class OrderUpdate
                     $response = \Safe\json_decode($notification->getContent(), true);
                     $this->transactionOrderUpdater->processNotificationResponse(
                         $notification->getOrderId(),
-                        $response
+                        $response,
+                        true
                     );
                 } catch (\Exception $e) {
                     $this->notificationLogger->addError(
@@ -90,7 +91,7 @@ class OrderUpdate
     {
         $collection = $this->notificationCollectionFactory->create();
         $collection->addFieldToFilter('cron_status', ['eq' => 0]);
-        $collection->setOrder('created_at', 'DESC');
+        $collection->setOrder('created_at', 'ASC');
 
         return $collection;
     }
