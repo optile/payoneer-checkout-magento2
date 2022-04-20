@@ -128,10 +128,11 @@ class TransactionOrderUpdater
      *
      * @param string $orderId
      * @param array <mixed> $response
+     * @param bool $isCron
      * @return bool|void
      * @throws LocalizedException
      */
-    public function processNotificationResponse($orderId, $response)
+    public function processNotificationResponse($orderId, $response, $isCron)
     {
         $filteredResponse = [];
         $filteredResponse['transaction_id'] = $response['transactionId'];
@@ -139,9 +140,9 @@ class TransactionOrderUpdater
         $filteredResponse['reason_code'] = $response['reasonCode'];
         $filteredResponse['long_id'] = $response['longId'];
         $filteredResponse['interactionReason'] = $response['interactionReason'];
-        $filteredResponse['resultCode'] = $response['resultCode'];
+        $filteredResponse['interactionCode'] = $response['interactionCode'];
 
-        return $this->processResponse($orderId, $filteredResponse);
+        return $this->processResponse($orderId, $filteredResponse, $isCron);
     }
 
     /**
@@ -170,39 +171,35 @@ class TransactionOrderUpdater
      *
      * @param string|Order $order
      * @param array <mixed> $response
+     * @param bool $isCron
      * @return bool|void
      * @throws LocalizedException
      */
-    public function processResponse($order, $response)
+    public function processResponse($order, $response, $isCron = false)
     {
         switch ([$response['status_code'], $response['reason_code']]) {
             case [self::PRE_AUTHORIZED_STATUS, self::PRE_AUTHORIZED_STATUS]:
-                if ($this->isValidOrder($order, $response)) {
+                if ($isCron && $this->isValidOrder($order, $response)) {
+                    return $this->checkAndAuthorizeOrder($order, $response);
+                } elseif (!$isCron) {
                     return $this->checkAndAuthorizeOrder($order, $response);
                 }
                 break;
             case [Helper::CHARGED, Helper::DEBITED]:
             case [Helper::CHARGED, Helper::CAPTURE_CLOSED]:
-                if ($this->isValidOrder($order, $response)) {
+                if ($isCron && $this->isValidOrder($order, $response)) {
+                    return $this->checkAndCaptureOrder($order, $response);
+                } elseif (!$isCron) {
                     return $this->checkAndCaptureOrder($order, $response);
                 }
                 break;
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_CREDITED]:
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_PAID_OUT_STATUS]:
-                if ($this->isValidOrder($order, $response)) {
-                    return $this->checkAndRefundOrder($order, $response);
-                }
-                break;
+                return $this->checkAndRefundOrder($order, $response);
             case [ResponseValidator::AUTH_CANCEL_PENDING_STATUS, ResponseValidator::CANCELLATION_REQUESTED]:
-                if ($this->isValidOrder($order, $response)) {
-                    return $this->checkAndVoidOrder($order, $response);
-                }
-                break;
+                return $this->checkAndVoidOrder($order, $response);
             case [ResponseValidator::AUTH_CANCELLED_STATUS, ResponseValidator::PREAUTHORIZATION_CANCELLED]:
-                if ($this->isValidOrder($order, $response)) {
-                    return $this->checkAndVoidOrderOnPreAuthCancel($order, $response);
-                }
-                break;
+                return $this->checkAndVoidOrderOnPreAuthCancel($order, $response);
         }
     }
 
@@ -241,7 +238,7 @@ class TransactionOrderUpdater
         $additionalInformation = $payment ? $payment->getAdditionalInformation() : [];
 
         if (($response['interactionReason'] !== $additionalInformation['interactionReason'])
-            || ($response['resultCode'] !== $additionalInformation['resultCode'])) {
+            || ($response['interactionCode'] !== $additionalInformation['interactionCode'])) {
             return false;
         }
         return true;
@@ -256,9 +253,9 @@ class TransactionOrderUpdater
     {
         if (!($order instanceof Order)) {
             $order = $this->getOrder($order);
-            $order->setState('payment_review')->setStatus('fraud');
-            $this->orderRepository->save($order);
         }
+        $order->setState('payment_review')->setStatus('fraud');
+        $this->orderRepository->save($order);
     }
 
     /**
