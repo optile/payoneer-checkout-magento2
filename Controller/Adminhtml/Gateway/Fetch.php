@@ -80,7 +80,8 @@ class Fetch extends Action
                 } else {
                     $this->helper
                         ->showErrorMessage(
-                            __('Error response is received from payoneer. Error : ' . $result['response']['resultInfo'])
+                            __('Error response is received from Payoneer. Error status code: ' . $result['status'] .
+                            '. Please check var/log/payoneer.log for more details.')
                         );
                 }
             } catch (\Exception $e) {
