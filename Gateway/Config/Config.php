@@ -100,6 +100,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const REGISTRATION          =   'registration';
     const ID                    =   'id';
     const TOKEN                 =   'token';
+    const TOKEN_NOTIFICATION    =   'notification_token';
 
     const ENTITY_PAYMENT        =   'payment';
 

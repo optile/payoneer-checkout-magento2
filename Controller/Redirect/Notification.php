@@ -125,7 +125,7 @@ class Notification implements CsrfAwareActionInterface
         if ($collection->getSize()) {
             $order = $collection->getFirstItem();
             $payment = $order->getPayment();
-            return $payment->getAdditionalInformation('token');
+            return $payment->getAdditionalInformation(Config::TOKEN_NOTIFICATION);
         }
         return null;
     }
@@ -148,7 +148,7 @@ class Notification implements CsrfAwareActionInterface
         $orderId = $request->getParam('order_id');
         $notificationToken = $request->getParam('token');
         $orderToken = $this->getTokenFromOrder($orderId);
-        if ($notificationToken != $orderToken) {
+        if ($notificationToken == '' || $notificationToken == null || $notificationToken != $orderToken) {
             $this->notificationLogger->addError(
                 __(
                     'Invalid token for order #%1, order token = %2, received token = %3',

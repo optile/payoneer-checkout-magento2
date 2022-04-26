@@ -59,8 +59,18 @@ require([
             apiKey: apiKey,
             storeCode: storeCode,
             hostName: hostName
-        }).done(function ($response) {
-            $('<div class="message message-success payoneer-credentials-success-message">' + $t("Your credentials are valid.") + '</div>').insertAfter(self);
+        }).done(function (response) {
+            if (response.data &&
+                response.data.interaction &&
+                response.data.interaction.reason &&
+                response.data.interaction.reason === 'OK') {
+                $('<div class="message message-success payoneer-credentials-success-message">' + $t("Your credentials are valid.") + '</div>').insertAfter(self);
+            } else {
+                alert({
+                    title: $t('Payoneer Credential Validation Failed'),
+                    content: $t('Your Payoneer Credentials could not be validated. Please ensure you have selected the correct environment and entered a valid Merchant Code, API Key, Store Code and Host Name.')
+                });
+            }
         }).fail(function () {
             alert({
                 title: $t('Payoneer Credential Validation Failed'),

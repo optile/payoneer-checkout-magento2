@@ -128,8 +128,6 @@ class Client implements ClientInterface
                 break;
             case self::REFUND:
             case self::AUTHORIZATION_CANCEL:
-                $responseObj = $this->processRequest($transferObject);
-                break;
             case self::LIST_CAPTURE:
             case self::LIST_FETCH:
                 $responseObj = $this->processRequest($transferObject);
