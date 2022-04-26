@@ -48,6 +48,7 @@ class ConfigProvider implements ConfigProviderInterface
                 self::CODE => [
                     'config' => [
                         'active' => (bool)$this->config->getValue('active'),
+                        'environment' => $this->config->getValue('environment'),
                         'payment_flow' => $this->config->getValue('payment_flow'),
                         'widgetCssUrl' => $this->getStaticFilePath()
                     ]

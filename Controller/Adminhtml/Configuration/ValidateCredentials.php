@@ -4,6 +4,7 @@ namespace Payoneer\OpenPaymentGateway\Controller\Adminhtml\Configuration;
 
 use Exception;
 use Magento\Backend\App\Action;
+use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
@@ -34,19 +35,29 @@ class ValidateCredentials extends Action
     protected $request;
 
     /**
+     * Json Factory
+     *
+     * @var JsonFactory
+     */
+    protected $jsonResultFactory;
+
+    /**
      * ValidateCredentials constructor.
      * @param Action\Context $context
      * @param Config $config
      * @param Request $request
+     * @param JsonFactory $jsonResultFactory
      */
     public function __construct(
         Action\Context $context,
         Config $config,
-        Request $request
+        Request $request,
+        JsonFactory $jsonResultFactory
     ) {
         parent::__construct($context);
         $this->config = $config;
         $this->request = $request;
+        $this->jsonResultFactory = $jsonResultFactory;
     }
 
     /**
@@ -56,6 +67,7 @@ class ValidateCredentials extends Action
      */
     public function execute(): ResultInterface
     {
+        $gatewayResponse = [];
         $endPoint = Config::END_POINT;
         $data = $this->config->getMockData();
         $storeCode = $this->getRequest()->getParam('storeCode');
@@ -84,8 +96,10 @@ class ValidateCredentials extends Action
         } catch (Exception $e) {
             $response->setHttpResponseCode(400);
         }
-
-        return $response;
+        $result = $this->jsonResultFactory->create();
+        $responseData = isset($gatewayResponse['response'])
+            ? $gatewayResponse['response'] : [];
+        return $result->setData(['data' => $responseData]);
     }
 
     /**

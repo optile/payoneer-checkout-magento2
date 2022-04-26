@@ -71,6 +71,14 @@ define(
                 return 'payoneer';
             },
 
+            getTitle: function () {
+                let environment = window.checkoutConfig.payment.payoneer.config.environment;
+                if (environment === 'test'){
+                    return 'Test Mode: ' + this.item.title;
+                }
+                return this.item.title;
+            },
+
             getCurrentPaymentMethod: function() {
                 return checkoutData.getSelectedPaymentMethod();
             },
