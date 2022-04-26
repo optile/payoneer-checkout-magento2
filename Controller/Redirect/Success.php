@@ -106,7 +106,7 @@ class Success implements HttpGetActionInterface
                 if (!isset($reqParams['token'])
                     || $payment->getAdditionalInformation('token') != $reqParams['token']) {
                     return $this->helper->redirectToCart(
-                        __('Something went wrong while processing payment. Invalid token.')
+                        __('Something went wrong while processing payment. Invalid response from Payoneer.')
                     );
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
