@@ -28,21 +28,22 @@ class Success implements HttpGetActionInterface
     /**
      * @var Context
      */
-    protected $context;
+    private $context;
+
     /**
      * @var CartManagementInterface
      */
-    protected $cartManagement;
+    private $cartManagement;
 
     /**
      * @var CartRepositoryInterface
      */
-    protected $cartRepository;
+    private $cartRepository;
 
     /**
      * @var PageFactory
      */
-    protected $resultPageFactory;
+    private $resultPageFactory;
 
     /**
      * @var Helper
@@ -57,7 +58,7 @@ class Success implements HttpGetActionInterface
     /**
      * @var Config
      */
-    protected $config;
+    private $config;
 
     /**
      * Success constructor.
@@ -67,6 +68,7 @@ class Success implements HttpGetActionInterface
      * @param PageFactory $resultPageFactory
      * @param Helper $helper
      * @param Session $checkoutSession
+     * @param Config $config
      */
     public function __construct(
         Context $context,
@@ -101,13 +103,13 @@ class Success implements HttpGetActionInterface
                 $cartId = $reqParams['cart_id'];
                 /** @var Quote $quote */
                 $quote = $this->cartRepository->getActive($cartId);
+                $quoteData = $quote->getData();
                 $payment = $quote->getPayment();
 
                 if (!isset($reqParams['token'])
-                    || $payment->getAdditionalInformation('token') != $reqParams['token']) {
-                    return $this->helper->redirectToCart(
-                        __('Something went wrong while processing payment. Invalid response from Payoneer.')
-                    );
+                    || $payment->getAdditionalInformation('token') != $reqParams['token']
+                    || $quoteData['grand_total'] != $reqParams['amount']) {
+                    return $this->redirectToCart();
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
                         $payment->setAdditionalInformation($key, $value);
@@ -136,13 +138,23 @@ class Success implements HttpGetActionInterface
                 $this->cartManagement->placeOrder($cartId);
                 return $this->resultPageFactory->create();
             } else {
-                return $this->helper->redirectToCart(
-                    __('Something went wrong while processing payment. Invalid response from Payoneer')
-                );
+                return $this->redirectToCart();
             }
         } catch (\Exception $e) {
-            return $this->helper->redirectToCart($e->getMessage());
+            return $this->redirectToCart($e->getMessage());
         }
+    }
+
+    /**
+     * @param string|null $message
+     * @return Redirect
+     */
+    public function redirectToCart($message = null)
+    {
+        if (!$message) {
+            $message = 'Something went wrong while processing payment. Invalid response from Payoneer';
+        }
+        return $this->helper->redirectToCart(__($message));
     }
 
     /**

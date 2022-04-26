@@ -139,6 +139,7 @@ class TransactionOrderUpdater
         $filteredResponse['status_code'] = $response['statusCode'];
         $filteredResponse['reason_code'] = $response['reasonCode'];
         $filteredResponse['long_id'] = $response['longId'];
+        $filteredResponse['amount'] = $response['amount'];
         $filteredResponse['interactionReason'] = $response['interactionReason'];
         $filteredResponse['interactionCode'] = $response['interactionCode'];
 
@@ -236,9 +237,9 @@ class TransactionOrderUpdater
         }
         $payment = $orderObj->getPayment();
         $additionalInformation = $payment ? $payment->getAdditionalInformation() : [];
-
         if (($response['interactionReason'] !== $additionalInformation['interactionReason'])
-            || ($response['interactionCode'] !== $additionalInformation['interactionCode'])) {
+            || ($response['interactionCode'] !== $additionalInformation['interactionCode'])
+            || ($response['amount'] !== $additionalInformation['amount'])) {
             return false;
         }
         return true;
