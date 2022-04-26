@@ -109,10 +109,12 @@ class TransactionService
         }
 
         $token = strtotime('now') . uniqid();
+        $nToken = strtotime('now') . uniqid();
 
         $payment = $quote->getPayment();
         $transactionId = $payment->getId() . strtotime('now');
         $payment->setAdditionalInformation(Config::TOKEN, $token);
+        $payment->setAdditionalInformation(Config::TOKEN_NOTIFICATION, $nToken);
         $payment->setAdditionalInformation(Config::TXN_ID, $transactionId);
 
         $quote->setPayment($payment);

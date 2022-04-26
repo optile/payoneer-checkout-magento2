@@ -54,7 +54,8 @@ class CallBackDataBuilder implements BuilderInterface
     public function build(array $buildSubject)
     {
         $payment = SubjectReader::readPayment($buildSubject);
-        $token = $payment->getPayment()->getAdditionalInformation('token');
+        $token = $payment->getPayment()->getAdditionalInformation(Config::TOKEN);
+        $notificationToken = $payment->getPayment()->getAdditionalInformation(Config::TOKEN_NOTIFICATION);
         $orderId = $payment->getOrder()->getOrderIncrementId();
 
         $successParams = ['cart_id' => $this->getQuoteIdFromSession(), 'token' => $token];
@@ -64,7 +65,7 @@ class CallBackDataBuilder implements BuilderInterface
             Config::CALLBACK => [
                 Config::RETURN_URL => $this->urlBuilder->getUrl(Config::RETURN_URL_PATH, $successParams),
                 Config::CANCEL_URL => $this->urlBuilder->getUrl(Config::CANCEL_URL_PATH, $cancelParams),
-                Config::NOTIFICATION_URL => $this->getNotificationUrl($orderId, $token)
+                Config::NOTIFICATION_URL => $this->getNotificationUrl($orderId, $notificationToken)
             ]
         ];
     }

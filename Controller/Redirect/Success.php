@@ -107,6 +107,8 @@ class Success implements HttpGetActionInterface
                 $payment = $quote->getPayment();
 
                 if (!isset($reqParams['token'])
+                    || $reqParams['token'] == ''
+                    || $reqParams['token'] == null
                     || $payment->getAdditionalInformation('token') != $reqParams['token']
                     || $quoteData['grand_total'] != $reqParams['amount']) {
                     return $this->redirectToCart();
