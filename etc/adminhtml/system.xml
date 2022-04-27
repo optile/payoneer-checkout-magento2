@@ -59,7 +59,7 @@
                 <field id="key_validation" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label></label>
                     <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ValidateCredentials</frontend_model>
-                    <comment>Makes a list API call and see if it is returning HTTP 200</comment>
+                    <comment>Makes a list API call and see if it is returning HTTP 200 and interaction reason is OK.</comment>
                 </field>
                 <field id="success_url" translate="label" type="text" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Success URL</label>
