@@ -109,7 +109,7 @@ class TransactionService
         }
 
         $token = strtotime('now') . uniqid();
-        $nToken = strtotime('now') . uniqid();
+        $nToken = $this->getNotificationToken();
 
         $payment = $quote->getPayment();
         $transactionId = $payment->getId() . strtotime('now');
@@ -202,5 +202,15 @@ class TransactionService
             'payment' => $paymentDataObject,
             'order' => $order
         ]);
+    }
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function getNotificationToken()
+    {
+        $bytes = random_bytes(20);
+        return bin2hex($bytes);
     }
 }
