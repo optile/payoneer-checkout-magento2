@@ -59,8 +59,7 @@ class OrderUpdate
                     $response = \Safe\json_decode($notification->getContent(), true);
                     $this->transactionOrderUpdater->processNotificationResponse(
                         $notification->getOrderId(),
-                        $response,
-                        true
+                        $response
                     );
                 } catch (\Exception $e) {
                     $this->notificationLogger->addError(
