@@ -128,11 +128,10 @@ class TransactionOrderUpdater
      *
      * @param string $orderId
      * @param array <mixed> $response
-     * @param bool $isCron
      * @return bool|void
      * @throws LocalizedException
      */
-    public function processNotificationResponse($orderId, $response, $isCron)
+    public function processNotificationResponse($orderId, $response)
     {
         $filteredResponse = [];
         $filteredResponse['transaction_id'] = $response['transactionId'];
@@ -143,7 +142,7 @@ class TransactionOrderUpdater
         $filteredResponse['interactionReason'] = $response['interactionReason'];
         $filteredResponse['interactionCode'] = $response['interactionCode'];
 
-        return $this->processResponse($orderId, $filteredResponse, $isCron);
+        return $this->processResponse($orderId, $filteredResponse);
     }
 
     /**
@@ -162,6 +161,9 @@ class TransactionOrderUpdater
         $filteredResponse['status_code'] = $actualResponse['status']['code'];
         $filteredResponse['reason_code'] = $actualResponse['status']['reason'];
         $filteredResponse['long_id'] = $actualResponse['identification']['longId'];
+        $filteredResponse['amount'] = $actualResponse['payment']['amount'];
+        $filteredResponse['interactionReason'] = $actualResponse['interaction']['reason'];
+        $filteredResponse['interactionCode'] = $actualResponse['interaction']['code'];
 
         return $this->processResponse($order, $filteredResponse);
     }
@@ -172,25 +174,20 @@ class TransactionOrderUpdater
      *
      * @param string|Order $order
      * @param array <mixed> $response
-     * @param bool $isCron
      * @return bool|void
      * @throws LocalizedException
      */
-    public function processResponse($order, $response, $isCron = false)
+    public function processResponse($order, $response)
     {
         switch ([$response['status_code'], $response['reason_code']]) {
             case [self::PRE_AUTHORIZED_STATUS, self::PRE_AUTHORIZED_STATUS]:
-                if ($isCron && $this->isValidOrder($order, $response)) {
-                    return $this->checkAndAuthorizeOrder($order, $response);
-                } elseif (!$isCron) {
+                if ($this->isValidOrder($order, $response)) {
                     return $this->checkAndAuthorizeOrder($order, $response);
                 }
                 break;
             case [Helper::CHARGED, Helper::DEBITED]:
             case [Helper::CHARGED, Helper::CAPTURE_CLOSED]:
-                if ($isCron && $this->isValidOrder($order, $response)) {
-                    return $this->checkAndCaptureOrder($order, $response);
-                } elseif (!$isCron) {
+                if ($this->isValidOrder($order, $response)) {
                     return $this->checkAndCaptureOrder($order, $response);
                 }
                 break;
@@ -239,7 +236,7 @@ class TransactionOrderUpdater
         $additionalInformation = $payment ? $payment->getAdditionalInformation() : [];
         if (($response['interactionReason'] !== $additionalInformation['interactionReason'])
             || ($response['interactionCode'] !== $additionalInformation['interactionCode'])
-            || ($response['amount'] !== $additionalInformation['amount'])) {
+            || ($response['amount'] != $additionalInformation['amount'])) {
             return false;
         }
         return true;
