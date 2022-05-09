@@ -22,7 +22,7 @@ class ValidateCredentials extends Action
     /**
      * @var Config
      */
-    protected $config;
+    private $config;
 
     /**
      * @var array <mixed>
@@ -32,14 +32,14 @@ class ValidateCredentials extends Action
     /**
      * @var Request
      */
-    protected $request;
+    private $request;
 
     /**
      * Json Factory
      *
      * @var JsonFactory
      */
-    protected $jsonResultFactory;
+    private $jsonResultFactory;
 
     /**
      * ValidateCredentials constructor.

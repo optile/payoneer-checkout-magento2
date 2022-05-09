@@ -107,8 +107,11 @@ class Cart extends \Magento\Checkout\Model\Cart
         $this->getQuote()->collectTotals();
 
         if ($this->isCartUpdateAllowed()) {
+            $this->_checkoutSession->setPayoneerCartUpdate(true);
             $this->quoteRepository->save($this->getQuote());
             $this->_checkoutSession->setQuoteId($this->getQuote()->getId());
+        } else {
+            $this->_checkoutSession->setPayoneerCartUpdate(false);
         }
 
         /**

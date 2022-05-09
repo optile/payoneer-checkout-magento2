@@ -15,4 +15,5 @@
         </arguments>
     </type>
     <preference for="Magento\Checkout\Model\Cart" type="Payoneer\OpenPaymentGateway\Model\Checkout\Cart" />
+    <preference for="Magento\Checkout\Controller\Cart\Add" type="Payoneer\OpenPaymentGateway\Model\Checkout\Cart\Add" />
 </config>
