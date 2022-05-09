@@ -34,9 +34,8 @@ class AddressDataBuilder implements BuilderInterface
         $order = $payment->getOrder();
         $billingAddress = $order->getBillingAddress();
         $shippingAddress = $order->getShippingAddress();
-
         $billingAddressChanged = false;
-        $address = $buildSubject['address'];
+        $address = isset($buildSubject['address']) ? $buildSubject['address'] : null;
         if ($address) {
             $billingAddress = $address;
             $billingAddressChanged = true;

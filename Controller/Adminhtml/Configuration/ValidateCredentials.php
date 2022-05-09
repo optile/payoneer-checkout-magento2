@@ -68,7 +68,7 @@ class ValidateCredentials extends Action
     public function execute(): ResultInterface
     {
         $gatewayResponse = [];
-        $endPoint = Config::END_POINT;
+        $endPoint = Config::LIST_END_POINT;
         $data = $this->config->getMockData();
         $storeCode = $this->getRequest()->getParam('storeCode');
         $storeId = $this->getRequest()->getParam('storeId', 0);

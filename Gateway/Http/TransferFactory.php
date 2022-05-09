@@ -2,10 +2,10 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Http;
 
+use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Http\TransferBuilder;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 
 /**
  * Class TransferFactory
@@ -25,15 +25,23 @@ class TransferFactory implements TransferFactoryInterface
     protected $config;
 
     /**
+     * @var string
+     */
+    protected $method;
+
+    /**
      * @param TransferBuilder $transferBuilder
      * @param Config $config
+     * @param string $method
      */
     public function __construct(
         TransferBuilder $transferBuilder,
-        Config $config
+        Config $config,
+        $method
     ) {
         $this->transferBuilder = $transferBuilder;
         $this->config = $config;
+        $this->method = $method;
     }
 
     /**
@@ -69,7 +77,17 @@ class TransferFactory implements TransferFactoryInterface
      */
     protected function getApiUri(PaymentDataObjectInterface $payment)
     {
-        return Config::END_POINT;
+        if ($this->method == Config::METHOD_POST) {
+            return Config::LIST_END_POINT;
+        } else {
+            $additionalInformation = $payment->getPayment()->getAdditionalInformation();
+            $listId = isset($additionalInformation['listId']) ? $additionalInformation['listId'] : null;
+
+            return sprintf(
+                Config::LIST_UPDATE_END_POINT,
+                $listId
+            );
+        }
     }
 
     /**
@@ -79,6 +97,6 @@ class TransferFactory implements TransferFactoryInterface
      */
     protected function getMethod()
     {
-        return Config::METHOD_POST;
+        return $this->method;
     }
 }

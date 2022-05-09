@@ -2,6 +2,8 @@
 
 namespace Payoneer\OpenPaymentGateway\Api;
 
+use Payoneer\OpenPaymentGateway\Api\Data\NotificationInterface;
+
 /**
  * @api
  * @since 100.0.2
@@ -11,11 +13,11 @@ interface PayoneerNotificationRepositoryInterface
     /**
      * Save the notification data
      *
-     * @param \Payoneer\OpenPaymentGateway\Api\Data\NotificationInterface $notification
-     * @return \Payoneer\OpenPaymentGateway\Api\Data\NotificationInterface
+     * @param NotificationInterface $notification
+     * @return NotificationInterface
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
-    public function save(\Payoneer\OpenPaymentGateway\Api\Data\NotificationInterface $notification);
+    public function save(NotificationInterface $notification);
 }

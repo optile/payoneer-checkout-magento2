@@ -46,6 +46,12 @@
         </arguments>
     </type>
 
+    <type name="Payoneer\OpenPaymentGateway\Model\ListUpdateTransactionService">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">PayoneerCommandPool</argument>
+        </arguments>
+    </type>
+
     <!-- Payoneer Transaction Order Updater -->
     <type name="Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater">
         <arguments>
@@ -72,6 +78,7 @@
                 <item name="embedded" xsi:type="string">PayoneerListCommand</item>
                 <item name="list_capture" xsi:type="string">PayoneerListCaptureCommand</item>
                 <item name="list_fetch" xsi:type="string">PayoneerListFetchCommand</item>
+                <item name="list_update" xsi:type="string">PayoneerListUpdateCommand</item>
             </argument>
         </arguments>
     </virtualType>
@@ -80,7 +87,7 @@
     <virtualType name="PayoneerListCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">PayoneerListRequestBuilder</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory</argument>
+            <argument name="transferFactory" xsi:type="object">PayoneerListTransferFactory</argument>
             <argument name="client" xsi:type="object">PayoneerClientList</argument>
         </arguments>
     </virtualType>
@@ -101,10 +108,54 @@
         </arguments>
     </virtualType>
 
+    <!-- Payoneer List Transfer Factory -->
+    <virtualType name="PayoneerListTransferFactory" type="Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory">
+        <arguments>
+            <argument name="method" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::METHOD_POST</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Payoneer List Client -->
     <virtualType name="PayoneerClientList" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
         <arguments>
             <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::LIST</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Update Command -->
+    <virtualType name="PayoneerListUpdateCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayoneerListUpdateRequestBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">PayoneerListUpdateTransferFactory</argument>
+            <argument name="client" xsi:type="object">PayoneerListUpdateClient</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Update Request Builder -->
+    <virtualType name="PayoneerListUpdateRequestBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="base_request" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\BaseRequestDataBuilder</item>
+                <item name="customer" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\CustomerDataBuilder</item>
+                <item name="addresses" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AddressDataBuilder</item>
+                <item name="items" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\ItemsDataBuilder</item>
+                <item name="payment" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\PaymentDataBuilder</item>
+                <item name="callback" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\CallBackDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Update Transfer Factory -->
+    <virtualType name="PayoneerListUpdateTransferFactory" type="Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory">
+        <arguments>
+            <argument name="method" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::METHOD_PUT</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Update Client -->
+    <virtualType name="PayoneerListUpdateClient" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
+        <arguments>
+            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::LIST_UPDATE</argument>
         </arguments>
     </virtualType>
 

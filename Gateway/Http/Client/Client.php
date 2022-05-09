@@ -15,15 +15,16 @@ use Payoneer\OpenPaymentGateway\Model\Method\Logger;
  */
 class Client implements ClientInterface
 {
-    const AUTHORIZE     = 'authorize';
-    const LIST          = 'list';
-    const CAPTURE       = 'authorize_capture';
-    const LIST_CAPTURE  = 'list_capture';
-    const AUTHORIZATION_CANCEL   = 'authorize_cancel';
-    const REFUND        = 'refund';
-    const VOID          = 'void';
-    const LIST_FETCH    = 'list_fetch';
-    const PREAUTH_CANCEL    = 'preauth_cancel';
+    const AUTHORIZE             =   'authorize';
+    const LIST                  =   'list';
+    const CAPTURE               =   'authorize_capture';
+    const AUTHORIZATION_CANCEL  =   'authorize_cancel';
+    const REFUND                =   'refund';
+    const VOID                  =   'void';
+    const LIST_FETCH            =   'list_fetch';
+    const LIST_CAPTURE          =   'list_capture';
+    const LIST_UPDATE           =   'list_update';
+    const PREAUTH_CANCEL        =   'preauth_cancel';
 
     /**
      * @var Logger
@@ -115,6 +116,7 @@ class Client implements ClientInterface
         $this->logData(['operation' => $this->operation]);
         switch ($this->operation) {
             case self::LIST:
+            case self::LIST_UPDATE:
                 $isRequestValid = $this->validateRequest();
                 if ($isRequestValid) {
                     $responseObj = $this->processRequest($transferObject);
@@ -175,6 +177,7 @@ class Client implements ClientInterface
 
     /**
      * Validate payoneer request data
+     *
      * @return bool
      */
     public function validateRequest()
@@ -206,6 +209,7 @@ class Client implements ClientInterface
 
     /**
      * Check if mandatory fields exists
+     *
      * @param array <mixed> $mandatoryFields
      * @param string $objectName
      * @return bool
@@ -253,7 +257,6 @@ class Client implements ClientInterface
         if ((bool)$this->config->getValue('debug') == true) {
             $this->logger->debug(['request' => $data]);
         }
-
         return $this->request->send(
             $transferObject->getMethod(),
             $transferObject->getUri(),

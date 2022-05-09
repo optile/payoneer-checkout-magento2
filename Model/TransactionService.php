@@ -5,6 +5,7 @@ use Exception;
 use Magento\Framework\App\RequestInterface as Request;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Payment\Gateway\Command\CommandException;
@@ -12,12 +13,13 @@ use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Command\ResultInterface;
 use Magento\Payment\Gateway\ConfigInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
+use Magento\Payment\Model\InfoInterface;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\Quote\Payment;
 use Magento\Sales\Model\Order;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use Magento\Quote\Api\CartRepositoryInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client;
-use Magento\Payment\Model\InfoInterface;
 
 /**
  * Class GetPayoneerTransactionService
@@ -27,6 +29,7 @@ use Magento\Payment\Model\InfoInterface;
 class TransactionService
 {
     const HOSTED = 'hosted';
+
     /**
      * @var CommandPoolInterface
      */
@@ -134,6 +137,8 @@ class TransactionService
                 'address' => $address
             ]);
 
+            $this->setAdditionalInformation($quote, $result);
+
             if ($isHostedIntegration) {
                 $jsonData = $this->processHostedResponse($result);
             } else {
@@ -212,5 +217,30 @@ class TransactionService
     {
         $bytes = random_bytes(20);
         return bin2hex($bytes);
+    }
+
+    /**
+     * @param Quote $quote
+     * @param array <mixed> $result
+     * @return void
+     * @throws LocalizedException
+     */
+    public function setAdditionalInformation($quote, $result)
+    {
+        $payment = $quote->getPayment();
+        $listId = $result['response']['identification']['longId'];
+        $payment->setAdditionalInformation(Config::LIST_ID, $listId);
+        $this->saveQuote($quote, $payment);
+    }
+
+    /**
+     * @param Quote $quote
+     * @param Payment $payment
+     * @return void
+     */
+    public function saveQuote($quote, $payment)
+    {
+        $quote->setPayment($payment);
+        $this->quoteRepository->save($quote);
     }
 }
