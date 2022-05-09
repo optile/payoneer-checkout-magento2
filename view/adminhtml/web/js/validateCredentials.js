@@ -26,7 +26,7 @@ require([
         /* Basic field validation */
         var errors = [];
 
-        if (!envId || envId !== 'test' && envId !== 'production') {
+        if (!envId || envId !== 'test' && envId !== 'live') {
             errors.push($t("Please select an Environment"));
         }
 

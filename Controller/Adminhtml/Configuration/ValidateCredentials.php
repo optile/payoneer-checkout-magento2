@@ -77,12 +77,10 @@ class ValidateCredentials extends Action
         $credentials['merchantCode'] = $this->getRequest()->getParam('merchantCode');
         $credentials['apiKey'] = $this->getRequest()->getParam('apiKey');
         $credentials['hostName'] = $this->getRequest()->getParam('hostName');
-
         if ($storeCode) {
             $data['division'] = $storeCode;
         }
 
-        $this->setFieldValues($environment, $storeId);
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         try {
@@ -100,24 +98,5 @@ class ValidateCredentials extends Action
         $responseData = isset($gatewayResponse['response'])
             ? $gatewayResponse['response'] : [];
         return $result->setData(['data' => $responseData]);
-    }
-
-    /**
-     * Set the field values
-     * @param string $environment
-     * @param mixed $storeId
-     * @return void
-     */
-    public function setFieldValues($environment, $storeId)
-    {
-        if ($environment === AdminFields::ENVIRONMENT_SANDBOX_VALUE) {
-            $this->fields['apiKey'] = $this->config->getValue('sandbox_api_key', $storeId);
-            $this->fields['storeCode'] = $this->config->getValue('sandbox_store_code', $storeId);
-            $this->fields['hostName'] = $this->config->getValue('sandbox_host_name', $storeId);
-        } else {
-            $this->fields['apiKey'] = $this->config->getValue('live_api_key', $storeId);
-            $this->fields['storeCode'] = $this->config->getValue('live_store_code', $storeId);
-            $this->fields['hostName'] = $this->config->getValue('live_host_name', $storeId);
-        }
     }
 }
