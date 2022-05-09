@@ -15,5 +15,6 @@
         </arguments>
     </type>
     <preference for="Magento\Checkout\Model\Cart" type="Payoneer\OpenPaymentGateway\Model\Checkout\Cart" />
-    <preference for="Magento\Checkout\Controller\Cart\Add" type="Payoneer\OpenPaymentGateway\Model\Checkout\Cart\Add" />
+    <preference for="Magento\Checkout\Controller\Cart\Add" type="Payoneer\OpenPaymentGateway\Controller\Checkout\Cart\Add" />
+    <preference for="Magento\Wishlist\Controller\Index\Cart" type="Payoneer\OpenPaymentGateway\Controller\Wishlist\Index\Cart" />
 </config>

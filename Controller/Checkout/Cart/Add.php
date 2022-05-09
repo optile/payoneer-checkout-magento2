@@ -1,6 +1,6 @@
 <?php
 
-namespace Payoneer\OpenPaymentGateway\Model\Checkout\Cart;
+namespace Payoneer\OpenPaymentGateway\Controller\Checkout\Cart;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Checkout\Model\Cart as CustomerCart;

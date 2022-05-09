@@ -8,7 +8,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields as AdminFields;
 use Payoneer\OpenPaymentGateway\Model\Api\Request;
 
 /**
@@ -23,11 +22,6 @@ class ValidateCredentials extends Action
      * @var Config
      */
     private $config;
-
-    /**
-     * @var array <mixed>
-     */
-    protected $fields = [];
 
     /**
      * @var Request
@@ -71,8 +65,6 @@ class ValidateCredentials extends Action
         $endPoint = Config::LIST_END_POINT;
         $data = $this->config->getMockData();
         $storeCode = $this->getRequest()->getParam('storeCode');
-        $storeId = $this->getRequest()->getParam('storeId', 0);
-        $environment = $this->getRequest()->getParam('environment');
 
         $credentials['merchantCode'] = $this->getRequest()->getParam('merchantCode');
         $credentials['apiKey'] = $this->getRequest()->getParam('apiKey');
