@@ -2,7 +2,6 @@
 
 namespace Payoneer\OpenPaymentGateway\Model\Wishlist;
 
-use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Exception as ProductException;
 use Magento\Checkout\Helper\Cart as CartHelper;
 use Magento\Checkout\Model\Cart;
@@ -65,16 +64,7 @@ class ItemCarrier extends \Magento\Wishlist\Model\ItemCarrier
             $urlBuilder,
             $messageManager,
             $redirector
-        );/*
-        $this->customerSession = $customerSession;
-        $this->quantityProcessor = $quantityProcessor;
-        $this->cart = $cart;
-        $this->logger = $logger;
-        $this->helper = $helper;
-        $this->cartHelper = $cartHelper;
-        $this->urlBuilder = $urlBuilder;
-        $this->messageManager = $messageManager;
-        $this->redirector = $redirector;*/
+        );
         $this->checkoutSession = $checkoutSession;
     }
 
