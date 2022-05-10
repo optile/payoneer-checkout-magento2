@@ -3,6 +3,7 @@
 namespace Payoneer\OpenPaymentGateway\Controller\Checkout\Cart;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\Product;
 use Magento\Checkout\Model\Cart as CustomerCart;
 use Magento\Checkout\Model\Cart\RequestQuantityProcessor;
 use Magento\Checkout\Model\Session;
@@ -13,6 +14,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Store\Model\StoreManagerInterface;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
  * Controller for processing add to cart action.
@@ -27,6 +29,11 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
     private $quantityProcessor;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * Add constructor.
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
@@ -35,6 +42,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
      * @param Validator $formKeyValidator
      * @param CustomerCart $cart
      * @param ProductRepositoryInterface $productRepository
+     * @param Config $config
      * @param RequestQuantityProcessor|null $quantityProcessor
      */
     public function __construct(
@@ -45,6 +53,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
         Validator $formKeyValidator,
         CustomerCart $cart,
         ProductRepositoryInterface $productRepository,
+        Config $config,
         ?RequestQuantityProcessor $quantityProcessor = null
     ) {
         parent::__construct(
@@ -60,6 +69,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
         /** @phpstan-ignore-next-line */
         $this->quantityProcessor = $quantityProcessor
             ?? ObjectManager::getInstance()->get(RequestQuantityProcessor::class);
+        $this->config = $config;
     }
 
     /**
@@ -113,29 +123,13 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
             );
 
             if (!$this->_checkoutSession->getNoCartRedirect(true)) {
-                if ($this->_checkoutSession->getPayoneerCartUpdate() == true) {
-                    if ($this->shouldRedirectToCart()) {
-                        $message = __(
-                            'You added %1 to your shopping cart.',
-                            $product->getName()
-                        );
-                        $this->messageManager->addSuccessMessage($message);
-                    } else {
-                        $this->messageManager->addComplexSuccessMessage(
-                            'addCartSuccessMessage',
-                            [
-                                'product_name' => $product->getName(),
-                                'cart_url' => $this->getCartUrl(),
-                            ]
-                        );
-                    }
-                    if ($this->cart->getQuote()->getHasError()) {
-                        $errors = $this->cart->getQuote()->getErrors();
-                        foreach ($errors as $error) {
-                            $this->messageManager->addErrorMessage($error->getText());
-                        }
-                    }
+                if ($this->config->isPayoneerEnabled() && $this->_checkoutSession->getPayoneerCartUpdate() == true) {
+                    $this->processData($product);
+                } else {
+                    $this->unsetPayoneerCheckoutSession();
+                    $this->processData($product);
                 }
+
                 return $this->goBack(null, $product);
             }
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
@@ -168,6 +162,46 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
         }
 
         return $this->getResponse();
+    }
+
+    /**
+     * @param Product $product
+     * @return void
+     */
+    public function processData($product)
+    {
+        if ($this->shouldRedirectToCart()) {
+            $message = __(
+                'You added %1 to your shopping cart.',
+                $product->getName()
+            );
+            $this->messageManager->addSuccessMessage($message);
+        } else {
+            $this->messageManager->addComplexSuccessMessage(
+                'addCartSuccessMessage',
+                [
+                    'product_name' => $product->getName(),
+                    'cart_url' => $this->getCartUrl(),
+                ]
+            );
+        }
+        if ($this->cart->getQuote()->getHasError()) {
+            $errors = $this->cart->getQuote()->getErrors();
+            foreach ($errors as $error) {
+                $this->messageManager->addErrorMessage($error->getText());
+            }
+        }
+    }
+
+    /**
+     * Unset custom checkout session variable
+     * @return void
+     */
+    public function unsetPayoneerCheckoutSession()
+    {
+        if ($this->_checkoutSession->getPayoneerCartUpdate()) {
+            $this->_checkoutSession->unsPayoneerCartUpdate();
+        }
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Payoneer\OpenPaymentGateway\Model\Checkout;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\CatalogInventory\Api\StockStateInterface;
+use Magento\Checkout\Model\Cart\CartInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -108,12 +109,15 @@ class Cart extends \Magento\Checkout\Model\Cart
         $this->getQuote()->getShippingAddress()->setCollectShippingRates(true);
         $this->getQuote()->collectTotals();
 
-        if ($this->isCartUpdateAllowed()) {
-            $this->_checkoutSession->setPayoneerCartUpdate(true);
-            $this->quoteRepository->save($this->getQuote());
-            $this->_checkoutSession->setQuoteId($this->getQuote()->getId());
+        if ($this->config->isPayoneerEnabled()) {
+            if ($this->isCartUpdateAllowed()) {
+                $this->_checkoutSession->setPayoneerCartUpdate(true);
+                $this->saveQuote();
+            } else {
+                $this->_checkoutSession->setPayoneerCartUpdate(false);
+            }
         } else {
-            $this->_checkoutSession->setPayoneerCartUpdate(false);
+            $this->saveQuote();
         }
 
         /**
@@ -121,6 +125,18 @@ class Cart extends \Magento\Checkout\Model\Cart
          */
         $this->_eventManager->dispatch('checkout_cart_save_after', ['cart' => $this]);
         $this->reinitializeState();
+        return $this;
+    }
+
+    /**
+     * Save quote
+     *
+     * @return CartInterface
+     */
+    public function saveQuote()
+    {
+        $this->quoteRepository->save($this->getQuote());
+        $this->_checkoutSession->setQuoteId($this->getQuote()->getId());
         return $this;
     }
 
