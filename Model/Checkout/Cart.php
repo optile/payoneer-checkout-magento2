@@ -10,6 +10,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\Quote\Payment;
 use Magento\Store\Model\StoreManagerInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\ListUpdateTransactionService;
@@ -27,8 +28,9 @@ class Cart extends \Magento\Checkout\Model\Cart
     /**
      * Api status constants
      */
-    const PROCEED   = 'PROCEED';
-    const REASON_OK = 'OK';
+    const PROCEED       = 'PROCEED';
+    const REASON_OK     = 'OK';
+    const LIST_EXPIRED  = 'list_expired';
 
     /**
      * @var ListUpdateTransactionService
@@ -138,6 +140,12 @@ class Cart extends \Magento\Checkout\Model\Cart
             /** @var array <mixed> $result */
             $result = $this->transactionService->process($this->getQuote()->getPayment(), Config::LIST_UPDATE);
 
+            $isListExpired = $this->isListExpired($result);
+            if ($isListExpired) {
+                $this->resetListId($payment);
+                return true;
+            }
+
             return $this->isValidResponse($result);
         }
     }
@@ -157,6 +165,29 @@ class Cart extends \Magento\Checkout\Model\Cart
             }
         }
         return false;
+    }
+
+    /**
+     * @param array <mixed> $result
+     * @return bool
+     */
+    public function isListExpired($result)
+    {
+        if (str_contains($result['reason'], self::LIST_EXPIRED)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param Payment $payment
+     * @throws LocalizedException
+     * @return void
+     */
+    public function resetListId($payment)
+    {
+        $payment->setAdditionalInformation(Config::LIST_ID, null);
+        $this->getQuote()->setPayment($payment);
     }
 
     /**
