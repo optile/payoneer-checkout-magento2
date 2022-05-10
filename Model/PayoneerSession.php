@@ -4,11 +4,11 @@ namespace Payoneer\OpenPaymentGateway\Model;
 use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
- * Class UnsetSession
+ * Class PayoneerSession
  *
- * Module helper file for unsetting payoneer session
+ * Module helper file for custom payoneer session
  */
-class UnsetSession
+class PayoneerSession
 {
     /**
      * @var CheckoutSession

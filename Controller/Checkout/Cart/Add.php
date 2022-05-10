@@ -15,7 +15,7 @@ use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Store\Model\StoreManagerInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use Payoneer\OpenPaymentGateway\Model\UnsetSession;
+use Payoneer\OpenPaymentGateway\Model\PayoneerSession as PayoneerSession;
 
 /**
  * Controller for processing add to cart action.
@@ -35,9 +35,9 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
     private $config;
 
     /**
-     * @var UnsetSession
+     * @var PayoneerSession
      */
-    private $sessionUnset;
+    private $payoneerSession;
 
     /**
      * Add constructor.
@@ -49,7 +49,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
      * @param CustomerCart $cart
      * @param ProductRepositoryInterface $productRepository
      * @param Config $config
-     * @param UnsetSession $sessionUnset
+     * @param PayoneerSession $payoneerSession
      * @param RequestQuantityProcessor|null $quantityProcessor
      */
     public function __construct(
@@ -61,7 +61,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
         CustomerCart $cart,
         ProductRepositoryInterface $productRepository,
         Config $config,
-        UnsetSession $sessionUnset,
+        PayoneerSession $payoneerSession,
         ?RequestQuantityProcessor $quantityProcessor = null
     ) {
         parent::__construct(
@@ -78,7 +78,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
         $this->quantityProcessor = $quantityProcessor
             ?? ObjectManager::getInstance()->get(RequestQuantityProcessor::class);
         $this->config = $config;
-        $this->sessionUnset = $sessionUnset;
+        $this->payoneerSession = $payoneerSession;
     }
 
     /**
@@ -135,7 +135,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
                 if ($this->config->isPayoneerEnabled() && $this->_checkoutSession->getPayoneerCartUpdate() == true) {
                     $this->processData($product);
                 } else {
-                    $this->sessionUnset->unsetPayoneerCheckoutSession();
+                    $this->payoneerSession->unsetPayoneerCheckoutSession();
                     $this->processData($product);
                 }
 
