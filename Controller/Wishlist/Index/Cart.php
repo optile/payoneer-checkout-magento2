@@ -26,6 +26,8 @@ use Magento\Wishlist\Model\Item\OptionFactory;
 use Magento\Wishlist\Model\ItemFactory;
 use Magento\Wishlist\Model\LocaleQuantityProcessor;
 use Magento\Wishlist\Model\ResourceModel\Item\Option\Collection;
+use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Payoneer\OpenPaymentGateway\Model\UnsetSession;
 
 /**
  * Add wishlist item to shopping cart and remove from wishlist controller.
@@ -100,6 +102,16 @@ class Cart extends AbstractIndex implements Action\HttpPostActionInterface
     private $checkoutSession;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * @var UnsetSession
+     */
+    private $sessionUnset;
+
+    /**
      * @param Action\Context $context
      * @param WishlistProviderInterface $wishlistProvider
      * @param LocaleQuantityProcessor $quantityProcessor
@@ -112,6 +124,8 @@ class Cart extends AbstractIndex implements Action\HttpPostActionInterface
      * @param CartHelper $cartHelper
      * @param Validator $formKeyValidator
      * @param Session $checkoutSession
+     * @param Config $config
+     * @param UnsetSession $sessionUnset
      * @param CookieManagerInterface|null $cookieManager
      * @param CookieMetadataFactory|null $cookieMetadataFactory
      *
@@ -130,6 +144,8 @@ class Cart extends AbstractIndex implements Action\HttpPostActionInterface
         CartHelper $cartHelper,
         Validator $formKeyValidator,
         Session $checkoutSession,
+        Config $config,
+        UnsetSession $sessionUnset,
         ?CookieManagerInterface $cookieManager = null,
         ?CookieMetadataFactory $cookieMetadataFactory = null
     ) {
@@ -150,6 +166,8 @@ class Cart extends AbstractIndex implements Action\HttpPostActionInterface
         $this->cookieMetadataFactory = $cookieMetadataFactory ?:
             ObjectManager::getInstance()->get(CookieMetadataFactory::class);
         parent::__construct($context);
+        $this->config = $config;
+        $this->sessionUnset = $sessionUnset;
     }
 
     /**
@@ -224,6 +242,11 @@ class Cart extends AbstractIndex implements Action\HttpPostActionInterface
             );
 
             $item->mergeBuyRequest($buyRequest);
+            $isPayoneerEnabled = $this->config->isPayoneerEnabled();
+            if (!$isPayoneerEnabled) {
+                $this->sessionUnset->unsetPayoneerCheckoutSession();
+                $item->addToCart($this->cart, true);
+            }
 
             $related = $this->getRequest()->getParam('related_product');
             if (!empty($related)) {
@@ -231,7 +254,10 @@ class Cart extends AbstractIndex implements Action\HttpPostActionInterface
             }
 
             $this->cart->save()->getQuote()->collectTotals();
-            if ($this->checkoutSession->getPayoneerCartUpdate() == true) {
+
+            if (!$isPayoneerEnabled
+                || ($isPayoneerEnabled && $this->checkoutSession->getPayoneerCartUpdate() == true) /** @phpstan-ignore-line */
+            ) {
                 $item->addToCart($this->cart, true);
                 /** @phpstan-ignore-next-line */
                 $wishlist->save();

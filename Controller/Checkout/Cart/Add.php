@@ -15,6 +15,7 @@ use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Store\Model\StoreManagerInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Payoneer\OpenPaymentGateway\Model\UnsetSession;
 
 /**
  * Controller for processing add to cart action.
@@ -34,6 +35,11 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
     private $config;
 
     /**
+     * @var UnsetSession
+     */
+    private $sessionUnset;
+
+    /**
      * Add constructor.
      * @param Context $context
      * @param ScopeConfigInterface $scopeConfig
@@ -43,6 +49,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
      * @param CustomerCart $cart
      * @param ProductRepositoryInterface $productRepository
      * @param Config $config
+     * @param UnsetSession $sessionUnset
      * @param RequestQuantityProcessor|null $quantityProcessor
      */
     public function __construct(
@@ -54,6 +61,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
         CustomerCart $cart,
         ProductRepositoryInterface $productRepository,
         Config $config,
+        UnsetSession $sessionUnset,
         ?RequestQuantityProcessor $quantityProcessor = null
     ) {
         parent::__construct(
@@ -70,6 +78,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
         $this->quantityProcessor = $quantityProcessor
             ?? ObjectManager::getInstance()->get(RequestQuantityProcessor::class);
         $this->config = $config;
+        $this->sessionUnset = $sessionUnset;
     }
 
     /**
@@ -126,7 +135,7 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
                 if ($this->config->isPayoneerEnabled() && $this->_checkoutSession->getPayoneerCartUpdate() == true) {
                     $this->processData($product);
                 } else {
-                    $this->unsetPayoneerCheckoutSession();
+                    $this->sessionUnset->unsetPayoneerCheckoutSession();
                     $this->processData($product);
                 }
 
@@ -190,17 +199,6 @@ class Add extends \Magento\Checkout\Controller\Cart\Add
             foreach ($errors as $error) {
                 $this->messageManager->addErrorMessage($error->getText());
             }
-        }
-    }
-
-    /**
-     * Unset custom checkout session variable
-     * @return void
-     */
-    public function unsetPayoneerCheckoutSession()
-    {
-        if ($this->_checkoutSession->getPayoneerCartUpdate()) {
-            $this->_checkoutSession->unsPayoneerCartUpdate();
         }
     }
 
