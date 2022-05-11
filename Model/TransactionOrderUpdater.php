@@ -252,7 +252,7 @@ class TransactionOrderUpdater
         if (!($order instanceof Order)) {
             $order = $this->getOrder($order);
         }
-        $order->setState('payment_review')->setStatus('fraud');
+        $order->setState('payment_review')->setStatus('payment_review');
         $this->orderRepository->save($order);
     }
 
