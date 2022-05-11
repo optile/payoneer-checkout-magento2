@@ -16,6 +16,7 @@ use Magento\Sales\Model\Order\Payment\Transaction;
 class PayoneerResponseHandler implements HandlerInterface
 {
     const ADDITIONAL_INFO_KEY_REFUND_RESPONSE = 'refund_response';
+    const ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE = 'partial_refund_response';
     const ADDITIONAL_INFO_KEY_CAPTURE_RESPONSE = 'capture_response';
     const ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE = 'auth_cancel_response';
 

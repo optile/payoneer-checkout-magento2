@@ -313,17 +313,33 @@ class TransactionOrderUpdater
             $orderObj = $this->getOrder($order);
             $authTxn = $this->getTransaction($orderObj->getId(), Client::REFUND);
             if ($authTxn != null && $authTxn->getTransactionId()) {
-                if ($orderObj->getState() != Order::STATE_CLOSED) {
+                if ($orderObj->getState() != Order::STATE_CLOSED && $response['amount'] == $orderObj->getGrandTotal()) {
                     $this->creditmemoCreator->create($orderObj);
                 }
                 return true;
             }
-
-            $this->creditmemoCreator->create($orderObj);
-
             $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
                 $orderObj->getGrandTotal()
             );
+            if($response['amount'] < $orderObj->getGrandTotal()) {
+                $txnData = [
+                    'additional_info' => $response,
+                    'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE,
+                    'is_transaction_closed' => false,
+                    'transaction_type' => Client::REFUND,
+                    'order_comment' => __('Partial amount refunded of %1.', $orderTotal),
+                    'parent_txn_id' => $response['transaction_id'],
+                    'txn_id_post_text' => 'refund'
+                ];
+                $this->addNewTransactionEntry(
+                    $orderObj,
+                    $txnData
+                );
+                return true;
+            }
+
+            $this->creditmemoCreator->create($orderObj);
+            
             $txnData = [
                 'additional_info' => $response,
                 'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE,
