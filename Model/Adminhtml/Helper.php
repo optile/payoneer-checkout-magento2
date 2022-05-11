@@ -29,6 +29,7 @@ class Helper
     const AUTHORIZATION = 'authorization';
     const CAPTURE = 'capture';
     const CHARGED = 'charged';
+    const PAID_OUT_PARTIAL = 'paid_out_partial';
     const DEBITED = 'debited';
     const CAPTURE_CLOSED = 'closed';
 
