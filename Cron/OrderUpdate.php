@@ -57,6 +57,9 @@ class OrderUpdate
             foreach ($notifications as $notification) {
                 try {
                     $response = \Safe\json_decode($notification->getContent(), true);
+                    if (!isset($response['statusCode'])) {
+                        continue;
+                    }
                     $this->transactionOrderUpdater->processNotificationResponse(
                         $notification->getOrderId(),
                         $response

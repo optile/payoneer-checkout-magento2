@@ -191,6 +191,8 @@ class TransactionOrderUpdater
                     return $this->checkAndCaptureOrder($order, $response);
                 }
                 break;
+            case [Helper::CHARGED, Helper::PAID_OUT_PARTIAL]:
+                return $this->checkAndRefundPartial($order, $response);
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_CREDITED]:
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_PAID_OUT_STATUS]:
                 return $this->checkAndRefundOrder($order, $response);
@@ -313,17 +315,33 @@ class TransactionOrderUpdater
             $orderObj = $this->getOrder($order);
             $authTxn = $this->getTransaction($orderObj->getId(), Client::REFUND);
             if ($authTxn != null && $authTxn->getTransactionId()) {
-                if ($orderObj->getState() != Order::STATE_CLOSED) {
+                if ($orderObj->getState() != Order::STATE_CLOSED && $response['amount'] == $orderObj->getGrandTotal()) {
                     $this->creditmemoCreator->create($orderObj);
                 }
                 return true;
             }
-
-            $this->creditmemoCreator->create($orderObj);
-
             $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
                 $orderObj->getGrandTotal()
             );
+            if ($response['amount'] < $orderObj->getGrandTotal()) {
+                $txnData = [
+                    'additional_info' => $response,
+                    'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE,
+                    'is_transaction_closed' => false,
+                    'transaction_type' => Client::REFUND,
+                    'order_comment' => __('Partial amount refunded of %1.', $orderTotal),
+                    'parent_txn_id' => $response['transaction_id'],
+                    'txn_id_post_text' => 'refund'
+                ];
+                $this->addNewTransactionEntry(
+                    $orderObj,
+                    $txnData
+                );
+                return true;
+            }
+
+            $this->creditmemoCreator->create($orderObj);
+            
             $txnData = [
                 'additional_info' => $response,
                 'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE,
@@ -344,6 +362,46 @@ class TransactionOrderUpdater
         } catch (\Exception $e) {
             throw new LocalizedException(
                 __('Something went wrong while refunding the order.')
+            );
+        }
+    }
+    
+    /**
+     * Partial refund, only add a new refund transaction.
+     *
+     * @param string|Order $order
+     * @param array <mixed> $response
+     * @return bool|void
+     * @throws LocalizedException
+     */
+    public function checkAndRefundPartial($order, $response)
+    {
+        try {
+            $orderObj = $this->getOrder($order);
+            $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
+                $orderObj->getGrandTotal()
+            );
+            
+            $txnData = [
+                'additional_info' => $response,
+                'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE,
+                'is_transaction_closed' => false,
+                'transaction_type' => Client::REFUND,
+                'order_comment' => __('Partial amount refunded of %1.', $orderTotal),
+                'parent_txn_id' => $response['transaction_id'],
+                'txn_id_post_text' => 'refund'
+            ];
+            $this->addNewTransactionEntry(
+                $orderObj,
+                $txnData
+            );
+        } catch (LocalizedException $le) {
+            throw new LocalizedException(
+                __($le->getMessage())
+            );
+        } catch (\Exception $e) {
+            throw new LocalizedException(
+                __('Something went wrong while partial refunding the order.')
             );
         }
     }

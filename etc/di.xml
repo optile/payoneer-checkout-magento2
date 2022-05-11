@@ -290,8 +290,14 @@
         </arguments>
     </virtualType>
 
-    <!-- Payoneer Refund Request -->
-    <virtualType name="PayoneerRefundRequest" type="PayoneerListCaptureRequest">
+    <!-- Payoneer List Request -->
+    <virtualType name="PayoneerRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="adminTransactionId" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AdminTransactionIDDataBuilder</item>                
+                <item name="payment" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\PaymentDataBuilder</item>                
+            </argument>
+        </arguments>
     </virtualType>
 
     <!-- Payoneer Refund Client -->
