@@ -132,7 +132,7 @@ class Success implements HttpGetActionInterface
                         $quote->setCustomerEmail($this->checkoutSession->getPayoneerCustomerEmail());
                     }
                 } else {
-                    $this->unsetCustomCheckoutSession();
+                    $this->unsetPayoneerCustomerEmailSession();
                 }
                 $this->cartRepository->save($quote);
 
@@ -141,6 +141,8 @@ class Success implements HttpGetActionInterface
                 }
 
                 $this->cartManagement->placeOrder($cartId);
+
+                $this->unsetPayoneerCountryIdSession();
                 return $this->resultPageFactory->create();
             } else {
                 return $this->redirectToCart();
@@ -166,10 +168,24 @@ class Success implements HttpGetActionInterface
      * Unset custom checkout session variable
      * @return void
      */
-    public function unsetCustomCheckoutSession()
+    public function unsetPayoneerCustomerEmailSession()
     {
         if ($this->checkoutSession->getPayoneerCustomerEmail()) {
             $this->checkoutSession->unsPayoneerCustomerEmail();
+        }
+    }
+
+    /**
+     * Unset custom checkout session variable
+     * @return void
+     */
+    public function unsetPayoneerCountryIdSession()
+    {
+        if ($this->checkoutSession->getShippingCountryId()) {
+            $this->checkoutSession->unsShippingCountryId();
+        }
+        if ($this->checkoutSession->getBillingCountryId()) {
+            $this->checkoutSession->unsBillingCountryId();
         }
     }
 }

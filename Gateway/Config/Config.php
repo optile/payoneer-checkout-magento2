@@ -8,6 +8,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields as AdminFields;
 use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class Config
@@ -41,6 +42,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const LIST_CAPTURE  = 'list_capture';
     const LIST_FETCH    = 'list_fetch';
     const LIST_UPDATE   = 'list_update';
+
+    /**
+     * Country path
+     */
+    const COUNTRY_CODE_PATH = 'general/country/default';
 
     /**
      * API Request constants
@@ -312,5 +318,18 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function isDebuggingEnabled()
     {
         return $this->getValue('debug');
+    }
+
+    /**
+     * Get Country code by website scope
+     *
+     * @return string
+     */
+    public function getCountryByWebsite(): string
+    {
+        return $this->scopeConfig->getValue(
+            self::COUNTRY_CODE_PATH,
+            ScopeInterface::SCOPE_WEBSITES
+        );
     }
 }

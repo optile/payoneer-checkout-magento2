@@ -2,6 +2,7 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
+use Magento\Checkout\Model\Session;
 use Magento\Payment\Gateway\Data\AddressAdapterInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -14,12 +15,26 @@ use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 class AddressDataBuilder implements BuilderInterface
 {
     /**
-     * Billingaddress data constants
+     * Billing address data constants
      */
-    const FIRST_NAME = 'firstname';
-    const LAST_NAME = 'lastname';
-    const MIDDLE_NAME = 'middlename';
-    const EMPTY_STRING = '';
+    const FIRST_NAME    =   'firstname';
+    const LAST_NAME     =   'lastname';
+    const MIDDLE_NAME   =   'middlename';
+    const EMPTY_STRING  =   '';
+
+    /**
+     * @var Session
+     */
+    private $checkoutSession;
+
+    /**
+     * @param Session $checkoutSession
+     */
+    public function __construct(
+        Session $checkoutSession
+    ) {
+        $this->checkoutSession = $checkoutSession;
+    }
 
     /**
      * Builds address data
@@ -39,6 +54,11 @@ class AddressDataBuilder implements BuilderInterface
         if ($address) {
             $billingAddress = $address;
             $billingAddressChanged = true;
+        }
+
+        $shippingAddressCountryId = $shippingAddress ? $shippingAddress->getCountryId() : null;
+        if ($shippingAddressCountryId) {
+            $this->checkoutSession->setShippingCountryId($shippingAddressCountryId);
         }
 
         return [
@@ -67,7 +87,7 @@ class AddressDataBuilder implements BuilderInterface
             Config::ZIP => $address->getPostcode(),
             Config::CITY => $address->getCity(),
             Config::STATE => $address->getRegionCode(),
-            Config::COUNTRY => $address->getCountryId(),
+            Config::COUNTRY => $address->getCountryId() ?: $this->checkoutSession->getShippingCountryId(),
             Config::NAME => [
                 Config::FIRST_NAME => $address->getFirstname(),
                 Config::MIDDLE_NAME => $address->getMiddlename(),
@@ -83,6 +103,9 @@ class AddressDataBuilder implements BuilderInterface
      */
     public function getNewBillingAddress($billingAddress)
     {
+        $billingAddressCountryId = isset($billingAddress[Config::COUNTRY_ID]) ?
+            $billingAddress[Config::COUNTRY_ID] : $this->checkoutSession->getBillingCountryId();
+
         return [
             Config::STREET => isset($billingAddress[Config::STREET][0]) ?
                 $billingAddress[Config::STREET][0] : self::EMPTY_STRING,
@@ -94,8 +117,7 @@ class AddressDataBuilder implements BuilderInterface
                 $billingAddress[Config::CITY] : self::EMPTY_STRING,
             Config::STATE => isset($billingAddress[Config::REGION]) ?
                 $billingAddress[Config::REGION] : self::EMPTY_STRING,
-            Config::COUNTRY => isset($billingAddress[Config::COUNTRY_ID]) ?
-                $billingAddress[Config::COUNTRY_ID] : self::EMPTY_STRING,
+            Config::COUNTRY => $billingAddressCountryId,
             Config::NAME => [
                 Config::FIRST_NAME => isset($billingAddress[self::FIRST_NAME]) ?
                     $billingAddress[self::FIRST_NAME] : self::EMPTY_STRING,

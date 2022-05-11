@@ -56,7 +56,8 @@ class ListUpdateTransactionService
 
             return $this->commandPool->get($command)->execute([
                 'payment' => $paymentDataObject,
-                'amount' => $payment->getQuote()->getGrandTotal()/** @phpstan-ignore-line */
+                'amount' => $payment->getQuote()->getGrandTotal(), /** @phpstan-ignore-line */
+                'totalItemsCount' => $payment->getQuote()->getItemsCount() /** @phpstan-ignore-line */
             ]);
         } catch (Exception $e) {
             throw new LocalizedException(__($e->getMessage()));
