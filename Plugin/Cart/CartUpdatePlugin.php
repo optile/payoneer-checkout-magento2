@@ -83,7 +83,7 @@ class CartUpdatePlugin
      */
     public function isListExpired($result)
     {
-        if (str_contains($result['reason'], self::LIST_EXPIRED)) {
+        if (isset($result['reason']) && str_contains($result['reason'], self::LIST_EXPIRED)) {
             return true;
         }
         return false;
