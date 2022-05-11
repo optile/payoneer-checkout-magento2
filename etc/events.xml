@@ -10,4 +10,7 @@
     <event name="sales_order_invoice_save_after">
         <observer name="payoneer_payment_gateway_capture" instance="Payoneer\OpenPaymentGateway\Observer\InvoiceSaveAfterObserver" />
     </event>
+    <event name="sales_order_payment_place_end">
+        <observer name="payoneer_update_order_status" instance="Payoneer\OpenPaymentGateway\Observer\UpdateOrderStatusObserver"/>
+    </event>
 </config>

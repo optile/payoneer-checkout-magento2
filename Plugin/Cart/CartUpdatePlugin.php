@@ -9,7 +9,7 @@ use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\ListUpdateTransactionService;
 
 /**
- * CartUpdatePlugin - Restricts user from updating cart if list session already exists
+ * CartUpdatePlugin - Update list if list session already exists
  */
 class CartUpdatePlugin
 {

@@ -55,16 +55,18 @@ class CancelOrderObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $cancellationDone = false;
-        /**@var Order $order */
-        $order = $observer->getEvent()->getOrder();
-        $additionalInformation = $order->getPayment()->getAdditionalInformation();
-        if ($additionalInformation && isset($additionalInformation['payoneerCancel'])) {
-            $cancellationDone = true;
-        }
-        if (!$cancellationDone) {
-            if ($order->getState() == 'canceled' && $this->payoneerAdminHelper->canCancelAuthorization($order)) {
-                return $this->transactionService->processAuthCancel($order);
+        if ($this->payoneerAdminHelper->isPayoneerEnabled()) {
+            $cancellationDone = false;
+            /**@var Order $order */
+            $order = $observer->getEvent()->getOrder();
+            $additionalInformation = $order->getPayment()->getAdditionalInformation();
+            if ($additionalInformation && isset($additionalInformation['payoneerCancel'])) {
+                $cancellationDone = true;
+            }
+            if (!$cancellationDone) {
+                if ($order->getState() == 'canceled' && $this->payoneerAdminHelper->canCancelAuthorization($order)) {
+                    return $this->transactionService->processAuthCancel($order);
+                }
             }
         }
     }

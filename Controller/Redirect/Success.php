@@ -109,7 +109,7 @@ class Success implements HttpGetActionInterface
                     || $reqParams['token'] == ''
                     || $reqParams['token'] == null
                     || $payment->getAdditionalInformation('token') != $reqParams['token']
-                    || $quoteData['grand_total'] != $reqParams['amount']) {
+                ) {
                     return $this->redirectToCart();
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
@@ -135,6 +135,10 @@ class Success implements HttpGetActionInterface
                     $this->unsetCustomCheckoutSession();
                 }
                 $this->cartRepository->save($quote);
+
+                if ($quoteData['grand_total'] != $reqParams['amount']) {
+                    $this->checkoutSession->setUpdateOrderStatus(true);
+                }
 
                 $this->cartManagement->placeOrder($cartId);
                 return $this->resultPageFactory->create();
