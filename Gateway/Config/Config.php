@@ -8,6 +8,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields as AdminFields;
 use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
+use Magento\Store\Model\ScopeInterface;
 
 /**
  * Class Config
@@ -22,13 +23,15 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * API method types
      */
     const METHOD_GET    = 'GET';
+    const METHOD_PUT    = 'PUT';
     const METHOD_POST   = 'POST';
     const METHOD_DELETE = 'DELETE';
 
     /**
      * API endpoints
      */
-    const END_POINT                         =   'api/lists';
+    const LIST_END_POINT                    =   'api/lists';
+    const LIST_UPDATE_END_POINT             =   'api/lists/%s'; //api/lists/{longId}
     const CAPTURE_END_POINT                 =   'api/charges/%s/closing'; //api/charges/{longId}/closing
     const REFUND_END_POINT                  =   'api/charges/%s/payout'; //api/charges/{longId}/payout
     const AUTHORIZATION_CANCEL_END_POINT    =   'api/charges/%s'; //api/charges/{longId}
@@ -38,6 +41,12 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     const LIST_CAPTURE  = 'list_capture';
     const LIST_FETCH    = 'list_fetch';
+    const LIST_UPDATE   = 'list_update';
+
+    /**
+     * Country path
+     */
+    const COUNTRY_CODE_PATH = 'general/country/default';
 
     /**
      * API Request constants
@@ -101,6 +110,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const ID                    =   'id';
     const TOKEN                 =   'token';
     const TOKEN_NOTIFICATION    =   'notification_token';
+    const LIST_ID               =   'listId';
 
     const ENTITY_PAYMENT        =   'payment';
 
@@ -308,5 +318,18 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function isDebuggingEnabled()
     {
         return $this->getValue('debug');
+    }
+
+    /**
+     * Get Country code by website scope
+     *
+     * @return string
+     */
+    public function getCountryByWebsite(): string
+    {
+        return $this->scopeConfig->getValue(
+            self::COUNTRY_CODE_PATH,
+            ScopeInterface::SCOPE_WEBSITES
+        );
     }
 }

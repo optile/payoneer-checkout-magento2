@@ -14,4 +14,8 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Checkout\Model\Cart">
+        <plugin name="payoneer_cart_update_plugin"
+                type="Payoneer\OpenPaymentGateway\Plugin\Cart\CartUpdatePlugin" />
+    </type>
 </config>

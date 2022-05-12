@@ -4,10 +4,8 @@ namespace Payoneer\OpenPaymentGateway\Controller\Integration;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\ActionInterface;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Payoneer\OpenPaymentGateway\Model\TransactionService;
@@ -19,32 +17,24 @@ use Payoneer\OpenPaymentGateway\Model\TransactionService;
 class ProcessPayment implements ActionInterface
 {
     /**
-     * @var JsonFactory
-     */
-    protected $resultJsonFactory;
-
-    /**
      * @var Session
      */
-    protected $checkoutSession;
+    private $checkoutSession;
 
     /**
      * @var TransactionService
      */
-    protected $transactionService;
+    private $transactionService;
 
     /**
      * ProcessPayment constructor.
-     * @param JsonFactory $resultJsonFactory
      * @param Session $checkoutSession
      * @param TransactionService $transactionService
      */
     public function __construct(
-        JsonFactory $resultJsonFactory,
         Session $checkoutSession,
         TransactionService $transactionService
     ) {
-        $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession = $checkoutSession;
         $this->transactionService = $transactionService;
     }

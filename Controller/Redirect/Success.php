@@ -105,12 +105,11 @@ class Success implements HttpGetActionInterface
                 $quote = $this->cartRepository->getActive($cartId);
                 $quoteData = $quote->getData();
                 $payment = $quote->getPayment();
-
                 if (!isset($reqParams['token'])
                     || $reqParams['token'] == ''
                     || $reqParams['token'] == null
                     || $payment->getAdditionalInformation('token') != $reqParams['token']
-                    || $quoteData['grand_total'] != $reqParams['amount']) {
+                ) {
                     return $this->redirectToCart();
                 } else {
                     foreach ($this->context->getRequest()->getParams() as $key => $value) {
@@ -133,11 +132,17 @@ class Success implements HttpGetActionInterface
                         $quote->setCustomerEmail($this->checkoutSession->getPayoneerCustomerEmail());
                     }
                 } else {
-                    $this->unsetCustomCheckoutSession();
+                    $this->unsetPayoneerCustomerEmailSession();
                 }
                 $this->cartRepository->save($quote);
 
+                if ($quoteData['grand_total'] != $reqParams['amount']) {
+                    $this->checkoutSession->setUpdateOrderStatus(true);
+                }
+
                 $this->cartManagement->placeOrder($cartId);
+
+                $this->unsetPayoneerCountryIdSession();
                 return $this->resultPageFactory->create();
             } else {
                 return $this->redirectToCart();
@@ -163,10 +168,24 @@ class Success implements HttpGetActionInterface
      * Unset custom checkout session variable
      * @return void
      */
-    public function unsetCustomCheckoutSession()
+    public function unsetPayoneerCustomerEmailSession()
     {
         if ($this->checkoutSession->getPayoneerCustomerEmail()) {
             $this->checkoutSession->unsPayoneerCustomerEmail();
+        }
+    }
+
+    /**
+     * Unset custom checkout session variable
+     * @return void
+     */
+    public function unsetPayoneerCountryIdSession()
+    {
+        if ($this->checkoutSession->getShippingCountryId()) {
+            $this->checkoutSession->unsShippingCountryId();
+        }
+        if ($this->checkoutSession->getBillingCountryId()) {
+            $this->checkoutSession->unsBillingCountryId();
         }
     }
 }

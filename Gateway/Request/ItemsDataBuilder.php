@@ -20,7 +20,7 @@ class ItemsDataBuilder implements BuilderInterface
     /**
      * @var Helper
      */
-    protected $helper;
+    private $helper;
 
     /**
      * @param Helper $helper
@@ -43,7 +43,10 @@ class ItemsDataBuilder implements BuilderInterface
 
         $order = $payment->getOrder();
 
-        if ($order->getItems()) {
+        $totalItemsCount = isset($buildSubject['totalItemsCount'])
+            ? $buildSubject['totalItemsCount'] : 0;
+
+        if ($order->getItems() && $totalItemsCount > 0) {
             $items = $this->buildItems($order);
             return [
                 Config::PRODUCTS => $items
@@ -91,7 +94,6 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::NAME => self::ADJUSTMENTS,
                 Config::AMOUNT => number_format($totalAdjustments, 2)
             ];
-
         }
 
         return $result;

@@ -105,6 +105,7 @@ class GatewayCommand implements CommandInterface
             $this->requestBuilder->build($commandSubject),
             $payment
         );
+
         $response = $this->client->placeRequest($transferO);
 
         if ($this->validator !== null) {

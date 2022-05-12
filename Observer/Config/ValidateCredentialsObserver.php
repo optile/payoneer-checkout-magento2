@@ -108,7 +108,7 @@ class ValidateCredentialsObserver implements ObserverInterface
 
         $response = $this->request->send(
             PayoneerConfig::METHOD_POST,
-            PayoneerConfig::END_POINT,
+            PayoneerConfig::LIST_END_POINT,
             $credentials,
             $data
         );
