@@ -163,10 +163,17 @@
     <virtualType name="PayoneerListCaptureCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">PayoneerListCaptureRequest</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\ListCaptureTransferFactory</argument>
+            <argument name="transferFactory" xsi:type="object">PayoneerCaptureTransferFactory</argument>
             <argument name="client" xsi:type="object">PayoneerClientListCapture</argument>
             <argument name="handler" xsi:type="object">PayoneerCaptureResponseHandler</argument>
             <argument name="validator" xsi:type="object">PayoneerListCaptureResponseValidator</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer Capture Transfer Factory -->
+    <virtualType name="PayoneerCaptureTransferFactory" type="Payoneer\OpenPaymentGateway\Gateway\Http\ListCaptureTransferFactory">
+        <arguments>
+            <argument name="method" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::METHOD_POST</argument>
         </arguments>
     </virtualType>
 
@@ -289,7 +296,7 @@
             <argument name="method" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::METHOD_POST</argument>
         </arguments>
     </virtualType>
-    
+
     <!-- Payoneer Refund Response Validator -->
     <virtualType name="PayoneerRefundResponseValidator" type="Payoneer\OpenPaymentGateway\Gateway\Validator\ResponseValidator">
         <arguments>
