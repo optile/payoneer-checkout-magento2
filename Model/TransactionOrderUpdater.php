@@ -214,7 +214,7 @@ class TransactionOrderUpdater
         $orderObj = $this->getOrder($order);
         $isValidData = $this->compareData($orderObj, $response);
         if (!$isValidData) {
-            $this->updateOrderStatusToFraud($orderObj);
+            $this->updateOrderStatusToPaymentReview($orderObj);
             return false;
         } else {
             return true;
@@ -249,7 +249,7 @@ class TransactionOrderUpdater
      * @return void
      * @throws LocalizedException
      */
-    public function updateOrderStatusToFraud($order)
+    public function updateOrderStatusToPaymentReview($order)
     {
         if (!($order instanceof Order)) {
             $order = $this->getOrder($order);
@@ -341,7 +341,7 @@ class TransactionOrderUpdater
             }
 
             $this->creditmemoCreator->create($orderObj);
-            
+
             $txnData = [
                 'additional_info' => $response,
                 'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE,
@@ -365,7 +365,7 @@ class TransactionOrderUpdater
             );
         }
     }
-    
+
     /**
      * Partial refund, only add a new refund transaction.
      *
@@ -381,7 +381,7 @@ class TransactionOrderUpdater
             $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
                 $orderObj->getGrandTotal()
             );
-            
+
             $txnData = [
                 'additional_info' => $response,
                 'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE,

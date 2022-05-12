@@ -48,6 +48,8 @@ class UpdateOrderStatusObserver implements ObserverInterface
             /** @var \Magento\Sales\Model\Order\Payment $orderPayment */
             $orderPayment = $observer->getEvent()->getPayment();
             $order = $orderPayment->getOrder();
+            $grandTotal = $order->getGrandTotal();
+            $orderPayment->setAdditionalInformation('amount', $grandTotal);
             $order->setStatus('payment_review')->setState('payment_review');
             $this->checkoutSession->unsUpdateOrderStatus();
         }
