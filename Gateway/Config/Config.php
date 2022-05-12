@@ -304,7 +304,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         foreach ($this->styleConfigs as $key => $path) {
             $value = $this->scopeConfig->getValue($path);
             if ($value) {
-                $styleConfigValues[$key] = $value;
+                $styleConfigValues[$key] = trim($value);
             }
         }
         return $styleConfigValues;
