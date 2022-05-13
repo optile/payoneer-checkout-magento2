@@ -21,6 +21,8 @@ class AddressDataBuilder implements BuilderInterface
     const LAST_NAME     =   'lastname';
     const MIDDLE_NAME   =   'middlename';
     const EMPTY_STRING  =   '';
+    const SHIPPING      =   'shipping';
+    const BILLING       =   'billing';
 
     /**
      * @var Session
@@ -28,12 +30,20 @@ class AddressDataBuilder implements BuilderInterface
     private $checkoutSession;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param Session $checkoutSession
+     * @param Config $config
      */
     public function __construct(
-        Session $checkoutSession
+        Session $checkoutSession,
+        Config $config
     ) {
         $this->checkoutSession = $checkoutSession;
+        $this->config = $config;
     }
 
     /**
@@ -64,10 +74,10 @@ class AddressDataBuilder implements BuilderInterface
         return [
             Config::CUSTOMER => [
                 Config::ADDRESSES => [
-                    Config::SHIPPING => $shippingAddress ? $this->getAddressData($shippingAddress) : [],
+                    Config::SHIPPING => $shippingAddress ? $this->getAddressData($shippingAddress, self::SHIPPING) : [],
                     Config::BILLING => $billingAddressChanged ?
                         $this->getNewBillingAddress($billingAddress) :
-                        $this->getAddressData($billingAddress)
+                        $this->getAddressData($billingAddress, self::BILLING)
                 ]
             ]
         ];
@@ -77,23 +87,45 @@ class AddressDataBuilder implements BuilderInterface
      * Gets address details
      *
      * @param AddressAdapterInterface $address
+     * @param string $type
      * @return array <mixed>
      */
-    public function getAddressData($address)
+    public function getAddressData($address, $type)
     {
         return [
-            Config::STREET => $address->getStreetLine1(),
+            Config::STREET => $address->getStreetLine1() ?: null,
             Config::HOUSE_NUMBER => $address->getStreetLine2(),
             Config::ZIP => $address->getPostcode(),
             Config::CITY => $address->getCity(),
             Config::STATE => $address->getRegionCode(),
-            Config::COUNTRY => $address->getCountryId() ?: $this->checkoutSession->getShippingCountryId(),
+            Config::COUNTRY => $this->getCountryId($address, $type),
             Config::NAME => [
                 Config::FIRST_NAME => $address->getFirstname(),
                 Config::MIDDLE_NAME => $address->getMiddlename(),
                 Config::LAST_NAME => $address->getLastname()
             ]
         ];
+    }
+
+    /**
+     * @param AddressAdapterInterface $address
+     * @param string $type
+     * @return string
+     */
+    public function getCountryId($address, $type)
+    {
+        $countryId = $address->getCountryId();
+        if (!$countryId) {
+            switch ($type) {
+                case self::SHIPPING:
+                    $countryId = $this->checkoutSession->getShippingCountryId() ?: $this->config->getCountryByStore();
+                    break;
+                case self::BILLING:
+                    $countryId = $this->checkoutSession->getBillingCountryId() ?: $this->config->getCountryByStore();
+                    break;
+            }
+        }
+        return $countryId;
     }
 
     /**
@@ -117,7 +149,7 @@ class AddressDataBuilder implements BuilderInterface
                 $billingAddress[Config::CITY] : self::EMPTY_STRING,
             Config::STATE => isset($billingAddress[Config::REGION]) ?
                 $billingAddress[Config::REGION] : self::EMPTY_STRING,
-            Config::COUNTRY => $billingAddressCountryId,
+            Config::COUNTRY => $billingAddressCountryId ?: $this->config->getCountryByStore(),
             Config::NAME => [
                 Config::FIRST_NAME => isset($billingAddress[self::FIRST_NAME]) ?
                     $billingAddress[self::FIRST_NAME] : self::EMPTY_STRING,

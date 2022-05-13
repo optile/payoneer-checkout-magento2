@@ -228,9 +228,13 @@ class TransactionService
     public function setAdditionalInformation($quote, $result)
     {
         $payment = $quote->getPayment();
-        $listId = $result['response']['identification']['longId'];
-        $payment->setAdditionalInformation(Config::LIST_ID, $listId);
-        $this->saveQuote($quote, $payment);
+        if (isset($result['response'])
+            && isset($result['response']['identification'])
+            && isset($result['response']['identification']['longId'])) {
+            $listId = $result['response']['identification']['longId'];
+            $payment->setAdditionalInformation(Config::LIST_ID, $listId);
+            $this->saveQuote($quote, $payment);
+        }
     }
 
     /**
@@ -241,6 +245,7 @@ class TransactionService
     public function saveQuote($quote, $payment)
     {
         $quote->setPayment($payment);
-        $this->quoteRepository->save($quote);
+        //$this->quoteRepository->save($quote);//Gift cart amount is getting as null if quoterepository save is called
+        $quote->save();/** @phpstan-ignore-line */
     }
 }
