@@ -325,11 +325,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      *
      * @return string
      */
-    public function getCountryByWebsite(): string
+    public function getCountryByStore(): string
     {
         return $this->scopeConfig->getValue(
             self::COUNTRY_CODE_PATH,
-            ScopeInterface::SCOPE_WEBSITES
+            ScopeInterface::SCOPE_STORE
         );
     }
 }

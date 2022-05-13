@@ -118,10 +118,10 @@ class AddressDataBuilder implements BuilderInterface
         if (!$countryId) {
             switch ($type) {
                 case self::SHIPPING:
-                    $countryId = $this->checkoutSession->getShippingCountryId() ?: $this->config->getCountryByWebsite();
+                    $countryId = $this->checkoutSession->getShippingCountryId() ?: $this->config->getCountryByStore();
                     break;
                 case self::BILLING:
-                    $countryId = $this->checkoutSession->getBillingCountryId() ?: $this->config->getCountryByWebsite();
+                    $countryId = $this->checkoutSession->getBillingCountryId() ?: $this->config->getCountryByStore();
                     break;
             }
         }
@@ -149,7 +149,7 @@ class AddressDataBuilder implements BuilderInterface
                 $billingAddress[Config::CITY] : self::EMPTY_STRING,
             Config::STATE => isset($billingAddress[Config::REGION]) ?
                 $billingAddress[Config::REGION] : self::EMPTY_STRING,
-            Config::COUNTRY => $billingAddressCountryId ?: $this->config->getCountryByWebsite(),
+            Config::COUNTRY => $billingAddressCountryId ?: $this->config->getCountryByStore(),
             Config::NAME => [
                 Config::FIRST_NAME => isset($billingAddress[self::FIRST_NAME]) ?
                     $billingAddress[self::FIRST_NAME] : self::EMPTY_STRING,
