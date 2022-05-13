@@ -241,6 +241,7 @@ class TransactionService
     public function saveQuote($quote, $payment)
     {
         $quote->setPayment($payment);
-        $this->quoteRepository->save($quote);
+        //$this->quoteRepository->save($quote);//Gift cart amount is getting as null if quoterepository save is called
+        $quote->save();/** @phpstan-ignore-line */
     }
 }

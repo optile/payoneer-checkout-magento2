@@ -58,7 +58,7 @@ class BaseRequestDataBuilder implements BuilderInterface
         $countryId = $countryId ?: $this->checkoutSession->getBillingCountryId();
         return [
             Config::TRANSACTION_ID  => $payment->getPayment()->getAdditionalInformation(Config::TXN_ID),
-            Config::COUNTRY         => $countryId,
+            Config::COUNTRY         => $countryId ?: $this->config->getCountryByWebsite(),
             Config::INTEGRATION     => $this->config->getValue('payment_flow'),
             Config::DIVISION        => $this->config->getValue('environment') == Fields::ENVIRONMENT_SANDBOX_VALUE
                 ? $this->config->getValue('sandbox_store_code')
