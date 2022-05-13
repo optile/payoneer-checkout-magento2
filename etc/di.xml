@@ -163,10 +163,17 @@
     <virtualType name="PayoneerListCaptureCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
         <arguments>
             <argument name="requestBuilder" xsi:type="object">PayoneerListCaptureRequest</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\ListCaptureTransferFactory</argument>
+            <argument name="transferFactory" xsi:type="object">PayoneerCaptureTransferFactory</argument>
             <argument name="client" xsi:type="object">PayoneerClientListCapture</argument>
             <argument name="handler" xsi:type="object">PayoneerCaptureResponseHandler</argument>
             <argument name="validator" xsi:type="object">PayoneerListCaptureResponseValidator</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer Capture Transfer Factory -->
+    <virtualType name="PayoneerCaptureTransferFactory" type="Payoneer\OpenPaymentGateway\Gateway\Http\ListCaptureTransferFactory">
+        <arguments>
+            <argument name="method" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::METHOD_POST</argument>
         </arguments>
     </virtualType>
 
@@ -278,8 +285,15 @@
             <argument name="requestBuilder" xsi:type="object">PayoneerRefundRequest</argument>
             <argument name="validator" xsi:type="object">PayoneerRefundResponseValidator</argument>
             <argument name="handler" xsi:type="object">PayoneerRefundResponseHandler</argument>
-            <argument name="transferFactory" xsi:type="object">Payoneer\OpenPaymentGateway\Gateway\Http\RefundTransferFactory</argument>
+            <argument name="transferFactory" xsi:type="object">PayoneerRefundTransferFactory</argument>
             <argument name="client" xsi:type="object">PayoneerRefundClient</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer Refund Transfer Factory -->
+    <virtualType name="PayoneerRefundTransferFactory" type="Payoneer\OpenPaymentGateway\Gateway\Http\RefundTransferFactory">
+        <arguments>
+            <argument name="method" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::METHOD_POST</argument>
         </arguments>
     </virtualType>
 
@@ -294,8 +308,8 @@
     <virtualType name="PayoneerRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
-                <item name="adminTransactionId" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AdminTransactionIDDataBuilder</item>                
-                <item name="payment" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\PaymentDataBuilder</item>                
+                <item name="adminTransactionId" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\AdminTransactionIDDataBuilder</item>
+                <item name="payment" xsi:type="string">Payoneer\OpenPaymentGateway\Gateway\Request\PaymentDataBuilder</item>
             </argument>
         </arguments>
     </virtualType>
