@@ -326,6 +326,8 @@
     <virtualType name="PayoneerRefundResponseHandler" type="Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler">
         <arguments>
             <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE</argument>
+            <argument name="transactionType" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::REFUND_TXN_TYPE</argument>
+            <argument name="transactionOrderUpdater" xsi:type="object">Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater</argument>
         </arguments>
     </virtualType>
 
