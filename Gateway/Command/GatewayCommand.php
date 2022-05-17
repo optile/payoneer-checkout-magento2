@@ -138,7 +138,9 @@ class GatewayCommand implements CommandInterface
     private function processErrors(ResultInterface $result)
     {
         $messages = [];
+        $errorCodeOrMessage = null;
         $errorsSource = array_merge($result->getErrorCodes(), $result->getFailsDescription());
+
         foreach ($errorsSource as $errorCodeOrMessage) {
             $errorCodeOrMessage = (string) $errorCodeOrMessage;
 
@@ -150,13 +152,16 @@ class GatewayCommand implements CommandInterface
                     $errorCodeOrMessage = $mapped;
                 }
             }
+
             $this->logger->critical('Payment Error: ' . $errorCodeOrMessage);
         }
+
+        $exceptionMessage = $errorCodeOrMessage ?: 'Transaction has been declined. Please try again later';
 
         throw new CommandException(
             !empty($messages)
                 ? __(implode(PHP_EOL, $messages))
-                : __('Transaction has been declined. Please try again later.')
+                : __($exceptionMessage)
         );
     }
 }

@@ -3,10 +3,11 @@
 namespace Payoneer\OpenPaymentGateway\Gateway\Response;
 
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Payment;
-use PayPal\Braintree\Gateway\Helper\SubjectReader;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater;
 
 /**
  * Class PayoneerResponseHandler
@@ -22,6 +23,7 @@ class PayoneerResponseHandler implements HandlerInterface
 
     const AUTH_CANCEL_STATUS_NODE = 'auth_cancel_status';
     const AUTH_CAPTURE_STATUS_NODE = 'capture_status';
+    const REFUND_TXN_TYPE =   'refund';
 
     /**
      * @var SubjectReader
@@ -39,21 +41,36 @@ class PayoneerResponseHandler implements HandlerInterface
     private $actionSuccessResponseKey;
 
     /**
+     * @var mixed
+     */
+    private $transactionType;
+
+    /**
+     * @var TransactionOrderUpdater|null
+     */
+    private $transactionOrderUpdater;
+
+    /**
      * PayoneerResponseHandler constructor.
      *
      * @param SubjectReader $subjectReader
      * @param string|mixed $additionalInfoKey
      * @param string|mixed $actionSuccessResponseKey
-     * @return void
+     * @param string $transactionType
+     * @param TransactionOrderUpdater|null $transactionOrderUpdater
      */
     public function __construct(
         SubjectReader $subjectReader,
         $additionalInfoKey = '',
-        $actionSuccessResponseKey = ''
+        $actionSuccessResponseKey = '',
+        $transactionType = '',
+        TransactionOrderUpdater $transactionOrderUpdater = null
     ) {
         $this->subjectReader = $subjectReader;
         $this->additionalInfoKey = $additionalInfoKey;
         $this->actionSuccessResponseKey = $actionSuccessResponseKey;
+        $this->transactionType = $transactionType;
+        $this->transactionOrderUpdater = $transactionOrderUpdater;
     }
 
     /**
@@ -71,6 +88,8 @@ class PayoneerResponseHandler implements HandlerInterface
         /** @var Payment $orderPayment */
         $orderPayment = $paymentDO->getPayment();
 
+        $orderincrementId = $paymentDO->getOrder()->getOrderIncrementId();
+
         $additionalInfo = $this->buildAdditionalInfoDataFromResponse($response);
         $orderPayment->setAdditionalInformation(
             $this->additionalInfoKey,
@@ -80,6 +99,13 @@ class PayoneerResponseHandler implements HandlerInterface
             Transaction::RAW_DETAILS,
             $additionalInfo /** @phpstan-ignore-line */
         );
+
+        if ($this->transactionType == self::REFUND_TXN_TYPE) {
+            /** @phpstan-ignore-next-line */
+            $filteredResponse = $this->transactionOrderUpdater->getFilteredResponse($response);
+            /** @phpstan-ignore-next-line */
+            $this->transactionOrderUpdater->checkAndRefundOrder($orderincrementId, $filteredResponse, true);
+        }
     }
 
     /**

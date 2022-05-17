@@ -5,7 +5,7 @@ namespace Payoneer\OpenPaymentGateway\Gateway\Response;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Payment;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use PayPal\Braintree\Gateway\Helper\SubjectReader;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Sales\Model\Order\Payment\Transaction;
 
 /**
