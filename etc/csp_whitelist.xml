@@ -3,33 +3,24 @@
     <policies>
         <policy id="script-src">
             <values>
-                <value id="api-sandbox-script" type="host">https://api.sandbox.oscato.com</value>
                 <value id="assets-optile-script" type="host">https://assets.optile.net</value>
-                <value id="oscato-checkout-script" type="host">https://resources.checkout.integration.oscato.com</value>
-                <value id="oscato-checkout-api-script" type="host">https://api.checkout.integration.oscato.com</value>
+                <value id="oscato-payment-script" type="host">*.oscato.com</value>
             </values>
         </policy>
         <policy id="connect-src">
             <values>
-                <value id="api-sandbox-connect" type="host">https://api.sandbox.oscato.com</value>
-                <value id="api-sandbox-resource-connect" type="host">https://resources.sandbox.oscato.com</value>
-                <value id="oscato-checkout-src" type="host">https://resources.checkout.integration.oscato.com</value>
-                <value id="oscato-checkout-api-src" type="host">https://api.checkout.integration.oscato.com</value>
+                <value id="oscato-payment-src" type="host">*.oscato.com</value>
             </values>
         </policy>
         <policy id="frame-src">
             <values>
-                <value id="api-sandbox-resource-frame" type="host">https://resources.sandbox.oscato.com</value>
-                <value id="oscato-checkout-frame" type="host">https://resources.checkout.integration.oscato.com</value>
-                <value id="oscato-checkout-api-frame" type="host">https://api.checkout.integration.oscato.com</value>
+                <value id="oscato-payment-api-frame" type="host">*.oscato.com</value>
             </values>
         </policy>
         <policy id="img-src">
             <values>
-                <value id="api-sandbox-resource-image" type="host">https://resources.sandbox.oscato.com</value>
                 <value id="sandbox-paypal-image" type="host">https://hnd.stats.paypal.com</value>
-                <value id="oscato-checkout-img" type="host">https://resources.checkout.integration.oscato.com</value>
-                <value id="oscato-checkout-api-img" type="host">https://api.checkout.integration.oscato.com</value>
+                <value id="oscato-payment-api-img" type="host">*.oscato.com</value>
             </values>
         </policy>
     </policies>
