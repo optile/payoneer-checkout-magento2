@@ -99,10 +99,22 @@ class PayoneerResponseHandler implements HandlerInterface
                 $orderPayment->setTransactionId($longId . '- refund');
             }
         }
-        $orderPayment->setAdditionalInformation(
-            $this->additionalInfoKey,
-            $additionalInfo
-        );
+        if ($this->additionalInfoKey == self::ADDITIONAL_INFO_KEY_REFUND_RESPONSE) {
+            $paymentAdditionalInfo = $orderPayment->getAdditionalInformation();
+
+            $refundResponse = isset($paymentAdditionalInfo[$this->additionalInfoKey]) ?
+                $paymentAdditionalInfo[$this->additionalInfoKey] : [];
+            $refundResponse[] = $additionalInfo;
+            $orderPayment->setAdditionalInformation(
+                $this->additionalInfoKey,
+                $refundResponse
+            );
+        } else {
+            $orderPayment->setAdditionalInformation(
+                $this->additionalInfoKey,
+                $additionalInfo
+            );
+        }
         $orderPayment->setTransactionAdditionalInfo(
             Transaction::RAW_DETAILS,
             $additionalInfo
@@ -117,19 +129,22 @@ class PayoneerResponseHandler implements HandlerInterface
      */
     public function buildAdditionalInfoDataFromResponse($response)
     {
-        $additionalInfo = [
-            'resultinfo' => $response['response']['resultInfo'],
-            'returncode_name' => $response['response']['returnCode']['name'],
-            'returncode_source' => $response['response']['returnCode']['source'],
-            'status_code' => $response['response']['status']['code'],
-            'status_reason' => $response['response']['status']['reason'],
-            'interaction_code' => $response['response']['interaction']['code'],
-            'interaction_reason' => $response['response']['interaction']['reason'],
-            'longId' => $response['response']['identification']['longId'],
-            'shortId' => $response['response']['identification']['shortId'],
-            'transactionId' => $response['response']['identification']['transactionId'],
-            'amount' => $response['response']['payment']['amount']
-        ];
+        $additionalInfo = [];
+        if (isset($response['response'])) {
+            $additionalInfo = [
+                'resultinfo' => $response['response']['resultInfo'],
+                'returncode_name' => $response['response']['returnCode']['name'],
+                'returncode_source' => $response['response']['returnCode']['source'],
+                'status_code' => $response['response']['status']['code'],
+                'status_reason' => $response['response']['status']['reason'],
+                'interaction_code' => $response['response']['interaction']['code'],
+                'interaction_reason' => $response['response']['interaction']['reason'],
+                'longId' => $response['response']['identification']['longId'],
+                'shortId' => $response['response']['identification']['shortId'],
+                'transactionId' => $response['response']['identification']['transactionId'],
+                'amount' => $response['response']['payment']['amount']
+            ];
+        }
         if (!empty($this->actionSuccessResponseKey)) {
             $additionalInfo[$this->actionSuccessResponseKey] = 'success';
         }

@@ -522,6 +522,19 @@ class TransactionOrderUpdater
     public function canRefund($order, $response)
     {
         $orderObj = $this->getOrder($order);
+        $newRefundLongId = $response['long_id'];
+        $additionalInformation = $orderObj->getPayment()->getAdditionalInformation();
+
+        $refundResponse = isset($additionalInformation['refund_response']) ?
+            $additionalInformation['refund_response'] : null;
+
+        if (is_array($refundResponse)) {
+            foreach ($refundResponse as $response) {
+                if ($newRefundLongId == $response['longId']) {
+                    return false;
+                }
+            }
+        }
         if ($response['reason_code'] == ResponseValidator::REFUND_PAID_OUT_STATUS) {
             if (isset($response['previousReasonCode'])
                 && $response['previousReasonCode'] == ResponseValidator::REFUND_PAID_OUT_PARTIAL
@@ -531,6 +544,7 @@ class TransactionOrderUpdater
                 return false;
             }
         }
+
         return true;
     }
 
