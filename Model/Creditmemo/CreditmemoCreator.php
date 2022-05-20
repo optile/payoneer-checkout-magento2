@@ -3,10 +3,10 @@
 namespace Payoneer\OpenPaymentGateway\Model\Creditmemo;
 
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Sales\Api\InvoiceRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\CreditmemoFactory;
 use Magento\Sales\Model\Service\CreditmemoService;
-use Magento\Sales\Api\InvoiceRepositoryInterface;
 
 class CreditmemoCreator
 {
@@ -67,7 +67,7 @@ class CreditmemoCreator
             return true;
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Failed to create the credit memo for the order %1', $order->getIncrementId())
+                __('Failed to create the credit memo for the order %1' . $e->getMessage(), $order->getIncrementId())
             );
         }
     }

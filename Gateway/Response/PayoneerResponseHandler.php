@@ -2,12 +2,12 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Response;
 
+use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Response\HandlerInterface;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Order\Payment\Transaction;
-use Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater;
 
 /**
  * Class PayoneerResponseHandler
@@ -46,31 +46,31 @@ class PayoneerResponseHandler implements HandlerInterface
     private $transactionType;
 
     /**
-     * @var TransactionOrderUpdater|null
+     * @var Session
      */
-    private $transactionOrderUpdater;
+    private $session;
 
     /**
      * PayoneerResponseHandler constructor.
      *
      * @param SubjectReader $subjectReader
+     * @param Session $checkoutSession
      * @param string|mixed $additionalInfoKey
      * @param string|mixed $actionSuccessResponseKey
      * @param string $transactionType
-     * @param TransactionOrderUpdater|null $transactionOrderUpdater
      */
     public function __construct(
         SubjectReader $subjectReader,
+        Session $checkoutSession,
         $additionalInfoKey = '',
         $actionSuccessResponseKey = '',
-        $transactionType = '',
-        TransactionOrderUpdater $transactionOrderUpdater = null
+        $transactionType = ''
     ) {
         $this->subjectReader = $subjectReader;
+        $this->session = $checkoutSession;
         $this->additionalInfoKey = $additionalInfoKey;
         $this->actionSuccessResponseKey = $actionSuccessResponseKey;
         $this->transactionType = $transactionType;
-        $this->transactionOrderUpdater = $transactionOrderUpdater;
     }
 
     /**
@@ -88,24 +88,37 @@ class PayoneerResponseHandler implements HandlerInterface
         /** @var Payment $orderPayment */
         $orderPayment = $paymentDO->getPayment();
 
-        $orderincrementId = $paymentDO->getOrder()->getOrderIncrementId();
+        if ($this->session->getFetchNotificationResponse()) {
+            $additionalInfo = $this->session->getFetchNotificationResponse();
+            $longId = $additionalInfo['long_id'];
+            $orderPayment->setTransactionId($longId . '- refund');
+        } else {
+            $additionalInfo = $this->buildAdditionalInfoDataFromResponse($response);
+            if ($this->transactionType == self::REFUND_TXN_TYPE) {
+                $longId = $response['response']['identification']['longId'];
+                $orderPayment->setTransactionId($longId . '- refund');
+            }
+        }
+        if ($this->additionalInfoKey == self::ADDITIONAL_INFO_KEY_REFUND_RESPONSE) {
+            $paymentAdditionalInfo = $orderPayment->getAdditionalInformation();
 
-        $additionalInfo = $this->buildAdditionalInfoDataFromResponse($response);
-        $orderPayment->setAdditionalInformation(
-            $this->additionalInfoKey,
-            $additionalInfo
-        );
+            $refundResponse = isset($paymentAdditionalInfo[$this->additionalInfoKey]) ?
+                $paymentAdditionalInfo[$this->additionalInfoKey] : [];
+            $refundResponse[] = $additionalInfo;
+            $orderPayment->setAdditionalInformation(
+                $this->additionalInfoKey,
+                $refundResponse
+            );
+        } else {
+            $orderPayment->setAdditionalInformation(
+                $this->additionalInfoKey,
+                $additionalInfo
+            );
+        }
         $orderPayment->setTransactionAdditionalInfo(
             Transaction::RAW_DETAILS,
-            $additionalInfo /** @phpstan-ignore-line */
+            $additionalInfo
         );
-
-        if ($this->transactionType == self::REFUND_TXN_TYPE) {
-            /** @phpstan-ignore-next-line */
-            $filteredResponse = $this->transactionOrderUpdater->getFilteredResponse($response);
-            /** @phpstan-ignore-next-line */
-            $this->transactionOrderUpdater->checkAndRefundOrder($orderincrementId, $filteredResponse, true);
-        }
     }
 
     /**
@@ -116,18 +129,22 @@ class PayoneerResponseHandler implements HandlerInterface
      */
     public function buildAdditionalInfoDataFromResponse($response)
     {
-        $additionalInfo = [
-            'resultinfo' => $response['response']['resultInfo'],
-            'returncode_name' => $response['response']['returnCode']['name'],
-            'returncode_source' => $response['response']['returnCode']['source'],
-            'status_code' => $response['response']['status']['code'],
-            'status_reason' => $response['response']['status']['reason'],
-            'interaction_code' => $response['response']['interaction']['code'],
-            'interaction_reason' => $response['response']['interaction']['reason'],
-            'longId' => $response['response']['identification']['longId'],
-            'shortId' => $response['response']['identification']['shortId'],
-            'transactionId' => $response['response']['identification']['transactionId']
-        ];
+        $additionalInfo = [];
+        if (isset($response['response'])) {
+            $additionalInfo = [
+                'resultinfo' => $response['response']['resultInfo'],
+                'returncode_name' => $response['response']['returnCode']['name'],
+                'returncode_source' => $response['response']['returnCode']['source'],
+                'status_code' => $response['response']['status']['code'],
+                'status_reason' => $response['response']['status']['reason'],
+                'interaction_code' => $response['response']['interaction']['code'],
+                'interaction_reason' => $response['response']['interaction']['reason'],
+                'longId' => $response['response']['identification']['longId'],
+                'shortId' => $response['response']['identification']['shortId'],
+                'transactionId' => $response['response']['identification']['transactionId'],
+                'amount' => $response['response']['payment']['amount']
+            ];
+        }
         if (!empty($this->actionSuccessResponseKey)) {
             $additionalInfo[$this->actionSuccessResponseKey] = 'success';
         }

@@ -14,6 +14,7 @@ use Magento\Payment\Gateway\Validator\ResultInterfaceFactory;
 class ResponseValidator extends AbstractValidator
 {
     const REFUND_PAID_OUT_STATUS        = 'paid_out';
+    const REFUND_PAID_OUT_PARTIAL       = 'paid_out_partial';
     const CAPTURE_STATUS                = 'charged';
     const REFUND_CREDITED               = 'refund_credited';
     const AUTH_CANCEL_PENDING_STATUS    = 'pending';
