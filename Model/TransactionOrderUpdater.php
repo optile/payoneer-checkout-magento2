@@ -4,7 +4,8 @@ namespace Payoneer\OpenPaymentGateway\Model;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Pricing\Helper\Data as PriceHelperData;
+use Magento\Framework\Registry;
+use Magento\Sales\Api\CreditmemoManagementInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\Data\TransactionInterface;
@@ -12,6 +13,7 @@ use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderPaymentRepositoryInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
+use Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Order\Payment\Transaction;
@@ -86,9 +88,18 @@ class TransactionOrderUpdater
     protected $orderPaymentRepository;
 
     /**
-     * @var PriceHelperData
+     * @var CreditmemoLoader
      */
-    private $priceHelper;
+    private $creditmemoLoader;
+    /**
+     * @var CreditmemoManagementInterface
+     */
+    private $creditmemoManagement;
+
+    /**
+     * @var Registry
+     */
+    private $registry;
 
     /**
      * TransactionOrderUpdater construct function
@@ -103,7 +114,8 @@ class TransactionOrderUpdater
      * @param SearchCriteriaBuilder $searchCriteria
      * @param TransactionRepositoryInterface $transactionRepository
      * @param OrderPaymentRepositoryInterface $orderPaymentRepository
-     * @param PriceHelperData $priceHelper
+     * @param CreditmemoLoader $creditmemoLoader
+     * @param CreditmemoManagementInterface $creditmemoManagement
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
@@ -116,7 +128,9 @@ class TransactionOrderUpdater
         SearchCriteriaBuilder $searchCriteria,
         TransactionRepositoryInterface $transactionRepository,
         OrderPaymentRepositoryInterface $orderPaymentRepository,
-        PriceHelperData $priceHelper
+        CreditmemoLoader $creditmemoLoader,
+        CreditmemoManagementInterface $creditmemoManagement,
+        Registry $registry
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderTransactionCollectionFactory = $orderTransactionCollectionFactory;
@@ -128,7 +142,9 @@ class TransactionOrderUpdater
         $this->searchCriteria = $searchCriteria;
         $this->transactionRepository = $transactionRepository;
         $this->orderPaymentRepository = $orderPaymentRepository;
-        $this->priceHelper = $priceHelper;
+        $this->creditmemoLoader = $creditmemoLoader;
+        $this->creditmemoManagement = $creditmemoManagement;
+        $this->registry = $registry;
     }
 
     /**
@@ -149,6 +165,9 @@ class TransactionOrderUpdater
         $filteredResponse['amount'] = $response['amount'];
         $filteredResponse['interactionReason'] = $response['interactionReason'];
         $filteredResponse['interactionCode'] = $response['interactionCode'];
+        $filteredResponse['previousReasonCode'] =
+            isset($response['previousReasonCode']) ?
+                $response['previousReasonCode'] : null;
         return $this->processResponse($orderId, $filteredResponse);
     }
 
@@ -322,72 +341,44 @@ class TransactionOrderUpdater
      *
      * @param string|Order $order
      * @param array <mixed> $response
-     * @param bool $isAdmin
      * @return bool|void
      * @throws LocalizedException
      */
-    public function checkAndRefundOrder($order, $response, $isAdmin = false)
+    public function checkAndRefundOrder($order, $response)
     {
         try {
             $orderObj = $this->getOrder($order);
-            $refundedAmount = $orderObj->getTotalRefunded() ?: 0.00;
-
-            $formattedOrderTotal = $orderObj->getBaseCurrency()->formatTxt(
-                $orderObj->getGrandTotal()
-            );
+            $canRefundOrder = $this->canRefund($order, $response);
+            if (!$canRefundOrder) {
+                return true;
+            }
+            if (isset($response['previousReasonCode']) &&
+                $response['reason_code'] == ResponseValidator::REFUND_PAID_OUT_STATUS
+                && $response['previousReasonCode'] == ResponseValidator::REFUND_PAID_OUT_PARTIAL) {
+                return true;
+            }
 
             if ($response['amount'] < $orderObj->getGrandTotal()) {
-                $txnData = [
-                    'additional_info' => $response,
-                    'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE,
-                    'is_transaction_closed' => $orderObj->getState() != Order::STATE_CLOSED ? false : true,
-                    'transaction_type' => Client::REFUND,
-                    'parent_txn_id' => $response['transaction_id'],
-                    'txn_id_post_text' => 'refund',
-                    'long_id' => $response['long_id']
-                ];
-                if (!$isAdmin) {
-                    $txnData['order_comment'] = __(
-                        'Partial amount refunded: %1 of %2.',
-                        $this->priceHelper->currency($response['amount'], true, false),
-                        $formattedOrderTotal
-                    );
-                }
-
-                if ($orderObj->getState() !== Order::STATE_CLOSED) {
-                    $orderObj->setData('total_refunded', ($refundedAmount + $response['amount']));
-                }
-
-                $this->addNewTransactionEntry(
-                    $orderObj,
-                    $txnData
-                );
+                $this->checkAndRefundPartial($orderObj, $response);
                 return true;
             }
             if ($orderObj->getState() == Order::STATE_CLOSED && $response['amount'] == $orderObj->getGrandTotal()) {
                 return true;
             }
-
-            if (!$isAdmin) {
-                $orderObj->setData('total_refunded', 0.00);
-
-                $this->creditmemoCreator->create($orderObj);
-
-                $txnData = [
+            $orderObj->setData('total_refunded', 0.00);
+            $this->creditmemoCreator->create($orderObj);
+            $txnData = [
                     'additional_info' => $response,
                     'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE,
                     'is_transaction_closed' => true,
                     'transaction_type' => Client::REFUND,
-                    'order_comment' => __('Refunded amount %1', $formattedOrderTotal),
                     'parent_txn_id' => $response['transaction_id'],
-                    'txn_id_post_text' => 'refund',
-                    'long_id' => $response['long_id']
+                    'txn_id_post_text' => 'refund'
                 ];
-                $this->addNewTransactionEntry(
-                    $orderObj,
-                    $txnData
-                );
-            }
+            $this->addNewTransactionEntry(
+                $orderObj,
+                $txnData
+            );
         } catch (LocalizedException $le) {
             throw new LocalizedException(
                 __($le->getMessage())
@@ -404,34 +395,19 @@ class TransactionOrderUpdater
      *
      * @param string|Order $order
      * @param array <mixed> $response
+     * @param bool $isAdmin
      * @return bool|void
      * @throws LocalizedException
      */
-    public function checkAndRefundPartial($order, $response)
+    public function checkAndRefundPartial($order, $response, $isAdmin = false)
     {
+        $orderObj = $this->getOrder($order);
         try {
-            $orderObj = $this->getOrder($order);
-            $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
-                $orderObj->getGrandTotal()
-            );
+            if (!$isAdmin) {
+                $this->createCreditMemo($orderObj, $response['amount']);
+            }
 
-            $txnData = [
-                'additional_info' => $response,
-                'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE,
-                'is_transaction_closed' => false,
-                'transaction_type' => Client::REFUND,
-                'order_comment' => __(
-                    'Partial amount refund of %1.',
-                    $this->priceHelper->currency($response['amount'], true, false),
-                    $orderTotal
-                ),
-                'parent_txn_id' => $response['transaction_id'],
-                'txn_id_post_text' => 'refund'
-            ];
-            $this->addNewTransactionEntry(
-                $orderObj,
-                $txnData
-            );
+            $this->createNewTransactionEntry($orderObj, $response);
         } catch (LocalizedException $le) {
             throw new LocalizedException(
                 __($le->getMessage())
@@ -441,6 +417,102 @@ class TransactionOrderUpdater
                 __('Something went wrong while partial refunding the order.')
             );
         }
+    }
+
+    /**
+     * @param string|Order $order
+     * @param array <mixed> $response
+     * @return void
+     * @throws LocalizedException
+     */
+    public function createNewTransactionEntry($order, $response)
+    {
+        $orderObj = $this->getOrder($order);
+        $refundedAmount = $orderObj->getTotalRefunded() ?: 0.00;
+        $txnData = [
+            'additional_info' => $response,
+            'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE,
+            'is_transaction_closed' => $orderObj->getState() != Order::STATE_CLOSED ? false : true,
+            'transaction_type' => Client::REFUND,
+            'parent_txn_id' => $response['transaction_id'],
+            'txn_id_post_text' => 'refund'
+
+        ];
+        if ($orderObj->getState() !== Order::STATE_CLOSED) {
+            $orderObj->setData('total_refunded', ($refundedAmount + $response['amount']));
+        }
+        $this->addNewTransactionEntry(
+            $orderObj,
+            $txnData
+        );
+    }
+
+    /**
+     * @param Order $orderObj
+     * @param float $amount
+     * @return void
+     */
+    public function createCreditMemo($orderObj, $amount)
+    {
+        try {
+            if ($this->registry->registry('current_creditmemo')) {
+                $this->registry->unregister('current_creditmemo');
+            }
+
+            $creditMemoData = [];
+            $creditMemoData['do_offline'] = 0;
+            $creditMemoData['shipping_amount'] = 0;
+            $creditMemoData['subtotal'] = 0;
+            $creditMemoData['adjustment_positive'] = $amount;
+            $creditMemoData['adjustment_negative'] = 0;
+            $creditMemoData['send_email'] = 0;
+            $itemsToCredit = [];
+            foreach ($orderObj->getAllVisibleItems() as $item) {
+                $itemsToCredit[$item->getId()] = ['qty'=>0];
+            }
+            $creditMemoData['items'] = $itemsToCredit;
+            $this->creditmemoLoader->setOrderId($orderObj->getEntityId()); //pass order id
+            $this->creditmemoLoader->setCreditmemo($creditMemoData);
+
+            $creditmemo = $this->creditmemoLoader->load();
+            if ($creditmemo) {
+                if (!$creditmemo->isValidGrandTotal()) {
+                    throw new \Magento\Framework\Exception\LocalizedException(
+                        __('The credit memo\'s total must be positive.')
+                    );
+                }
+
+                $creditmemo->getOrder()->setCustomerNoteNotify(0);
+                $this->creditmemoManagement->refund($creditmemo, (bool)$creditMemoData['do_offline']);
+
+                $this->adminHelper->showSuccessMessage(__('You created the credit memo.'));
+            }
+        } catch (\Magento\Framework\Exception\LocalizedException $e) {
+            $this->adminHelper->showErrorMessage($e->getMessage());
+        } catch (\Exception $e) {
+            $this->adminHelper->showErrorMessage(__('We can\'t save the credit memo right now.'));
+        }
+    }
+
+    /**
+     * @param string|Order $order
+     * @param array <mixed> $response
+     * @return bool
+     * @throws LocalizedException
+     */
+    public function canRefund($order, $response)
+    {
+        $orderObj = $this->getOrder($order);
+        if ($response['reason_code'] == ResponseValidator::REFUND_PAID_OUT_STATUS) {
+            if (isset($response['previousReasonCode'])
+                && $response['previousReasonCode'] == ResponseValidator::REFUND_PAID_OUT_PARTIAL
+            ) {
+                return false;
+            } elseif ($orderObj->getTotalRefunded() >= $orderObj->getGrandTotal()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -681,7 +753,6 @@ class TransactionOrderUpdater
                 $payment,
                 $data
             );
-
             if (isset($data['order_comment'])) {
                 $payment->addTransactionCommentsToOrder(
                     $transaction,
@@ -751,8 +822,9 @@ class TransactionOrderUpdater
     private function getFinalTransactionId($data)
     {
         $postText = isset($data['txn_id_post_text']) ? $data['txn_id_post_text'] : null;
-        $longId = isset($data['long_id']) ? $data['long_id'] : null;
+        $longId = isset($data['additional_info']['long_id']) ? $data['additional_info']['long_id'] : null;
         $txnId = $data['additional_info']['transaction_id'];
+
         if ($postText == Client::REFUND && $longId) {
             return $longId . '-' . $data['txn_id_post_text'];
         }

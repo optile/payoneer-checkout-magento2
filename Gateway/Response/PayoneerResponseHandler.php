@@ -104,7 +104,7 @@ class PayoneerResponseHandler implements HandlerInterface
             /** @phpstan-ignore-next-line */
             $filteredResponse = $this->transactionOrderUpdater->getFilteredResponse($response);
             /** @phpstan-ignore-next-line */
-            $this->transactionOrderUpdater->checkAndRefundOrder($orderincrementId, $filteredResponse, true);
+            $this->transactionOrderUpdater->createNewTransactionEntry($orderincrementId, $filteredResponse);
         }
     }
 
