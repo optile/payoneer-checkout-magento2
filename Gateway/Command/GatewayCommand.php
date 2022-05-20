@@ -1,7 +1,9 @@
 <?php
 namespace Payoneer\OpenPaymentGateway\Gateway\Command;
 
+use Magento\Checkout\Model\Session;
 use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Payment\Gateway\Command\ResultInterface as CommandResultInterface;
 use Magento\Payment\Gateway\CommandInterface;
 use Magento\Payment\Gateway\ErrorMapper\ErrorMessageMapperInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
@@ -14,7 +16,6 @@ use Magento\Payment\Gateway\Validator\ResultInterface;
 use Magento\Payment\Gateway\Validator\ValidatorInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactoryInterface;
 use Psr\Log\LoggerInterface;
-use Magento\Payment\Gateway\Command\ResultInterface as CommandResultInterface;
 
 /**
  * Class GatewayCommand
@@ -59,23 +60,29 @@ class GatewayCommand implements CommandInterface
     private $errorMessageMapper;
 
     /**
+     * @var Session
+     */
+    private $session;
+
+    /**
      * Gateway command constructor
      *
      * @param BuilderInterface $requestBuilder
      * @param TransferFactoryInterface $transferFactory
      * @param ClientInterface $client
      * @param LoggerInterface $logger
+     * @param Session $checkoutSession
      * @param HandlerInterface $handler
      * @param ValidatorInterface $validator
      * @param ErrorMessageMapperInterface|null $errorMessageMapper
      *
-     * @return void
      */
     public function __construct(
         BuilderInterface $requestBuilder,
         TransferFactoryInterface $transferFactory,
         ClientInterface $client,
         LoggerInterface $logger,
+        Session $checkoutSession,
         HandlerInterface $handler = null,
         ValidatorInterface $validator = null,
         ErrorMessageMapperInterface $errorMessageMapper = null
@@ -84,6 +91,7 @@ class GatewayCommand implements CommandInterface
         $this->transferFactory = $transferFactory;
         $this->client = $client;
         $this->logger = $logger;
+        $this->session = $checkoutSession;
         $this->handler = $handler;
         $this->validator = $validator;
         $this->errorMessageMapper = $errorMessageMapper;
@@ -100,21 +108,27 @@ class GatewayCommand implements CommandInterface
      */
     public function execute(array $commandSubject)
     {
+        $response = [];
         $payment = SubjectReader::readPayment($commandSubject);
         $transferO = $this->transferFactory->create(
             $this->requestBuilder->build($commandSubject),
             $payment
         );
+        //process payoneer request only if it is not via fetch or notification
+        if ($this->session->getFetchNotificationResponse()) {
+            $response = $this->session->getFetchNotificationResponse();
+        } else {
+            $response = $this->client->placeRequest($transferO);
 
-        $response = $this->client->placeRequest($transferO);
-
-        if ($this->validator !== null) {
-            $result = $this->validator->validate(
-                array_merge($commandSubject, ['response' => $response])
-            );
-            if (!$result->isValid()) {
-                $this->processErrors($result);
+            if ($this->validator !== null) {
+                $result = $this->validator->validate(
+                    array_merge($commandSubject, ['response' => $response])
+                );
+                if (!$result->isValid()) {
+                    $this->processErrors($result);
+                }
             }
+
         }
 
         if ($this->handler) {
@@ -122,6 +136,10 @@ class GatewayCommand implements CommandInterface
                 $commandSubject,
                 $response
             );
+        }
+
+        if ($this->session->getFetchNotificationResponse()) {
+            $this->session->unsFetchNotificationResponse();
         }
 
         return $response;

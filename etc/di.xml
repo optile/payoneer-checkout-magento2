@@ -305,7 +305,7 @@
         </arguments>
     </virtualType>
 
-    <!-- Payoneer List Request -->
+    <!-- Payoneer Refund Request -->
     <virtualType name="PayoneerRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
         <arguments>
             <argument name="builders" xsi:type="array">
@@ -327,7 +327,6 @@
         <arguments>
             <argument name="additionalInfoKey" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::ADDITIONAL_INFO_KEY_REFUND_RESPONSE</argument>
             <argument name="transactionType" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler::REFUND_TXN_TYPE</argument>
-            <argument name="transactionOrderUpdater" xsi:type="object">Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater</argument>
         </arguments>
     </virtualType>
 

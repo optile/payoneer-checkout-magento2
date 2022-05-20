@@ -2,6 +2,7 @@
 
 namespace Payoneer\OpenPaymentGateway\Model;
 
+use Magento\Checkout\Model\Session;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
@@ -15,6 +16,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Sales\Model\Order\Payment\Transaction\BuilderInterface;
@@ -102,6 +104,16 @@ class TransactionOrderUpdater
     private $registry;
 
     /**
+     * @var Invoice
+     */
+    private $invoice;
+
+    /**
+     * @var Session
+     */
+    private $session;
+
+    /**
      * TransactionOrderUpdater construct function
      *
      * @param OrderCollectionFactory $orderCollectionFactory
@@ -116,6 +128,9 @@ class TransactionOrderUpdater
      * @param OrderPaymentRepositoryInterface $orderPaymentRepository
      * @param CreditmemoLoader $creditmemoLoader
      * @param CreditmemoManagementInterface $creditmemoManagement
+     * @param Invoice $invoice
+     * @param Registry $registry
+     * @param Session $checkoutSession
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
@@ -130,7 +145,9 @@ class TransactionOrderUpdater
         OrderPaymentRepositoryInterface $orderPaymentRepository,
         CreditmemoLoader $creditmemoLoader,
         CreditmemoManagementInterface $creditmemoManagement,
-        Registry $registry
+        Invoice $invoice,
+        Registry $registry,
+        Session $checkoutSession
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderTransactionCollectionFactory = $orderTransactionCollectionFactory;
@@ -145,6 +162,8 @@ class TransactionOrderUpdater
         $this->creditmemoLoader = $creditmemoLoader;
         $this->creditmemoManagement = $creditmemoManagement;
         $this->registry = $registry;
+        $this->invoice = $invoice;
+        $this->session = $checkoutSession;
     }
 
     /**
@@ -346,6 +365,7 @@ class TransactionOrderUpdater
      */
     public function checkAndRefundOrder($order, $response)
     {
+        $this->session->setFetchNotificationResponse($response);
         try {
             $orderObj = $this->getOrder($order);
             $canRefundOrder = $this->canRefund($order, $response);
@@ -366,6 +386,7 @@ class TransactionOrderUpdater
                 return true;
             }
             $orderObj->setData('total_refunded', 0.00);
+            $this->clearRegistry();
             $this->creditmemoCreator->create($orderObj);
             $txnData = [
                     'additional_info' => $response,
@@ -395,19 +416,16 @@ class TransactionOrderUpdater
      *
      * @param string|Order $order
      * @param array <mixed> $response
-     * @param bool $isAdmin
      * @return bool|void
      * @throws LocalizedException
      */
-    public function checkAndRefundPartial($order, $response, $isAdmin = false)
+    public function checkAndRefundPartial($order, $response)
     {
         $orderObj = $this->getOrder($order);
         try {
-            if (!$isAdmin) {
-                $this->createCreditMemo($orderObj, $response['amount']);
-            }
+            $this->createCreditMemo($orderObj, $response['amount']);
 
-            $this->createNewTransactionEntry($orderObj, $response);
+            //$this->createNewTransactionEntry($orderObj, $response);
         } catch (LocalizedException $le) {
             throw new LocalizedException(
                 __($le->getMessage())
@@ -420,34 +438,6 @@ class TransactionOrderUpdater
     }
 
     /**
-     * @param string|Order $order
-     * @param array <mixed> $response
-     * @return void
-     * @throws LocalizedException
-     */
-    public function createNewTransactionEntry($order, $response)
-    {
-        $orderObj = $this->getOrder($order);
-        $refundedAmount = $orderObj->getTotalRefunded() ?: 0.00;
-        $txnData = [
-            'additional_info' => $response,
-            'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_PARTIAL_REFUND_RESPONSE,
-            'is_transaction_closed' => $orderObj->getState() != Order::STATE_CLOSED ? false : true,
-            'transaction_type' => Client::REFUND,
-            'parent_txn_id' => $response['transaction_id'],
-            'txn_id_post_text' => 'refund'
-
-        ];
-        if ($orderObj->getState() !== Order::STATE_CLOSED) {
-            $orderObj->setData('total_refunded', ($refundedAmount + $response['amount']));
-        }
-        $this->addNewTransactionEntry(
-            $orderObj,
-            $txnData
-        );
-    }
-
-    /**
      * @param Order $orderObj
      * @param float $amount
      * @return void
@@ -455,9 +445,7 @@ class TransactionOrderUpdater
     public function createCreditMemo($orderObj, $amount)
     {
         try {
-            if ($this->registry->registry('current_creditmemo')) {
-                $this->registry->unregister('current_creditmemo');
-            }
+            $this->clearRegistry();
 
             $creditMemoData = [];
             $creditMemoData['do_offline'] = 0;
@@ -483,6 +471,10 @@ class TransactionOrderUpdater
                 }
 
                 $creditmemo->getOrder()->setCustomerNoteNotify(0);
+                $invoiceObj = $this->getInvoice($orderObj);
+                if ($invoiceObj) {
+                    $creditmemo->setInvoice($invoiceObj);/** @phpstan-ignore-line */
+                }
                 $this->creditmemoManagement->refund($creditmemo, (bool)$creditMemoData['do_offline']);
 
                 $this->adminHelper->showSuccessMessage(__('You created the credit memo.'));
@@ -492,6 +484,33 @@ class TransactionOrderUpdater
         } catch (\Exception $e) {
             $this->adminHelper->showErrorMessage(__('We can\'t save the credit memo right now.'));
         }
+    }
+
+    /**
+     * @return void
+     */
+    public function clearRegistry()
+    {
+        if ($this->registry->registry('current_creditmemo')) {
+            $this->registry->unregister('current_creditmemo');
+        }
+    }
+
+    /**
+     * @param Order $orderObj
+     * @return bool|Invoice
+     */
+    public function getInvoice($orderObj)
+    {
+        $invoiceIncrementId = null;
+        $invoices = $orderObj->getInvoiceCollection();
+        foreach ($invoices as $invoice) {
+            $invoiceIncrementId = $invoice->getIncrementId();
+        }
+        if ($invoiceIncrementId) {
+            return $this->invoice->loadByIncrementId($invoiceIncrementId);
+        }
+        return false;
     }
 
     /**
