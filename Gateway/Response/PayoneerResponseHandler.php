@@ -90,7 +90,7 @@ class PayoneerResponseHandler implements HandlerInterface
 
         if ($this->session->getFetchNotificationResponse()) {
             $additionalInfo = $this->session->getFetchNotificationResponse();
-            $longId = $additionalInfo['long_id'];
+            $longId = $additionalInfo['longId'];
             $orderPayment->setTransactionId($longId . '- refund');
         } else {
             $additionalInfo = $this->buildAdditionalInfoDataFromResponse($response);
