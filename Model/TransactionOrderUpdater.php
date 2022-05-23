@@ -180,7 +180,7 @@ class TransactionOrderUpdater
         $filteredResponse['transaction_id'] = $response['transactionId'];
         $filteredResponse['status_code'] = $response['statusCode'];
         $filteredResponse['reason_code'] = $response['reasonCode'];
-        $filteredResponse['long_id'] = $response['longId'];
+        $filteredResponse['longId'] = $response['longId'];
         $filteredResponse['amount'] = $response['amount'];
         $filteredResponse['interactionReason'] = $response['interactionReason'];
         $filteredResponse['interactionCode'] = $response['interactionCode'];
@@ -216,7 +216,7 @@ class TransactionOrderUpdater
         $filteredResponse['transaction_id'] = $actualResponse['identification']['transactionId'];
         $filteredResponse['status_code'] = $actualResponse['status']['code'];
         $filteredResponse['reason_code'] = $actualResponse['status']['reason'];
-        $filteredResponse['long_id'] = $actualResponse['identification']['longId'];
+        $filteredResponse['longId'] = $actualResponse['identification']['longId'];
         $filteredResponse['amount'] = $actualResponse['payment']['amount'];
         $filteredResponse['interactionReason'] = $actualResponse['interaction']['reason'];
         $filteredResponse['interactionCode'] = $actualResponse['interaction']['code'];
@@ -522,15 +522,14 @@ class TransactionOrderUpdater
     public function canRefund($order, $response)
     {
         $orderObj = $this->getOrder($order);
-        $newRefundLongId = $response['long_id'];
+        $newRefundLongId = $response['longId'];
         $additionalInformation = $orderObj->getPayment()->getAdditionalInformation();
 
         $refundResponse = isset($additionalInformation['refund_response']) ?
             $additionalInformation['refund_response'] : null;
-
         if (is_array($refundResponse)) {
-            foreach ($refundResponse as $response) {
-                if ($newRefundLongId == $response['longId']) {
+            foreach ($refundResponse as $responseItem) {
+                if ($newRefundLongId == $responseItem['longId']) {
                     return false;
                 }
             }
@@ -577,7 +576,7 @@ class TransactionOrderUpdater
             );
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while cancelling the authorization.' . $e->getMessage())
+                __('Something went wrong while cancelling the authorization.')
             );
         }
     }
@@ -855,7 +854,7 @@ class TransactionOrderUpdater
     private function getFinalTransactionId($data)
     {
         $postText = isset($data['txn_id_post_text']) ? $data['txn_id_post_text'] : null;
-        $longId = isset($data['additional_info']['long_id']) ? $data['additional_info']['long_id'] : null;
+        $longId = isset($data['additional_info']['longId']) ? $data['additional_info']['longId'] : null;
         $txnId = $data['additional_info']['transaction_id'];
 
         if ($postText == Client::REFUND && $longId) {
