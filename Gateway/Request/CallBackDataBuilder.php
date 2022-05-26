@@ -57,9 +57,10 @@ class CallBackDataBuilder implements BuilderInterface
         $token = $payment->getPayment()->getAdditionalInformation(Config::TOKEN);
         $notificationToken = $payment->getPayment()->getAdditionalInformation(Config::TOKEN_NOTIFICATION);
         $orderId = $payment->getOrder()->getOrderIncrementId();
+        $cartId = $this->getQuoteIdFromSession();
 
-        $successParams = ['cart_id' => $this->getQuoteIdFromSession(), 'token' => $token];
-        $cancelParams = ['error' => true];
+        $successParams = ['cart_id' => $cartId, 'token' => $token];
+        $cancelParams = ['cart_id' => $cartId, 'error' => true];
 
         return [
             Config::CALLBACK => [

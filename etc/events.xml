@@ -13,4 +13,7 @@
     <event name="sales_order_payment_place_end">
         <observer name="payoneer_update_order_status" instance="Payoneer\OpenPaymentGateway\Observer\UpdateOrderStatusObserver"/>
     </event>
+    <event name="sales_order_place_after">
+        <observer name="payoneer_redirect_previous_cart" instance="Payoneer\OpenPaymentGateway\Observer\RedirectCartObserver" />
+    </event>
 </config>

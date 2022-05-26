@@ -4,7 +4,6 @@ namespace Payoneer\OpenPaymentGateway\Model\Adminhtml;
 
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
@@ -16,8 +15,8 @@ use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\Service\InvoiceService;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
 use Payoneer\OpenPaymentGateway\Gateway\Response\PayoneerResponseHandler;
+use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
 
 /**
  * Class Helper
@@ -177,16 +176,12 @@ class Helper
 
     /**
      * @param int $orderId
-     * @return OrderInterface|null
+     * @return OrderInterface
      */
     public function getOrder($orderId)
     {
         if (!$this->order instanceof OrderInterface) {
-            try {
-                $this->order = $this->orderRepository->get($orderId);
-            } catch (NoSuchEntityException $e) {
-                return null;
-            }
+            $this->order = $this->orderRepository->get($orderId);
         }
         return $this->order;
     }
