@@ -210,17 +210,6 @@ class Helper
     }
 
     /**
-     * Get reorder URL
-     *
-     * @param object $order
-     * @return string
-     */
-    public function getReorderUrl($order)
-    {
-        return $this->urlBuilder->getUrl('sales/order/reorder', ['order_id' => $this->getLastOrderId()]);
-    }
-
-    /**
      * Get the static file's path
      * @param string $fileId
      * @param array <mixed> $params
