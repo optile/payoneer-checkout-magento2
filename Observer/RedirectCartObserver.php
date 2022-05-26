@@ -73,7 +73,7 @@ class RedirectCartObserver implements ObserverInterface
      */
     public function setOrderStatus($order)
     {
-        $order->setState('payment_review')->setStatus('payment_review');
+        $order->setState('canceled')->setStatus('canceled');
         $this->orderRepository->save($order);
     }
 }

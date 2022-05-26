@@ -5,10 +5,6 @@ namespace Payoneer\OpenPaymentGateway\Controller\Redirect;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
-use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\CsrfAwareActionInterface;
-use Magento\Framework\App\Request\InvalidRequestException;
-use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
@@ -17,17 +13,15 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
-use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
-use Payoneer\OpenPaymentGateway\Http\PayoneerClient;
 use Payoneer\OpenPaymentGateway\Model\Helper;
 
 /**
  * Class Cancel
  * Process CANCEL request
  */
-class Cancel implements HttpGetActionInterface, HttpPostActionInterface, CsrfAwareActionInterface
+class Cancel implements HttpGetActionInterface
 {
     /**
      * @var Context
@@ -129,15 +123,5 @@ class Cancel implements HttpGetActionInterface, HttpPostActionInterface, CsrfAwa
 
             $this->helper->placeOrder($reqParams['cart_id']);
         }
-    }
-
-    public function createCsrfValidationException(RequestInterface $request): ? InvalidRequestException
-    {
-        return null;
-    }
-
-    public function validateForCsrf(RequestInterface $request): ?bool
-    {
-        return true;
     }
 }
