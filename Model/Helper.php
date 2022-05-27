@@ -14,7 +14,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Module\ModuleListInterface;
-use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Quote\Api\CartManagementInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -74,14 +73,12 @@ class Helper
      * @var CartManagementInterface
      */
     private $cartManagement;
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
+
     /**
      * @var CheckoutSessionFactory
      */
     private $checkoutSessionFactory;
+
     /**
      * @var OrderRepositoryInterface
      */
@@ -112,7 +109,6 @@ class Helper
      * @param ModuleListInterface $moduleList
      * @param CheckoutSession $checkoutSession
      * @param CartManagementInterface $cartManagement
-     * @param UrlInterface $urlBuilder
      * @param OrderRepositoryInterface $orderRepository
      * @param CheckoutSessionFactory $checkoutSessionFactory
      * @param ProductRepositoryInterface $productRepository
@@ -129,7 +125,6 @@ class Helper
         ModuleListInterface $moduleList,
         CheckoutSession $checkoutSession,
         CartManagementInterface $cartManagement,
-        UrlInterface $urlBuilder,
         OrderRepositoryInterface $orderRepository,
         CheckoutSessionFactory $checkoutSessionFactory,
         ProductRepositoryInterface $productRepository,
@@ -145,7 +140,6 @@ class Helper
         $this->moduleList = $moduleList;
         $this->checkoutSession = $checkoutSession;
         $this->cartManagement = $cartManagement;
-        $this->urlBuilder = $urlBuilder;
         $this->orderRepository = $orderRepository;
         $this->checkoutSessionFactory = $checkoutSessionFactory;
         $this->productRepository = $productRepository;
@@ -197,7 +191,6 @@ class Helper
             }
             $this->cartRepository->save($quote);
             $session->replaceQuote($quote)->unsLastRealOrderId();
-
         } catch (LocalizedException $e) {
             throw new LocalizedException(
                 __($e->getMessage())
@@ -318,6 +311,16 @@ class Helper
         if ($this->checkoutSession->getPayoneerInvalidTxn()) {
             $this->checkoutSession->unsPayoneerInvalidTxn();
         }
+    }
+
+    /**
+     * Set invalid transaction session
+     *
+     * @return void
+     */
+    public function setPayoneerInvalidTxnSession()
+    {
+        $this->checkoutSession->setPayoneerInvalidTxn(true);
     }
 
     /**
