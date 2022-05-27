@@ -2,7 +2,6 @@
 
 namespace Payoneer\OpenPaymentGateway\Controller\Redirect;
 
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ResponseInterface;
@@ -15,6 +14,9 @@ use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
+use Magento\Sales\Api\TransactionRepositoryInterface;
+use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory as OrderTransactionCollectionFactory;
 use Payoneer\OpenPaymentGateway\Model\Helper;
 
 /**
@@ -39,10 +41,6 @@ class Cancel implements HttpGetActionInterface
     private $resultPageFactory;
 
     /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
-    /**
      * @var Helper
      */
     private $helper;
@@ -53,28 +51,41 @@ class Cancel implements HttpGetActionInterface
     protected $resultRedirectFactory;
 
     /**
+     * @var TransactionRepositoryInterface
+     */
+    private $transactionRepository;
+
+    /**
+     * @var OrderTransactionCollectionFactory
+     */
+    protected $orderTransactionCollectionFactory;
+
+    /**
      * Helper constructor.
      * @param Context $context
      * @param CartRepositoryInterface $cartRepository
      * @param PageFactory $resultPageFactory
-     * @param CheckoutSession $checkoutSession
      * @param Helper $helper
      * @param RedirectFactory $resultRedirectFactory
+     * @param TransactionRepositoryInterface $transactionRepository
+     * @param OrderTransactionCollectionFactory $orderTransactionCollectionFactory
      */
     public function __construct(
         Context $context,
         CartRepositoryInterface $cartRepository,
         PageFactory $resultPageFactory,
-        CheckoutSession $checkoutSession,
         Helper $helper,
-        RedirectFactory $resultRedirectFactory
+        RedirectFactory $resultRedirectFactory,
+        TransactionRepositoryInterface $transactionRepository,
+        OrderTransactionCollectionFactory $orderTransactionCollectionFactory
     ) {
         $this->context = $context;
         $this->cartRepository = $cartRepository;
         $this->resultPageFactory = $resultPageFactory;
-        $this->checkoutSession = $checkoutSession;
         $this->helper = $helper;
         $this->resultRedirectFactory = $resultRedirectFactory;
+        $this->transactionRepository = $transactionRepository;
+        $this->orderTransactionCollectionFactory = $orderTransactionCollectionFactory;
     }
 
     /**
@@ -85,11 +96,13 @@ class Cancel implements HttpGetActionInterface
         $reqParams = $this->context->getRequest()->getParams();
 
         try {
-            $this->checkoutSession->setPayoneerInvalidTxn(true);
-
+            $this->helper->setPayoneerInvalidTxnSession();
+            // Place order with invalid transaction details
             $this->saveCartAndPlaceOrder($reqParams);
-
+            // Redirect to cart with previous cart data
             $this->helper->redirectToReorderCart();
+            // Update the invalid order transaction type to void
+            $this->updateTransactionType();
 
             return $this->resultRedirectFactory->create()->setPath('checkout/cart');
         } catch (\Exception $e) {
@@ -122,6 +135,25 @@ class Cancel implements HttpGetActionInterface
             $this->cartRepository->save($quote);
 
             $this->helper->placeOrder($reqParams['cart_id']);
+        }
+    }
+
+    /**
+     * Updates transaction type to 'void'
+     *
+     * @return void
+     */
+    public function updateTransactionType()
+    {
+        $orderId = $this->helper->getLastOrderId();
+        $collection = $this->orderTransactionCollectionFactory->create();
+        $collection->addOrderIdFilter($orderId);
+        if ($collection->getSize()) {
+            /** @var  Transaction $transaction */
+            $transaction = $collection->getFirstItem();
+            $transaction->setTxnType('void');
+            $transaction->setIsClosed(1);
+            $this->transactionRepository->save($transaction);
         }
     }
 }
