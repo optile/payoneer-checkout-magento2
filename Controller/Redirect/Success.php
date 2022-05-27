@@ -31,11 +31,6 @@ class Success implements HttpGetActionInterface
     private $context;
 
     /**
-     * @var CartManagementInterface
-     */
-    private $cartManagement;
-
-    /**
      * @var CartRepositoryInterface
      */
     private $cartRepository;
@@ -63,7 +58,6 @@ class Success implements HttpGetActionInterface
     /**
      * Success constructor.
      * @param Context $context
-     * @param CartManagementInterface $cartManagement
      * @param CartRepositoryInterface $cartRepository
      * @param PageFactory $resultPageFactory
      * @param Helper $helper
@@ -72,7 +66,6 @@ class Success implements HttpGetActionInterface
      */
     public function __construct(
         Context $context,
-        CartManagementInterface $cartManagement,
         CartRepositoryInterface $cartRepository,
         PageFactory $resultPageFactory,
         Helper $helper,
@@ -80,7 +73,6 @@ class Success implements HttpGetActionInterface
         Config $config
     ) {
         $this->context = $context;
-        $this->cartManagement = $cartManagement;
         $this->cartRepository = $cartRepository;
         $this->resultPageFactory = $resultPageFactory;
         $this->helper = $helper;
@@ -112,7 +104,7 @@ class Success implements HttpGetActionInterface
                 ) {
                     return $this->redirectToCart();
                 } else {
-                    foreach ($this->context->getRequest()->getParams() as $key => $value) {
+                    foreach ($reqParams as $key => $value) {
                         $payment->setAdditionalInformation($key, $value);
                     }
                     if ($this->config->getValue('payment_action') == AdminFields::CAPTURE) {
@@ -126,23 +118,19 @@ class Success implements HttpGetActionInterface
                 }
 
                 if (!$quote->getCustomerId()) {
-                    $quote->setCheckoutMethod(CartManagementInterface::METHOD_GUEST);
-                    $customerEmail =  $quote->getCustomerEmail() ?: $quote->getBillingAddress()->getEmail();
-                    if (!$customerEmail) {
-                        $quote->setCustomerEmail($this->checkoutSession->getPayoneerCustomerEmail());
-                    }
+                    $quote = $this->helper->setGuestCustomerEmail($quote);
                 } else {
-                    $this->unsetPayoneerCustomerEmailSession();
+                    $this->helper->unsetPayoneerCustomerEmailSession();
                 }
                 $this->cartRepository->save($quote);
 
                 if ($quoteData['grand_total'] != $reqParams['amount']) {
                     $this->checkoutSession->setUpdateOrderStatus(true);
                 }
-
-                $this->cartManagement->placeOrder($cartId);
-
-                $this->unsetPayoneerCountryIdSession();
+                //Place order in magento
+                $this->helper->placeOrder($cartId);
+                //Unset custom Payoneer sessions
+                $this->helper->unsetPayoneerCountryIdSession();
                 return $this->resultPageFactory->create();
             } else {
                 return $this->redirectToCart();
@@ -162,30 +150,5 @@ class Success implements HttpGetActionInterface
             $message = 'Something went wrong while processing payment. Invalid response from Payoneer';
         }
         return $this->helper->redirectToCart(__($message));
-    }
-
-    /**
-     * Unset custom checkout session variable
-     * @return void
-     */
-    public function unsetPayoneerCustomerEmailSession()
-    {
-        if ($this->checkoutSession->getPayoneerCustomerEmail()) {
-            $this->checkoutSession->unsPayoneerCustomerEmail();
-        }
-    }
-
-    /**
-     * Unset custom checkout session variable
-     * @return void
-     */
-    public function unsetPayoneerCountryIdSession()
-    {
-        if ($this->checkoutSession->getShippingCountryId()) {
-            $this->checkoutSession->unsShippingCountryId();
-        }
-        if ($this->checkoutSession->getBillingCountryId()) {
-            $this->checkoutSession->unsBillingCountryId();
-        }
     }
 }
