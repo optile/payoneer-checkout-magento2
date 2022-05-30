@@ -19,12 +19,12 @@ class RefundTransferFactory extends TransferFactory
     {
         $payment = $payment->getPayment();
         $captureResponse = $payment->getAdditionalInformation('capture_response');
+
         if ($captureResponse) {
-            $longId = $captureResponse['longId'];
+            $longId = isset($captureResponse['longId']) ? $captureResponse['longId'] : null;
         } else {
             $longId = $payment->getAdditionalInformation('longId');
         }
-
         return sprintf(
             Config::REFUND_END_POINT,
             $longId
