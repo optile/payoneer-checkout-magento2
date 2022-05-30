@@ -103,8 +103,12 @@ class Cancel implements HttpGetActionInterface
             $this->helper->redirectToReorderCart();
             // Update the invalid order transaction type to void
             $this->updateTransactionType();
+            //Add comment to the order
+            $this->helper->addCommentToOrder();
 
-            return $this->resultRedirectFactory->create()->setPath('checkout/cart');
+            return $this->helper->redirectToCart(
+                __('Something went wrong while processing payment.')
+            );
         } catch (\Exception $e) {
             return $this->resultPageFactory->create();
         }
