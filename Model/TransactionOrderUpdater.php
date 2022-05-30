@@ -38,6 +38,7 @@ use Payoneer\OpenPaymentGateway\Model\Creditmemo\CreditmemoCreator;
 class TransactionOrderUpdater
 {
     const PRE_AUTHORIZED_STATUS = 'preauthorized';
+    const TXN_TYPE_CAPTURE      = 'payoneerCapture';
 
     /**
      * @var OrderCollectionFactory
@@ -187,7 +188,7 @@ class TransactionOrderUpdater
         $filteredResponse['previousReasonCode'] =
             isset($response['previousReasonCode']) ?
                 $response['previousReasonCode'] : null;
-        return $this->processResponse($orderId, $filteredResponse);
+        return $this->processResponse($orderId, $filteredResponse, true);
     }
 
     /**
@@ -230,10 +231,11 @@ class TransactionOrderUpdater
      *
      * @param string|Order $order
      * @param array <mixed> $response
+     * @param bool $notification
      * @return bool|void
      * @throws LocalizedException
      */
-    public function processResponse($order, $response)
+    public function processResponse($order, $response, $notification = false)
     {
         switch ([$response['status_code'], $response['reason_code']]) {
             case [self::PRE_AUTHORIZED_STATUS, self::PRE_AUTHORIZED_STATUS]:
@@ -244,7 +246,7 @@ class TransactionOrderUpdater
             case [Helper::CHARGED, Helper::DEBITED]:
             case [Helper::CHARGED, Helper::CAPTURE_CLOSED]:
                 if ($this->isValidOrder($order, $response)) {
-                    return $this->checkAndCaptureOrder($order, $response);
+                    return $this->checkAndCaptureOrder($order, $response, $notification);
                 }
                 break;
             case [ResponseValidator::REFUND_PAID_OUT_STATUS, ResponseValidator::REFUND_CREDITED]:
@@ -663,15 +665,24 @@ class TransactionOrderUpdater
     /**
      * @param Order $orderObj
      * @param string $transactionType
+     * @param null|array <mixed> $response
      * @return void
      */
-    public function setAdditionalInformation($orderObj, $transactionType)
+    public function setAdditionalInformation($orderObj, $transactionType, $response = null)
     {
         $payment = $orderObj->getPayment();
         if ($payment) {
             $additionalInformation = $payment->getAdditionalInformation();
             $additionalInformation = array_merge($additionalInformation, [$transactionType => 'success']);
-            $payment->setAdditionalInformation($additionalInformation);
+            if ($transactionType == PayoneerResponseHandler::ADDITIONAL_INFO_KEY_CAPTURE_RESPONSE) {
+                $additionalInformation = array_merge(
+                    $additionalInformation,
+                    [$transactionType => $response]
+                );
+            }
+            $payment->setAdditionalInformation($additionalInformation);/** @phpstan-ignore-line */
+            $orderObj->setPayment($payment);
+            $this->orderRepository->save($orderObj);
         }
     }
 
@@ -680,19 +691,28 @@ class TransactionOrderUpdater
      *
      * @param string|Order $order
      * @param array <mixed> $response
+     * @param bool $notification
      * @return bool|void
      * @throws LocalizedException
      */
-    public function checkAndCaptureOrder($order, $response)
+    public function checkAndCaptureOrder($order, $response, $notification = false)
     {
         try {
             $orderObj = $this->getOrder($order);
+            if ($notification && $response['reason_code'] == Helper::DEBITED) {
+                $this->setAdditionalInformation(
+                    $orderObj,
+                    PayoneerResponseHandler::ADDITIONAL_INFO_KEY_CAPTURE_RESPONSE,
+                    $response
+                );
+            }
+
             $authTxn = $this->getTransaction($orderObj->getId(), Helper::CAPTURE);
             if ($authTxn != null && $authTxn->getTransactionId()) {
                 return $this->changeOrderToProcessing($orderObj);
             }
 
-            $this->setAdditionalInformation($orderObj, 'payoneerCapture');
+            $this->setAdditionalInformation($orderObj, self::TXN_TYPE_CAPTURE);
 
             if ($orderObj->canInvoice()) {
                 $this->adminHelper->generateInvoice($orderObj);
