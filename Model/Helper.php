@@ -20,6 +20,8 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Api\Data\OrderStatusHistoryInterface;
+use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 
 /**
  * Class Helper
@@ -98,6 +100,9 @@ class Helper
      */
     private $cartRepository;
 
+    /** @var OrderStatusHistoryRepositoryInterface */
+    private $orderStatusRepository;
+
     /**
      * Helper constructor.
      * @param RedirectFactory $resultRedirectFactory
@@ -129,7 +134,8 @@ class Helper
         CheckoutSessionFactory $checkoutSessionFactory,
         ProductRepositoryInterface $productRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        CartRepositoryInterface $cartRepository
+        CartRepositoryInterface $cartRepository,
+        OrderStatusHistoryRepositoryInterface $orderStatusRepository
     ) {
         $this->resultRedirectFactory = $resultRedirectFactory;
         $this->messageManager = $messageManager;
@@ -145,6 +151,7 @@ class Helper
         $this->productRepository = $productRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->cartRepository = $cartRepository;
+        $this->orderStatusRepository = $orderStatusRepository;
     }
 
     /**
@@ -162,7 +169,6 @@ class Helper
     /**
      * @return void
      * @throws LocalizedException
-     * @throws NoSuchEntityException
      */
     public function redirectToReorderCart()
     {
@@ -354,5 +360,19 @@ class Helper
     public function getLastOrderId()
     {
         return $this->checkoutSession->getData('last_order_id');
+    }
+
+    /**
+     * Add comment to the order history
+     *
+     * @return void
+     * @throws CouldNotSaveException
+     */
+    public function addCommentToOrder()
+    {
+        $order = $this->orderRepository->get($this->getLastOrderId());
+        /** @phpstan-ignore-next-line */
+        $comment = $order->addStatusHistoryComment('Transaction voided.');
+        $this->orderStatusRepository->save($comment);
     }
 }
