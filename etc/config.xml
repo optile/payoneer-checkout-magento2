@@ -32,6 +32,13 @@
                     <report_only>1</report_only>
                 </admin>
             </mode>
+            <policies>
+                <storefront>
+                    <frame-ancestors>
+                        <inline>0</inline>
+                    </frame-ancestors>
+                </storefront>
+            </policies>
         </csp>
     </default>
 </config>
