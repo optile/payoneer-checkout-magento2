@@ -80,13 +80,13 @@ class Fetch extends Action
                 } else {
                     $this->helper
                         ->showErrorMessage(
-                            __('Error response is received from Payoneer. Error status code: ' . $result['status'] .
-                            '. Please check var/log/payoneer.log for more details.')
+                            __('Error response is received from Payoneer. Error status code: ') . $result['status'] .
+                            __('. Please check var/log/payoneer.log for more details.')
                         );
                 }
             } catch (\Exception $e) {
                 $this->helper
-                    ->showErrorMessage(__('Something went wrong with the transaction. ' . $e->getMessage()));
+                    ->showErrorMessage(__('Something went wrong with the transaction. ') . $e->getMessage());
             }
         }
         return $resultRedirect->setPath('sales/order/view', ['order_id' => $orderId]);

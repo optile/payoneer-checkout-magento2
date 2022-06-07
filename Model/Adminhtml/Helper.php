@@ -211,7 +211,7 @@ class Helper
                 $this->generateInvoice($order);
             }
 
-            $this->showSuccessMessage('Payoneer capture transaction has been completed successfully.');
+            $this->showSuccessMessage(__('Payoneer capture transaction has been completed successfully.'));
         } else {
             $this->showErrorMessage(__('Payoneer capture transaction failed. Check the payoneer.log for details.'));
         }
@@ -227,7 +227,7 @@ class Helper
     public function processFetchResponse($result, $order)
     {
         if ($result && $result['status'] == 200) {
-            $this->showSuccessMessage('Payoneer fetch transaction has been completed successfully.');
+            $this->showSuccessMessage(__('Payoneer fetch transaction has been completed successfully.'));
         } else {
             $this->showErrorMessage(__('Payoneer fetch api failed. Check the payoneer.log for details.'));
         }
@@ -277,7 +277,7 @@ class Helper
                 $this->showErrorMessage(__('We can\'t send the invoice email right now.'));
             }
         } catch (\Exception $e) {
-            $this->showSuccessMessage(__('Something when wrong while generating invoice.', $e));
+            $this->showSuccessMessage(__('Something when wrong while generating invoice.'), $e);
         }
     }
 

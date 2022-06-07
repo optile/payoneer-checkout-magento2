@@ -66,7 +66,7 @@ class Capture extends Action
                 }
             } catch (\Exception $e) {
                 $this->helper
-                    ->showErrorMessage(__('Something went wrong with the transaction. ' . $e->getMessage()));
+                    ->showErrorMessage(__('Something went wrong with the transaction. ') . $e->getMessage());
             }
         }
         return $resultRedirect->setPath('sales/order/view', ['order_id' => $orderId]);
