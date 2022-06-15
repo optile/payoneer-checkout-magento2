@@ -747,7 +747,7 @@ class TransactionOrderUpdater
             return reset($orders);
         }
         throw new LocalizedException(
-            __('No such order with increment id %s exist. ', $order)
+            __('No such order with increment id %s exist.', $order)
         );
     }
 
