@@ -105,13 +105,10 @@ class Cancel implements HttpGetActionInterface
             $this->updateTransactionType();
             //Add comment to the order
             $this->helper->addCommentToOrder();
-
-            return $this->helper->redirectToCart(
-                __('Something went wrong while processing payment.')
-            );
-        } catch (\Exception $e) {
-            return $this->resultPageFactory->create();
-        }
+        } catch (\Exception $e) {}
+        return $this->helper->redirectToCart(
+            __('Something went wrong while processing payment.')
+        );
     }
 
     /**
