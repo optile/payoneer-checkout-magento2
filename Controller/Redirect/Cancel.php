@@ -5,19 +5,18 @@ namespace Payoneer\OpenPaymentGateway\Controller\Redirect;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Result\Page;
-use Magento\Framework\View\Result\PageFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory as OrderTransactionCollectionFactory;
 use Payoneer\OpenPaymentGateway\Model\Helper;
+use Payoneer\OpenPaymentGateway\Logger\NotificationLogger;
 
 /**
  * Class Cancel
@@ -36,19 +35,9 @@ class Cancel implements HttpGetActionInterface
     private $cartRepository;
 
     /**
-     * @var PageFactory
-     */
-    private $resultPageFactory;
-
-    /**
      * @var Helper
      */
     private $helper;
-
-    /**
-     * @var RedirectFactory
-     */
-    protected $resultRedirectFactory;
 
     /**
      * @var TransactionRepositoryInterface
@@ -61,31 +50,33 @@ class Cancel implements HttpGetActionInterface
     protected $orderTransactionCollectionFactory;
 
     /**
+     * @var NotificationLogger
+     */
+    protected $notificationLogger;
+
+    /**
      * Helper constructor.
      * @param Context $context
      * @param CartRepositoryInterface $cartRepository
-     * @param PageFactory $resultPageFactory
      * @param Helper $helper
-     * @param RedirectFactory $resultRedirectFactory
      * @param TransactionRepositoryInterface $transactionRepository
      * @param OrderTransactionCollectionFactory $orderTransactionCollectionFactory
+     * @param NotificationLogger $notificationLogger
      */
     public function __construct(
         Context $context,
         CartRepositoryInterface $cartRepository,
-        PageFactory $resultPageFactory,
         Helper $helper,
-        RedirectFactory $resultRedirectFactory,
         TransactionRepositoryInterface $transactionRepository,
-        OrderTransactionCollectionFactory $orderTransactionCollectionFactory
+        OrderTransactionCollectionFactory $orderTransactionCollectionFactory,
+        NotificationLogger $notificationLogger
     ) {
         $this->context = $context;
         $this->cartRepository = $cartRepository;
-        $this->resultPageFactory = $resultPageFactory;
         $this->helper = $helper;
-        $this->resultRedirectFactory = $resultRedirectFactory;
         $this->transactionRepository = $transactionRepository;
         $this->orderTransactionCollectionFactory = $orderTransactionCollectionFactory;
+        $this->notificationLogger = $notificationLogger;
     }
 
     /**
@@ -105,7 +96,11 @@ class Cancel implements HttpGetActionInterface
             $this->updateTransactionType();
             //Add comment to the order
             $this->helper->addCommentToOrder();
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            $this->notificationLogger->addError(
+                'CancelError - ' . $e->getMessage()
+            );
+        }
         return $this->helper->redirectToCart(
             __('Something went wrong while processing payment.')
         );
