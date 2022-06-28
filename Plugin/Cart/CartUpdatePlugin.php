@@ -58,7 +58,8 @@ class CartUpdatePlugin
             return $result;
         }
 
-        $quote = $cart->getQuote();
+        $quoteId = $cart->getQuote()->getId();        
+        $quote = $this->cartRepository->get($quoteId);
         $payment = $quote->getPayment();
         $additionalInformation = $payment->getAdditionalInformation();
         $listId = isset($additionalInformation[Config::LIST_ID]) ? $additionalInformation[Config::LIST_ID] : null;
