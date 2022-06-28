@@ -134,7 +134,8 @@ class TransactionService
             $result = $this->commandPool->get($integration)->execute([
                 'payment' => $paymentDataObject,
                 'amount' => $quote->getGrandTotal(),
-                'address' => $address
+                'address' => $address,
+                'totalItemsCount' => $quote->getItemsCount()
             ]);
 
             $this->setAdditionalInformation($quote, $result);
