@@ -530,10 +530,8 @@ class TransactionOrderUpdater
         $refundResponse = isset($additionalInformation['refund_response']) ?
             $additionalInformation['refund_response'] : null;
         if (is_array($refundResponse)) {
-            foreach ($refundResponse as $responseItem) {
-                if ($newRefundLongId == $responseItem['longId']) {
-                    return false;
-                }
+            if ($newRefundLongId == $refundResponse['longId']) {
+                return false;
             }
         }
         if ($response['reason_code'] == ResponseValidator::REFUND_PAID_OUT_STATUS) {
