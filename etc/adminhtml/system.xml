@@ -84,6 +84,10 @@
                     <label>Order Reference Message</label>
                     <validate>required-entry</validate>
                 </field>
+                <field id="language_mapping" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Magento-Payoneer Language Mapping</label>
+                    <comment>Mapping will be in the format - magento_language_code:payoneer_language_code. Multiple entries should be separated by comma. Eg: en_CA:en_US,en_NL:en_GB...</comment>
+                </field>
                 <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
                        showInStore="1">
                     <label>Sort Order</label>
