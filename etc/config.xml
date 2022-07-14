@@ -21,6 +21,7 @@
                 <sort_order>1</sort_order>
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <language_mapping>zh_Hans_CN:zh_CN,zh_Hant_TW:zh_TW</language_mapping>
             </payoneer>
         </payment>
         <csp>
