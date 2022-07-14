@@ -350,6 +350,17 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      */
     public function getStoreLocale(): string
     {
-        return $this->localeResolver->getLocale();
+        $storeLocale = $this->localeResolver->getLocale();
+        $languageMapping = $this->getValue('language_mapping');
+        if ($languageMapping != '') {
+            $languageMappings = explode(',', $languageMapping);
+            foreach ($languageMappings as $language) {
+                $localeParts = explode(':', $language);
+                if (count($localeParts) > 1 && $localeParts[0] == $storeLocale) {
+                    return $localeParts[1];
+                }
+            }
+        }
+        return $storeLocale;
     }
 }
