@@ -46,7 +46,8 @@ class StyleDataBuilder implements BuilderInterface
 
         $styleData = [
             Config::STYLE => [
-                Config::HOSTED_VERSION => Config::VERSION_V4
+                Config::HOSTED_VERSION => Config::VERSION_V4,
+                Config::LANGUAGE => $this->config->getStoreLocale()
             ]
         ];
 

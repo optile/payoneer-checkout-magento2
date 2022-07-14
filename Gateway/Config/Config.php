@@ -9,6 +9,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields as AdminFields;
 use Payoneer\OpenPaymentGateway\Model\Ui\ConfigProvider;
 use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Locale\Resolver as LocaleResolver;
 
 /**
  * Class Config
@@ -111,6 +112,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const TOKEN                 =   'token';
     const TOKEN_NOTIFICATION    =   'notification_token';
     const LIST_ID               =   'listId';
+    const LANGUAGE              =   'language';
 
     const ENTITY_PAYMENT        =   'payment';
 
@@ -123,6 +125,11 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
+    
+    /**
+     * @var LocaleResolver
+     */
+    protected $localeResolver;
 
     /**
      * @var string|null
@@ -152,12 +159,14 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * Config constructor.
      * @param StoreManagerInterface $storeManager
      * @param ScopeConfigInterface $scopeConfig
+     * @param LocaleResolver $localeResolver
      * @param string $methodCode
      * @param string $pathPattern
      */
     public function __construct(
         StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig,
+        LocaleResolver $localeResolver,
         $methodCode = ConfigProvider::CODE,
         $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
@@ -166,6 +175,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
         $this->scopeConfig = $scopeConfig;
         $this->methodCode = $methodCode;
         $this->pathPattern = $pathPattern;
+        $this->localeResolver = $localeResolver;
     }
 
     /**
@@ -331,5 +341,15 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             self::COUNTRY_CODE_PATH,
             ScopeInterface::SCOPE_STORE
         );
+    }
+
+    /**
+     * Return the current store locale
+     *
+     * @return string
+     */
+    public function getStoreLocale(): string
+    {
+        return $this->localeResolver->getLocale();
     }
 }
