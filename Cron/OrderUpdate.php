@@ -6,6 +6,7 @@ use Payoneer\OpenPaymentGateway\Model\ResourceModel\PayoneerNotification\Collect
 use Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater;
 use Payoneer\OpenPaymentGateway\Model\ResourceModel\PayoneerNotification\Collection;
 use Payoneer\OpenPaymentGateway\Logger\NotificationLogger;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
 
 /**
  * Update order on running cron with notification data
@@ -58,6 +59,11 @@ class OrderUpdate
                 try {
                     $response = \Safe\json_decode($notification->getContent(), true);
                     if (!isset($response['statusCode'])) {
+                        continue;
+                    }
+                    if (isset($response['interactionReason']) &&
+                        $response['interactionReason'] == Helper::SYSTEM_FAILURE
+                    ) {
                         continue;
                     }
                     $this->transactionOrderUpdater->processNotificationResponse(

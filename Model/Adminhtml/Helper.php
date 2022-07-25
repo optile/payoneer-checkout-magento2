@@ -31,6 +31,7 @@ class Helper
     const PAID_OUT_PARTIAL = 'paid_out_partial';
     const DEBITED = 'debited';
     const CAPTURE_CLOSED = 'closed';
+    const SYSTEM_FAILURE = 'SYSTEM_FAILURE';
 
     /**
      * @var TransactionSearchResultInterfaceFactory
