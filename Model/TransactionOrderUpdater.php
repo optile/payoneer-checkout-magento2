@@ -315,6 +315,20 @@ class TransactionOrderUpdater
     }
 
     /**
+     * @param Order|string $order
+     * @return void
+     * @throws LocalizedException
+     */
+    public function updateOrderStatusToClosed($order)
+    {
+        if (!($order instanceof Order)) {
+            $order = $this->getOrder($order);
+        }
+        $order->setState('closed')->setStatus('closed');
+        $this->orderRepository->save($order);
+    }
+
+    /**
      * Authorize the order if it's not already authorized.
      *
      * @param string|Order $order
@@ -426,7 +440,6 @@ class TransactionOrderUpdater
         $orderObj = $this->getOrder($order);
         try {
             $this->createCreditMemo($orderObj, $response['amount']);
-
             //$this->createNewTransactionEntry($orderObj, $response);
         } catch (LocalizedException $le) {
             throw new LocalizedException(
@@ -530,7 +543,13 @@ class TransactionOrderUpdater
         $refundResponse = isset($additionalInformation['refund_response']) ?
             $additionalInformation['refund_response'] : null;
         if (is_array($refundResponse)) {
-            if ($newRefundLongId == $refundResponse['longId']) {
+            $longId = '';
+            if (isset($refundResponse['longId'])) {
+                $longId = $refundResponse['longId'];
+            } elseif (isset($refundResponse[0]['longId'])) {
+                $longId = $refundResponse[0]['longId'];
+            }
+            if ($newRefundLongId == $longId) {
                 return false;
             }
         }
