@@ -440,10 +440,6 @@ class TransactionOrderUpdater
         $orderObj = $this->getOrder($order);
         try {
             $this->createCreditMemo($orderObj, $response['amount']);
-            $totalRefunded = $orderObj->getTotalRefunded() + $response['amount'];
-            if ($orderObj->getGrandTotal() == $totalRefunded) {
-                $this->updateOrderStatusToClosed($orderObj);
-            }
             //$this->createNewTransactionEntry($orderObj, $response);
         } catch (LocalizedException $le) {
             throw new LocalizedException(
