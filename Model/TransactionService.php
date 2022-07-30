@@ -167,7 +167,7 @@ class TransactionService
                 'redirectURL' => $result['response']['redirect']['url']
             ];
         } else {
-            $this->messageManager->addErrorMessage(__('Something went wrong while processing payment.'));
+            $this->messageManager->addErrorMessage(__('We couldn\'t process the payment'));
         }
         return $jsonData;
     }
@@ -185,7 +185,7 @@ class TransactionService
                 'links' => $result['response']['links']
             ];
         } else {
-            $this->messageManager->addErrorMessage(__('Something went wrong while processing payment.'));
+            $this->messageManager->addErrorMessage(__('We couldn\'t process the payment'));
         }
         return $jsonData;
     }

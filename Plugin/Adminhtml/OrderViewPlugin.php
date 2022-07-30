@@ -40,7 +40,7 @@ class OrderViewPlugin
                 $subject->addButton(
                     'payoneer_capture',
                     [
-                    'label' => __('Payoneer Capture'),
+                    'label' => __('Payoneer capture'),
                     'class' => __('action-default scalable'),
                     'id' => 'order-view-payoneer-capture-button',
                     'onclick' => 'setLocation(\'' . $this->getCaptureUrl($subject) . '\')'
@@ -51,7 +51,7 @@ class OrderViewPlugin
                 $subject->addButton(
                     'payoneer_fetch',
                     [
-                        'label' => __('Payoneer Fetch'),
+                        'label' => __('Payoneer fetch'),
                         'class' => __('action-default scalable'),
                         'id' => 'order-view-payoneer-fetch-button',
                         'onclick' => 'setLocation(\'' . $this->getFetchUrl($subject) . '\')'
@@ -62,7 +62,7 @@ class OrderViewPlugin
     }
 
     /**
-     * Get URL for Payoneer Capture
+     * Get URL for Payoneer capture
      *
      * @param OrderView $subject
      * @return mixed
@@ -73,7 +73,7 @@ class OrderViewPlugin
     }
 
     /**
-     * Get URL for Payoneer Fetch
+     * Get URL for Payoneer fetch
      *
      * @param OrderView $subject
      * @return mixed

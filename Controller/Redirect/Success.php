@@ -147,7 +147,7 @@ class Success implements HttpGetActionInterface
     public function redirectToCart($message = null)
     {
         if (!$message) {
-            $message = 'Something went wrong while processing payment. Invalid response from Payoneer';
+            $message = 'We couldn\'t process the payment. Invalid response from Payoneer.';
         }
         return $this->helper->redirectToCart(__($message));
     }

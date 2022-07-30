@@ -170,7 +170,7 @@
         </arguments>
     </virtualType>
 
-    <!-- Payoneer Capture Transfer Factory -->
+    <!-- Payoneer capture Transfer Factory -->
     <virtualType name="PayoneerCaptureTransferFactory" type="Payoneer\OpenPaymentGateway\Gateway\Http\ListCaptureTransferFactory">
         <arguments>
             <argument name="method" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::METHOD_POST</argument>

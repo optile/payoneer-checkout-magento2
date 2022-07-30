@@ -115,7 +115,7 @@ class ValidateCredentialsObserver implements ObserverInterface
 
         if ($response->getData('status') !== 200) {
             throw new AlreadyExistsException(__(
-                'Payoneer validation failed. Please make sure the credentials you\'ve entered are correct'
+                'Payoneer validation failed. Make sure the credentials you have entered are correct.'
             ));
         }
     }

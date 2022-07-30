@@ -7,7 +7,7 @@
                 <model>PayoneerFacade</model>
                 <order_status>pending_payment</order_status>
                 <payment_action>authorize</payment_action>
-                <title>Payoneer Payment Gateway</title>
+                <title>Payoneer Checkout</title>
                 <live_host_name>https://api.live.oscato.com/</live_host_name>
                 <sandbox_host_name>https://api.sandbox.oscato.com/</sandbox_host_name>
                 <success_url>{{base_url}}payoneer/redirect/success</success_url>
