@@ -39,7 +39,7 @@ class PayoneerNotificationRepository implements PayoneerNotificationRepositoryIn
             return $notification;
         } catch (Exception $e) {
             throw new CouldNotSaveException(
-                __('Failed to save the notification.')
+                __('We couldn\'t save the notification. Try again later.')
             );
         }
     }

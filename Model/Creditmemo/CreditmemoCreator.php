@@ -67,7 +67,7 @@ class CreditmemoCreator
             return true;
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __(__('Failed to create the credit memo for the order %1') . $e->getMessage(), $order->getIncrementId())
+                __(__('We couldn\'t create a credit memo for the %1 order. Try again later.') . $e->getMessage(), $order->getIncrementId())
             );
         }
     }

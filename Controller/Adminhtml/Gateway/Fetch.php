@@ -14,7 +14,7 @@ use Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater;
 
 /**
  * Class Fetch
- * Process Payoneer Fetch request
+ * Process Payoneer fetch request
  */
 class Fetch extends Action
 {
@@ -75,17 +75,17 @@ class Fetch extends Action
                         $result
                     );
                     $this->helper->showSuccessMessage(
-                        __('Successfully fetched and updated the data.')
+                        __('Data successfully synced')
                     );
                 } else {
                     $this->helper
                         ->showErrorMessage(
-                            __('Error response is received from Payoneer. Error status code: %1. Please check var/log/payoneer.log for more details.', $result['status'])
+                            __('Error response with the %1 code received from Payoneer. Check the payoneer.log file for details.', $result['status'])
                         );
                 }
             } catch (\Exception $e) {
                 $this->helper
-                    ->showErrorMessage(__('Something went wrong with the transaction.') . ' ' . $e->getMessage());
+                    ->showErrorMessage(__('Transaction failed') . ' ' . $e->getMessage());
             }
         }
         return $resultRedirect->setPath('sales/order/view', ['order_id' => $orderId]);

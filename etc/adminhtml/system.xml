@@ -3,7 +3,7 @@
     <system>
         <section id="payment">
             <group id="payoneer" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Payoneer Payment Gateway</label>
+                <label>Payoneer Checkout</label>
                 <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -12,45 +12,45 @@
                     <label>Title</label>
                 </field>
                 <field id="merchant_gateway_key" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Merchant Code</label>
+                    <label>API username</label>
                 </field>
                 <field id="environment" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Environment</label>
                     <source_model>Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields</source_model>
                 </field>
                 <field id="live_api_key" translate="label" type="password" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Live API Key</label>
+                    <label>Live API token</label>
                     <depends>
                         <field id="environment">live</field>
                     </depends>
                 </field>
                 <field id="live_store_code" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Live Store Code(Division)</label>
+                    <label>Live Store code</label>
                     <depends>
                         <field id="environment">live</field>
                     </depends>
                 </field>
-                <field id="live_host_name" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Live Gateway Hostname</label>
+                <field id="live_host_name" translate="label" type="text" sortOrder="70" showInDefault="0" showInWebsite="0" showInStore="0">
+                    <label>Live OPG hostname</label>
                     <validate>validate-url validate-no-html-tags</validate>
                     <depends>
                         <field id="environment">live</field>
                     </depends>
                 </field>
                 <field id="sandbox_api_key" translate="label" type="password" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Test API Key</label>
+                    <label>Test API token</label>
                     <depends>
                         <field id="environment">test</field>
                     </depends>
                 </field>
                 <field id="sandbox_store_code" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Test Store Code(Division)</label>
+                    <label>Test Store code</label>
                     <depends>
                         <field id="environment">test</field>
                     </depends>
                 </field>
-                <field id="sandbox_host_name" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Test Gateway Hostname</label>
+                <field id="sandbox_host_name" translate="label" type="text" sortOrder="100" showInDefault="0" showInWebsite="0" showInStore="0">
+                    <label>Test OPG hostname</label>
                     <validate>validate-url validate-no-html-tags</validate>
                     <depends>
                         <field id="environment">test</field>
@@ -59,7 +59,7 @@
                 <field id="key_validation" translate="label comment" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label></label>
                     <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ValidateCredentials</frontend_model>
-                    <comment>Makes a list API call and see if it is returning HTTP 200 and interaction reason is OK.</comment>
+                    <comment>Makes a List API call to check if it returns HTTP 200 and the interaction reason is OK</comment>
                 </field>
                 <field id="success_url" translate="label" type="text" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Success URL</label>
@@ -73,24 +73,24 @@
                     <label>Notification URL</label>
                 </field>
                 <field id="payment_action" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Payment Action</label>
+                    <label>Payment action</label>
                     <source_model>Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields::paymentAction</source_model>
                 </field>
                 <field id="payment_flow" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Payment Flow</label>
+                    <label>Payment flow</label>
                     <source_model>Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields::paymentFlow</source_model>
                 </field>
                 <field id="order_reference_message" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Order Reference Message</label>
+                    <label>Order reference message</label>
                     <validate>required-entry</validate>
                 </field>
-                <field id="language_mapping" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="language_mapping" translate="label" type="text" sortOrder="145" showInDefault="0" showInWebsite="0" showInStore="0">
                     <label>Magento-Payoneer Language Mapping</label>
                     <comment>Mapping will be in the format - magento_language_code:payoneer_language_code. Multiple entries should be separated by comma. Eg: en_CA:en_US,en_NL:en_GB...</comment>
                 </field>
                 <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
                        showInStore="1">
-                    <label>Sort Order</label>
+                    <label>Payment method position</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
                 <field id="debug" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -98,51 +98,51 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <group id="widget_appearance" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="170">
-                    <label>Payment Widget Appearance</label>
+                    <label>Payment widget appearance</label>
                     <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
                     <field id="background_color" translate="label comment" type="text" sortOrder="180" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Background Color</label>
-                        <comment><![CDATA[Color of payment widget background.]]></comment>
+                        <label>Background color</label>
+                        <comment><![CDATA[Payment widget background color]]></comment>
                         <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ColorPicker</frontend_model>
                     </field>
                     <field id="color" translate="label comment" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Text Color</label>
-                        <comment>Color of payment widget text.</comment>
+                        <label>Text color</label>
+                        <comment>Payment widget text color</comment>
                         <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ColorPicker</frontend_model>
                     </field>
                     <field id="placeholders_color" translate="label comment" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Placeholders Color</label>
-                        <comment>Color of placeholders in the payment widget.</comment>
+                        <label>Placeholder color</label>
+                        <comment>Payment widget placeholder color</comment>
                         <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\ColorPicker</frontend_model>
                     </field>
                     <field id="font_size" translate="label comment" type="text" sortOrder="210" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Font Size</label>
-                        <comment>Font size in the payment widget. eg: 14px</comment>
+                        <label>Font size</label>
+                        <comment>Payment widget font size in px</comment>
                     </field>
                     <field id="font_weight" translate="label comment" type="select" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Font Weight</label>
-                        <comment>Font weight in the payment widget. eg format: 14px</comment>
+                        <label>Font weight</label>
+                        <comment>Payment widget font weight in px</comment>
                         <source_model>Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields::fontWeight</source_model>
                     </field>
                     <field id="letter_spacing" translate="label comment" type="text" sortOrder="230" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Letter Spacing</label>
-                        <comment>Space between letters in the payment widget. eg: 2px</comment>
+                        <label>Letter spacing</label>
+                        <comment>Payment widget letter spacing in px</comment>
                     </field>
                     <field id="line_height" translate="label comment" type="text" sortOrder="240" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Line Height</label>
-                        <comment>Line height in the payment widget. eg: 1.5 or normal</comment>
+                        <label>Line height</label>
+                        <comment>Payment widget line height, e.g. 1.5 or normal</comment>
                     </field>
                     <field id="padding" translate="label comment" type="text" sortOrder="250" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Padding</label>
-                        <comment>Padding in the payment widget. eg: 0 1px 1px 0.5px</comment>
+                        <comment>Payment widget padding in px</comment>
                     </field>
                     <field id="text_align" translate="label comment" type="select" sortOrder="260" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Align Text</label>
-                        <comment>Text alignment in the payment widget.</comment>
+                        <label>Align text</label>
+                        <comment>Payment widget text alignment</comment>
                         <source_model>Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields::alignText</source_model>
                     </field>
                     <field id="checkout_css" translate="label" type="textarea" sortOrder="270" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Checkout CSS</label>
+                        <label>Custom CSS</label>
                     </field>
                 </group>
 

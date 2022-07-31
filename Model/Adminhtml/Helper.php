@@ -212,9 +212,9 @@ class Helper
                 $this->generateInvoice($order);
             }
 
-            $this->showSuccessMessage(__('Payoneer capture transaction has been completed successfully.'));
+            $this->showSuccessMessage(__('Payoneer capture completed successfully'));
         } else {
-            $this->showErrorMessage(__('Payoneer capture transaction failed. Check the payoneer.log for details.'));
+            $this->showErrorMessage(__('We couldn\'t  capture the  transaction. Check the payoneer.log file for details.'));
         }
     }
 
@@ -228,9 +228,9 @@ class Helper
     public function processFetchResponse($result, $order)
     {
         if ($result && $result['status'] == 200) {
-            $this->showSuccessMessage(__('Payoneer fetch transaction has been completed successfully.'));
+            $this->showSuccessMessage(__('Payoneer fetch completed successfully'));
         } else {
-            $this->showErrorMessage(__('Payoneer fetch api failed. Check the payoneer.log for details.'));
+            $this->showErrorMessage(__('We couldn\'t fetch the data. Check the payoneer.log file for details.'));
         }
     }
 
@@ -243,19 +243,19 @@ class Helper
     public function generateInvoice($order)
     {
         if (!$order->getEntityId()) {
-            throw new LocalizedException(__('The order no longer exists.'));
+            throw new LocalizedException(__('The order no longer exists'));
         }
 
         if (!$order->canInvoice()) {
             throw new LocalizedException(
-                __('The order does not allow an invoice to be created.')
+                __('You can\'t create an invoice with this order')
             );
         }
         try {
             $invoice = $this->invoiceService->prepareInvoice($order);
             if (!$invoice->getTotalQty()) {
                 throw new LocalizedException(
-                    __('You can\'t create an invoice without products.')
+                    __('You can\'t create an invoice without products')
                 );
             }
             $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
@@ -272,13 +272,13 @@ class Helper
             try {
                 $this->invoiceSender->send($invoice);
                 $order->addCommentToStatusHistory(
-                    __('Notified customer about invoice creation #%1.', $invoice->getId())
+                    __('We\'ve notified the customer that the #%1 invoice has been created', $invoice->getId())
                 )->setIsCustomerNotified(1);
             } catch (\Exception $e) {
-                $this->showErrorMessage(__('We can\'t send the invoice email right now.'));
+                $this->showErrorMessage(__('We can\'t send an email with the invoice. Try again later.'));
             }
         } catch (\Exception $e) {
-            $this->showSuccessMessage(__('Something when wrong while generating invoice.'), $e);
+            $this->showSuccessMessage(__('We can\'t generate the invoice. Try again later.'), $e);
         }
     }
 

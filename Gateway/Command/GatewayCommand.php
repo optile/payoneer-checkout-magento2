@@ -174,7 +174,7 @@ class GatewayCommand implements CommandInterface
             $this->logger->critical('Payment Error: ' . $errorCodeOrMessage);
         }
 
-        $exceptionMessage = $errorCodeOrMessage ?: 'Transaction has been declined. Please try again later';
+        $exceptionMessage = $errorCodeOrMessage ?: 'Transaction declined. Try again later.';
 
         throw new CommandException(
             !empty($messages)

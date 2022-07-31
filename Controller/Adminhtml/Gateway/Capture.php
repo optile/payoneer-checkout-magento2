@@ -14,7 +14,7 @@ use Payoneer\OpenPaymentGateway\Model\Adminhtml\TransactionService as AdminTrans
 /**
  * Class Capture
  *
- * Process Payoneer Capture request
+ * Process Payoneer capture request
  */
 class Capture extends Action
 {
@@ -66,7 +66,7 @@ class Capture extends Action
                 }
             } catch (\Exception $e) {
                 $this->helper
-                    ->showErrorMessage(__('Something went wrong with the transaction.') . ' ' . $e->getMessage());
+                    ->showErrorMessage(__('Transaction failed') . ' ' . $e->getMessage());
             }
         }
         return $resultRedirect->setPath('sales/order/view', ['order_id' => $orderId]);

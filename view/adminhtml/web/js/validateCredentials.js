@@ -31,7 +31,7 @@ require([
         }
 
         if (!merchCode) {
-            errors.push($t("Please enter a Merchant Code"));
+            errors.push($t("Please enter a API username"));
         }
 
         if (!apiKey) {
@@ -68,16 +68,16 @@ require([
             } else {
                 alert({
                     title: $t('Payoneer Credential Validation Failed'),
-                    content: $t('Your Payoneer Credentials could not be validated. Please ensure you have selected the correct environment and entered a valid Merchant Code, API Key, Store Code and Host Name.')
+                    content: $t('Your Payoneer Credentials could not be validated. Please ensure you have selected the correct environment and entered a valid API username, API Key, Store Code and Host Name.')
                 });
             }
         }).fail(function () {
             alert({
                 title: $t('Payoneer Credential Validation Failed'),
-                content: $t('Your Payoneer Credentials could not be validated. Please ensure you have selected the correct environment and entered a valid Merchant Code, API Key, Store Code and Host Name.')
+                content: $t('Your Payoneer Credentials could not be validated. Please ensure you have selected the correct environment and entered a valid API username, API Key, Store Code and Host Name.')
             });
         }).always(function () {
-            $(self).text($t("Validate Credentials")).attr('disabled', false);
+            $(self).text($t("Validate credentials")).attr('disabled', false);
         });
     }
 });

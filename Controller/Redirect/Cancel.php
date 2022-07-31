@@ -102,7 +102,7 @@ class Cancel implements HttpGetActionInterface
             );
         }
         return $this->helper->redirectToCart(
-            __('Something went wrong while processing payment.')
+            __('We couldn\'t process the payment')
         );
     }
 

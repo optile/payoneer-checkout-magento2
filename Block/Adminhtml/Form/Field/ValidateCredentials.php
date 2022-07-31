@@ -29,7 +29,7 @@ class ValidateCredentials extends Field
     protected function _getElementHtml(AbstractElement $element): string
     {
         // Replace field markup with validation button
-        $title = __('Validate Credentials');
+        $title = __('Validate credentials');
         $envId = 'select-groups-payoneer-fields-environment-value';
         $storeId = 0;
 

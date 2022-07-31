@@ -352,7 +352,7 @@ class TransactionOrderUpdater
                 'additional_info_key' => 'auth_response',
                 'is_transaction_closed' => false,
                 'transaction_type' => Helper::AUTHORIZATION,
-                'order_comment' => __('Authorized amount of %1.', $orderTotal),
+                'order_comment' => __('Authorized amount of %1', $orderTotal),
                 'parent_txn_id' => null
             ];
 
@@ -366,7 +366,7 @@ class TransactionOrderUpdater
             );
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while authorizing the order.')
+                __('We couldn\'t authorize the order. Try again later.')
             );
         }
     }
@@ -422,7 +422,7 @@ class TransactionOrderUpdater
             );
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while refunding the order.')
+                __('We couldn\'t refund the order. Try again later.')
             );
         }
     }
@@ -447,7 +447,7 @@ class TransactionOrderUpdater
             );
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while partial refunding the order.')
+                __('We couldn\'t process the partial refund of the order. Try again later.')
             );
         }
     }
@@ -481,7 +481,7 @@ class TransactionOrderUpdater
             if ($creditmemo) {
                 if (!$creditmemo->isValidGrandTotal()) {
                     throw new \Magento\Framework\Exception\LocalizedException(
-                        __('The credit memo\'s total must be positive.')
+                        __('The credit memo\'s total must be positive')
                     );
                 }
 
@@ -492,12 +492,12 @@ class TransactionOrderUpdater
                 }
                 $this->creditmemoManagement->refund($creditmemo, (bool)$creditMemoData['do_offline']);
 
-                $this->adminHelper->showSuccessMessage(__('You created the credit memo.'));
+                $this->adminHelper->showSuccessMessage(__('Credit memo created.'));
             }
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             $this->adminHelper->showErrorMessage($e->getMessage());
         } catch (\Exception $e) {
-            $this->adminHelper->showErrorMessage(__('We can\'t save the credit memo right now.'));
+            $this->adminHelper->showErrorMessage(__('We couldn\'t save the credit memo. Try again later.'));
         }
     }
 
@@ -595,7 +595,7 @@ class TransactionOrderUpdater
             );
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while cancelling the authorization.')
+                __('We couldn\'t cancel the authorization. Try again later.')
             );
         }
     }
@@ -624,7 +624,7 @@ class TransactionOrderUpdater
                 );
                 $this->transactionRepository->save($authTxn);
                 $orderObj->addCommentToStatusHistory(
-                    __('Payoneer status changed to preauthorization_canceled.')
+                    __('Payoneer status changed to preauthorization_canceled')
                 );
                 $this->orderRepository->save($orderObj);
 
@@ -640,7 +640,7 @@ class TransactionOrderUpdater
             );
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while cancelling the preauthorization.')
+                __('We couldn\'t cancel the preauthorization. Try again later.')
             );
         }
     }
@@ -667,7 +667,7 @@ class TransactionOrderUpdater
             'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE,
             'is_transaction_closed' => true,
             'transaction_type' => Client::VOID,
-            'order_comment' => __('Void amount of %1.', $orderTotal),
+            'order_comment' => __('The amount of %1 is void', $orderTotal),
             'parent_txn_id' => $response['transaction_id'],
             'txn_id_post_text' => 'void'
         ];
@@ -740,7 +740,7 @@ class TransactionOrderUpdater
             );
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while capturing the order.')
+                __('We couldn\'t capture the transaction. Try again later.')
             );
         }
     }
@@ -764,7 +764,7 @@ class TransactionOrderUpdater
             return reset($orders);
         }
         throw new LocalizedException(
-            __('No such order with increment id %s exist.', $order)
+            __('We couldn\'t find an order with the increment ID of %s', $order)
         );
     }
 
@@ -838,7 +838,7 @@ class TransactionOrderUpdater
             return;
         } catch (\Exception $e) {
             throw new LocalizedException(
-                __('Something went wrong while creating new %1 transaction entry.', $data['transaction_type'])
+                __('We couldn\'t create the %1 transaction entry', $data['transaction_type'])
             );
         }
     }

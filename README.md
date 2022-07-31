@@ -1,6 +1,6 @@
 # Payoneer Magento 2 Integration Extension with [Open Payment Gateway](https://www.optile.io/opg)
 
-This library includes the files of the Magento 2 Extension for Payoneer Payment Gateway or Open Payment Gateway (OPG). The directories hierarchy is as positioned in a standard magento 2 project library.
+This library includes the files of the Magento 2 Extension for Payoneer Checkout or Open Payment Gateway (OPG). The directories hierarchy is as positioned in a standard magento 2 project library.
 
 ## Requirements
 
@@ -39,7 +39,7 @@ php bin/magento cache:clean
 
 After the installation, Go to the Magento 2 admin panel
 
-Go to Stores -> Settings -> Configuration -> Sales -> Payment Methods -> Other Payment Methods -> Payoneer Payment Gateway
+Go to Stores -> Settings -> Configuration -> Sales -> Payment Methods -> Other Payment Methods -> Payoneer Checkout
 
 ![Payoneer Main Configuration](docs/img/payoneer_config.png)
 
@@ -55,4 +55,4 @@ You can set advanced configurations here.
 
 ![Payoneer Style Configuration](docs/img/payoneer_style_config.png)
 
-You can set the style of the embedded widget from here. Please note that, styles defined in the field Checkout CSS will override any conflicting configurations as per CSS specificity rules.
+You can set the style of the embedded widget from here. Please note that, styles defined in the field Custom CSS will override any conflicting configurations as per CSS specificity rules.
