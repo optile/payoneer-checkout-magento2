@@ -272,7 +272,7 @@ class Helper
             try {
                 $this->invoiceSender->send($invoice);
                 $order->addCommentToStatusHistory(
-                    __('We\'ve nofified the customer taht the #%1 invoice has been created', $invoice->getId())
+                    __('We\'ve notified the customer that the #%1 invoice has been created', $invoice->getId())
                 )->setIsCustomerNotified(1);
             } catch (\Exception $e) {
                 $this->showErrorMessage(__('We can\'t send an email with the invoice. Try again later.'));

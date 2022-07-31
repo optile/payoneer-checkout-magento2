@@ -8,7 +8,7 @@
 "The order no longer exists","訂單已不存在"
 "You can\'t create an invoice with this order","無法以此訂單創建發票"
 "You can\'t create an invoice without products","如果沒有商品，便無法創建發票"
-"We\'ve nofified the customer taht the #%1 invoice has been created","我們已通知客戶#%1發票已發出"
+"We\'ve notified the customer that the #%1 invoice has been created","我們已通知客戶#%1發票已發出"
 "We can\'t send an email with the invoice. Try again later.","我們無法發送帶有發票的電郵。請稍後再次嘗試。"
 "We can\'t generate the invoice. Try again later.","我們無法生成發票。請稍後再次嘗試。"
 "We couldn\'t create a credit memo for the %1 order. Try again later.","我們無法為訂單%1創建貸項通知單。請稍後再次嘗試。"

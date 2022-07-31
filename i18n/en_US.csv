@@ -8,7 +8,7 @@
 "The order no longer exists", "The order no longer exists"
 "You can\'t create an invoice with this order", "You can\'t create an invoice with this order"
 "You can\'t create an invoice without products", "You can\'t create an invoice without products"
-"We\'ve nofified the customer taht the #%1 invoice has been created", "We\'ve nofified the customer taht the #%1 invoice has been created"
+"We\'ve notified the customer that the #%1 invoice has been created", "We\'ve notified the customer that the #%1 invoice has been created"
 "We can\'t send an email with the invoice. Try again later.", "We can\'t send an email with the invoice. Try again later."
 "We can\'t generate the invoice. Try again later.", "We can\'t generate the invoice. Try again later."
 "We couldn\'t create a credit memo for the %1 order. Try again later.", "We couldn\'t create a credit memo for the %1 order. Try again later."
