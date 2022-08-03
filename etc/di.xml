@@ -4,7 +4,6 @@
     <preference for="Magento\Payment\Gateway\Data\Quote\QuoteAdapter" type="Payoneer\OpenPaymentGateway\Gateway\QuoteAdapter" />
     <preference for="Payoneer\OpenPaymentGateway\Api\PayoneerNotificationRepositoryInterface" type="Payoneer\OpenPaymentGateway\Model\PayoneerNotificationRepository" />
     <preference for="Payoneer\OpenPaymentGateway\Api\Data\NotificationInterface" type="Payoneer\OpenPaymentGateway\Model\PayoneerNotification" />
-    <preference for="Magento\SalesRule\Model\Coupon\Usage\Processor" type="Payoneer\OpenPaymentGateway\Model\Coupon\Usage\Processor" />
 
     <!-- Payment Method Facade configuration -->
     <virtualType name="PayoneerFacade" type="Magento\Payment\Model\Method\Adapter">
