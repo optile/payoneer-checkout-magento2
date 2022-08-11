@@ -129,7 +129,7 @@ class ValidateCredentialsObserver implements ObserverInterface
     public function prepareConfigValues($fields, $group)
     {
         foreach ($fields as $field) {
-            if (isset($group['fields'][$field]['inherit'])) {
+            if (isset($group['fields'][$field]['inherit']) || !isset($group['fields'][$field]['value'])) {
                 $this->configFieldValues[$field] = $this->payoneerConfig->getValue($field);
             } else {
                 $this->configFieldValues[$field] = $group['fields'][$field]['value'];
