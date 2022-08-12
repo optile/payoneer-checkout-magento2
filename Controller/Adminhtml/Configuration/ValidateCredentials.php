@@ -68,7 +68,13 @@ class ValidateCredentials extends Action
 
         $credentials['merchantCode'] = $this->getRequest()->getParam('merchantCode');
         $credentials['apiKey'] = $this->getRequest()->getParam('apiKey');
-        $credentials['hostName'] = $this->getRequest()->getParam('hostName');
+        $hostName = $this->getRequest()->getParam('hostName');
+        if($hostName) {
+            $credentials['hostName'] = $hostName;
+        }
+        else {
+            $credentials['hostName'] = $this->config->getCredentials($this->config::HOST_NAME);
+        }
         if ($storeCode) {
             $data['division'] = $storeCode;
         }
