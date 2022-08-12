@@ -38,10 +38,6 @@ require([
             errors.push($t("Please enter an API Key"));
         }
 
-        if (!hostName) {
-            errors.push($t('Please enter a Host Name'));
-        }
-
         if (errors.length > 0) {
             alert({
                 title: $t('Payoneer Credential Validation Failed'),

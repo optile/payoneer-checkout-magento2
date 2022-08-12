@@ -116,6 +116,8 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     const ENTITY_PAYMENT        =   'payment';
 
+    const HOST_NAME = 'host_name';
+
     /**
      * @var StoreManagerInterface
      */
@@ -125,7 +127,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
-    
+
     /**
      * @var LocaleResolver
      */
@@ -278,7 +280,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
                 return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX_VALUE) ?
                     $this->getValue('sandbox_store_code') :
                     $this->getValue('live_store_code');
-            case 'host_name':
+            case self::HOST_NAME:
                 return ($environment && $environment == AdminFields::ENVIRONMENT_SANDBOX_VALUE) ?
                     $this->getValue('sandbox_host_name') :
                     $this->getValue('live_host_name');
