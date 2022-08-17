@@ -8,6 +8,7 @@ use Magento\Framework\Controller\Result\Raw;
 use Magento\Framework\Controller\Result\RawFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Payoneer\OpenPaymentGateway\Model\Config\Source\PaymentIconType;
 
 /**
  * Class Style
@@ -48,11 +49,17 @@ class Style implements HttpGetActionInterface
         $containerCSS = $this->getContainerStyle($styleConfig);
         $containerPlaceholderCSS = $this->getContainerPlaceholderStyle();
         $checkoutCssConfig = $this->config->getValue('widget_appearance/checkout_css');
+        $paymentIconStyle = $this->getPaymentIconStyle();
 
-        $widgetCSS = $containerCSS . $containerPlaceholderCSS;
+        $widgetCSS = $containerCSS . $containerPlaceholderCSS . $paymentIconStyle;
         if ($checkoutCssConfig) {
             $widgetCSS = $widgetCSS . $checkoutCssConfig;
         }
+
+        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/style.log');
+        $logger = new \Zend_Log();
+        $logger->addWriter($writer);
+        $logger->info($widgetCSS);
 
         $resultRaw = $this->resultRawFactory->create();
         $resultRaw->setHeader('Content-type', 'text/css');
@@ -98,5 +105,14 @@ class Style implements HttpGetActionInterface
             $phContent = $phContent . $inputStyle . $selectStyle;
         }
         return $phContent;
+    }
+
+    private function getPaymentIconStyle()
+    {
+        $paymentIconType = $this->config->getValue('widget_appearance/payment_icon_type');
+        if ($paymentIconType == PaymentIconType::PAYMENT_ICON_STATIC) {
+            return '.op-payment-widget-container > div.list > label.imgLabel{display: none;}';
+        }
+        return '';
     }
 }
