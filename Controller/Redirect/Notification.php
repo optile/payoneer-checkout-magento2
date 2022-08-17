@@ -16,6 +16,8 @@ use Payoneer\OpenPaymentGateway\Model\PayoneerNotification;
 use Payoneer\OpenPaymentGateway\Model\PayoneerNotificationFactory;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use Payoneer\OpenPaymentGateway\Logger\NotificationLogger;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\Helper;
+use Payoneer\OpenPaymentGateway\Model\TransactionOrderUpdater;
 
 /**
  * Class Notification
@@ -55,6 +57,11 @@ class Notification implements CsrfAwareActionInterface
     protected $notificationLogger;
 
     /**
+     * @var TransactionOrderUpdater
+     */
+    protected $transactionOrderUpdater;
+
+    /**
      * Notification constructor.
      *
      * @param PayoneerNotificationFactory $payoneerNotification
@@ -63,6 +70,7 @@ class Notification implements CsrfAwareActionInterface
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param NotificationLogger $notificationLogger
      * @param Http $request
+     * @param TransactionOrderUpdater $transactionOrderUpdater
      */
     public function __construct(
         PayoneerNotificationFactory $payoneerNotification,
@@ -70,7 +78,8 @@ class Notification implements CsrfAwareActionInterface
         NotificationInterfaceFactory $notificationFactory,
         OrderCollectionFactory $orderCollectionFactory,
         NotificationLogger $notificationLogger,
-        Http $request
+        Http $request,
+        TransactionOrderUpdater $transactionOrderUpdater
     ) {
         $this->payoneerNotification = $payoneerNotification;
         $this->notificationRepository = $notificationRepository;
@@ -78,6 +87,7 @@ class Notification implements CsrfAwareActionInterface
         $this->request = $request;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->notificationLogger = $notificationLogger;
+        $this->transactionOrderUpdater = $transactionOrderUpdater;
     }
 
     /**
@@ -103,13 +113,30 @@ class Notification implements CsrfAwareActionInterface
                     'cron_status' => 0
                 ]);
                 $this->notificationRepository->save($notification);
+                if (
+                    isset($postArray['statusCode']) &&
+                    isset($postArray['interactionReason']) &&
+                    $postArray['interactionReason'] != Helper::SYSTEM_FAILURE
+                ) {
+                    $this->transactionOrderUpdater->processNotificationResponse(
+                        $notification->getOrderId(),
+                        $postArray
+                    );
+                    $notification->setCronStatus(1);
+                    $this->notificationRepository->save($notification);
+                }
             }
         } catch (Exception $e) {
             $this->notificationLogger->addError(
-                $e->getMessage()
+                __(
+                    'ErrorMessage = %1, OrderId = %2, NotificationResponse = %3.',
+                    $e->getMessage(),
+                    $urlParams['order_id'],
+                    $post
+                )
             );
         }
-        exit;// @codingStandardsIgnoreLine
+        exit; // @codingStandardsIgnoreLine
     }
 
     /**

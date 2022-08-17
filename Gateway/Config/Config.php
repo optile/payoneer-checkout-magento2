@@ -61,6 +61,12 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const NOTIFICATION_URL_PATH =   'payoneer/redirect/notification';
     const EMBEDDED_STYLE_PATH   =   'payoneer/embedded/style';
 
+    /**
+     * Notification configuration constants
+     */
+    const NOTIFICATION_CLEANUP_DAYS_PATH    =   'payment/notification_settings/cleanup_days';
+    const EMAIL_NOTIFICATION_DAYS_PATH      =   'payment/notification_settings/send_email_days';
+
     const PRESELECTION          =   'preselection';
     const DEFERRAL              =   'deferral';
 
@@ -364,5 +370,31 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             }
         }
         return $storeLocale;
+    }
+
+    /**
+     * Get the notification cleanup days
+     *
+     * @return int
+     */
+    public function getNotificationCleanupDays(): int
+    {
+        return $this->scopeConfig->getValue(
+            self::NOTIFICATION_CLEANUP_DAYS_PATH,
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+    
+    /**
+     * Get the notification email sending days
+     *
+     * @return int
+     */
+    public function getNotificationEmailSendingDays(): int
+    {
+        return $this->scopeConfig->getValue(
+            self::EMAIL_NOTIFICATION_DAYS_PATH,
+            ScopeInterface::SCOPE_STORE
+        );
     }
 }

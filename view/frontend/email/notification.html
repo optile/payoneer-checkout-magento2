@@ -1,0 +1,47 @@
+<!--@subject {{trans "Unprocessed Notification"}} @-->
+<!--@vars {
+"var longId":"Long ID",
+"var transactionId":"Transaction ID",
+"var notificationId":"Notification ID",
+"var interactionCode":"Interaction Code",
+"var reasonCode":"Reason Code",
+"var statusCode":"Status Code",
+"var resultCode":"Result Code",
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<p>{{trans "Dear Merchant"}},</p>
+<p>{{trans "Please find the details of the notification which is in unprocessed state."}}</p>
+<table class="message-details">
+    <tr>
+        <td><strong>{{trans "Long ID"}}</strong></td>
+        <td>{{var longId}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Transaction ID"}}</strong></td>
+        <td>{{var transactionId}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Notification ID"}}</strong></td>
+        <td>{{var notificationId}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Interaction Code"}}</strong></td>
+        <td>{{var interactionCode}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Reason Code"}}</strong></td>
+        <td>{{var reasonCode}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Status Code"}}</strong></td>
+        <td>{{var statusCode}}</td>
+    </tr>
+    <tr>
+        <td><strong>{{trans "Result Code"}}</strong></td>
+        <td>{{var resultCode}}</td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}
