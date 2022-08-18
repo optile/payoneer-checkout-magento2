@@ -2,6 +2,7 @@
 
 namespace Payoneer\OpenPaymentGateway\Controller\Integration;
 
+use Exception;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\RequestInterface as Request;
@@ -90,14 +91,16 @@ class ProcessPayment implements ActionInterface
         $payment = $quote->getPayment();
         $additionalInformation = $payment->getAdditionalInformation();
         $listId = isset($additionalInformation[Config::LIST_ID]) ?? $additionalInformation[Config::LIST_ID];
-        if (!$listId) {
-            return $this->transactionService->process($quote);
-        } else {
-            /** @var array <mixed> $response */
-            $response = $this->updateTransactionService->process($quote->getPayment(), Config::LIST_UPDATE);
-            $isListExpired = $this->isListExpired($response);
-            if ($isListExpired) {
-                return $this->transactionService->process($quote);
+        try {
+            if (!$listId) {
+                $response = $this->transactionService->process($quote);
+            } else {
+                /** @var array <mixed> $response */
+                $response = $this->updateTransactionService->process($quote->getPayment(), Config::LIST_UPDATE);
+                $isListExpired = $this->isListExpired($response);
+                if ($isListExpired) {
+                    $response = $this->transactionService->process($quote);
+                }
             }
             $integration = $this->request->getParam('integration');
             $isHostedIntegration = $integration == self::HOSTED;
@@ -108,7 +111,10 @@ class ProcessPayment implements ActionInterface
             }
 
             return $this->resultJsonFactory->create()->setData($jsonData);
-
+        } catch (Exception $e) {
+            return $this->resultJsonFactory->create()->setHttpResponseCode(400)->setData([
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
@@ -131,15 +137,19 @@ class ProcessPayment implements ActionInterface
      */
     public function processHostedResponse($result)
     {
-        $jsonData = [];
         if ($result && isset($result['response']['redirect'])) {
-            $jsonData = [
-                'redirectURL' => $result['response']['redirect']['url']
-            ];
+            $redirectURL =  $result['response']['redirect']['url'];
         } else {
-            $this->messageManager->addErrorMessage(__('We couldn\'t process the payment'));
+            $quote = $this->checkoutSession->getQuote();
+            $payment = $quote->getPayment();
+            $additionalInformation = $payment->getAdditionalInformation();
+            if(isset($additionalInformation[Config::REDIRECT_URL])) {
+                $redirectURL = $additionalInformation[Config::REDIRECT_URL];
+            } else {
+                $this->messageManager->addErrorMessage(__('We couldn\'t process the payment'));
+            }
         }
-        return $jsonData;
+        return (isset($redirectURL)? ['redirectURL' => $redirectURL]: []);
     }
 
     /**

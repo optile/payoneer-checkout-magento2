@@ -97,7 +97,7 @@ class TransactionService
      * Process Api request
      *
      * @param Quote $quote
-     * @return Json | array <mixed>
+     * @return ResultInterface|null|bool|array <mixed>
      * @throws Exception
      */
     public function process(Quote $quote)
@@ -129,8 +129,7 @@ class TransactionService
             $address = $this->request->getParam('address');
             $address = json_decode($address, true);
 
-            $isHostedIntegration = $integration == self::HOSTED;
-            /** @var array <mixed> $result */
+            /** @var ResultInterface $result */
             $result = $this->commandPool->get($integration)->execute([
                 'payment' => $paymentDataObject,
                 'amount' => $quote->getGrandTotal(),
@@ -140,54 +139,10 @@ class TransactionService
 
             $this->setAdditionalInformation($quote, $result);
 
-            if ($isHostedIntegration) {
-                $jsonData = $this->processHostedResponse($result);
-            } else {
-                $jsonData = $this->processEmbeddedResponse($result);
-            }
-
-            return $this->resultJsonFactory->create()->setData($jsonData);
+            return $result;
         } catch (Exception $e) {
-            return $this->resultJsonFactory->create()->setHttpResponseCode(400)->setData([
-                'error' => $e->getMessage()
-            ]);
+            throw new LocalizedException(__($e->getMessage()));
         }
-    }
-
-    /**
-     * Process response of hosted integration
-     * @param array <mixed> $result
-     * @return array <mixed>
-     */
-    public function processHostedResponse($result)
-    {
-        $jsonData = [];
-        if ($result && isset($result['response']['redirect'])) {
-            $jsonData = [
-                'redirectURL' => $result['response']['redirect']['url']
-            ];
-        } else {
-            $this->messageManager->addErrorMessage(__('We couldn\'t process the payment'));
-        }
-        return $jsonData;
-    }
-
-    /**
-     * Process response of embedded integration
-     * @param array <mixed> $result
-     * @return array <mixed>
-     */
-    public function processEmbeddedResponse($result)
-    {
-        $jsonData = [];
-        if ($result && isset($result['response']['links'])) {
-            $jsonData = [
-                'links' => $result['response']['links']
-            ];
-        } else {
-            $this->messageManager->addErrorMessage(__('We couldn\'t process the payment'));
-        }
-        return $jsonData;
     }
 
     /**
@@ -234,6 +189,11 @@ class TransactionService
             && isset($result['response']['identification']['longId'])) {
             $listId = $result['response']['identification']['longId'];
             $payment->setAdditionalInformation(Config::LIST_ID, $listId);
+            if($this->request->getParam('integration') == self::HOSTED
+                && isset($result['response']['redirect'])
+                && isset($result['response']['redirect']['url'])) {
+                    $payment->setAdditionalInformation(Config::REDIRECT_URL, $result['response']['redirect']['url']);
+            }
             $this->saveQuote($quote, $payment);
         }
     }

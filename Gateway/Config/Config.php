@@ -113,6 +113,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const TOKEN_NOTIFICATION    =   'notification_token';
     const LIST_ID               =   'listId';
     const LANGUAGE              =   'language';
+    const REDIRECT_URL          =   'redirect_url';
 
     const ENTITY_PAYMENT        =   'payment';
 
