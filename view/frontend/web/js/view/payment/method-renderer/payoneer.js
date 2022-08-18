@@ -184,7 +184,20 @@ define(
                     self.shouldShowMessage(true);
                     fullScreenLoader.stopLoader();
                 });
-            }
+            },
+
+            /**
+             * Show or hide static payment icons
+             */
+             showStaticPaymentIcons: function() {
+                if (
+                    window.checkoutConfig.payment.payoneer.config.payment_icon_type == 'static' ||
+                    window.checkoutConfig.payment.payoneer.config.payment_icon_type == 'both'
+                ) {
+                    return true;
+                }
+                return false;
+            },
         });
     }
 );

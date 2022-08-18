@@ -55,12 +55,6 @@ class Style implements HttpGetActionInterface
         if ($checkoutCssConfig) {
             $widgetCSS = $widgetCSS . $checkoutCssConfig;
         }
-
-        $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/style.log');
-        $logger = new \Zend_Log();
-        $logger->addWriter($writer);
-        $logger->info($widgetCSS);
-
         $resultRaw = $this->resultRawFactory->create();
         $resultRaw->setHeader('Content-type', 'text/css');
         $resultRaw->setContents($widgetCSS);
@@ -107,6 +101,12 @@ class Style implements HttpGetActionInterface
         return $phContent;
     }
 
+    /**
+     * If the payment icon type is static, then return
+     * css to hide the dynamic payment icon.
+     *
+     * @return string
+     */
     private function getPaymentIconStyle()
     {
         $paymentIconType = $this->config->getValue('widget_appearance/payment_icon_type');

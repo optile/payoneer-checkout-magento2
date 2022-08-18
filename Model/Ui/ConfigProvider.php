@@ -50,7 +50,8 @@ class ConfigProvider implements ConfigProviderInterface
                         'active' => (bool)$this->config->getValue('active'),
                         'environment' => $this->config->getValue('environment'),
                         'payment_flow' => $this->config->getValue('payment_flow'),
-                        'widgetCssUrl' => $this->getStaticFilePath()
+                        'widgetCssUrl' => $this->getStaticFilePath(),
+                        'payment_icon_type' => $this->config->getValue('widget_appearance/payment_icon_type')
                     ]
                 ]
             ]
