@@ -99,11 +99,11 @@
                 <group id="notification_settings" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="170">
                     <label>Notification Setings</label>
                     <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
-                    <field id="cleanup_days" translate="label" type="text" sortOrder="145" showInDefault="0" showInWebsite="0" showInStore="0">
+                    <field id="cleanup_days" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Notification Cleanup Days</label>
                         <comment>Cronjob will remove all the processed notifications which are created this much of days before.eg:4, means remove notification created 4 days before.</comment>
                     </field>
-                    <field id="send_email_days" translate="label" type="text" sortOrder="145" showInDefault="0" showInWebsite="0" showInStore="0">
+                    <field id="send_email_days" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Email Notification Days</label>
                         <comment>Send email notifications for the unprocessed notification which are created this much of days before.eg:4, means send email for notification which are created 4 days before.</comment>
                     </field>

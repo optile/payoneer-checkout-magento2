@@ -113,8 +113,7 @@ class Notification implements CsrfAwareActionInterface
                     'cron_status' => 0
                 ]);
                 $this->notificationRepository->save($notification);
-                if (
-                    isset($postArray['statusCode']) &&
+                if (isset($postArray['statusCode']) &&
                     isset($postArray['interactionReason']) &&
                     $postArray['interactionReason'] != Helper::SYSTEM_FAILURE
                 ) {
@@ -122,7 +121,7 @@ class Notification implements CsrfAwareActionInterface
                         $notification->getOrderId(),
                         $postArray
                     );
-                    $notification->setCronStatus(1);
+                    $notification->setCronStatus(true);
                     $this->notificationRepository->save($notification);
                 }
             }

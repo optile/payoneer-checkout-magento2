@@ -3,10 +3,10 @@
 namespace Payoneer\OpenPaymentGateway\Model;
 
 use Magento\Framework\Mail\Template\TransportBuilder;
-use Magento\Framework\Translate\Inline\StateInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\ScopeInterface;
 
 class NotificationEmailSender
@@ -17,11 +17,6 @@ class NotificationEmailSender
      * @var TransportBuilder
      */
     private $transportBuilder;
-
-    /**
-     * @var StateInterface
-     */
-    private $inlineTranslation;
 
     /**
      * @var StoreManagerInterface
@@ -35,29 +30,25 @@ class NotificationEmailSender
 
     /**
      * Initialize dependencies.
-     *    
+     *
      * @param TransportBuilder $transportBuilder
-     * @param StateInterface $inlineTranslation
      * @param StoreManagerInterface $storeManager
      * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         TransportBuilder $transportBuilder,
-        StateInterface $inlineTranslation,
         StoreManagerInterface $storeManager,
         ScopeConfigInterface $scopeConfig
     ) {
         $this->transportBuilder = $transportBuilder;
-        $this->inlineTranslation = $inlineTranslation;
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
     }
 
     /**
-     * Send email from contact form
+     * Send notification email
      *
-     * @param string $replyTo
-     * @param array $variables
+     * @param array <mixed> $notificationResponse
      * @return void
      */
     public function send($notificationResponse)
@@ -80,11 +71,19 @@ class NotificationEmailSender
                 ->getTransport();
 
             $transport->sendMessage();
-        } finally {
-            //$this->inlineTranslation->resume();
+        } catch (\Exception $e) {
+            throw new LocalizedException(
+                __('Error sending email = %1', $e->getMessage())
+            );
         }
     }
 
+    /**
+     * Prepare the email template variables.
+     *
+     * @param array <mixed> $notificationResponse
+     * @return array <mixed>
+     */
     private function prepareEmailTemplateVars($notificationResponse)
     {
         $emailTemplateVars = [];
@@ -106,6 +105,12 @@ class NotificationEmailSender
         return $emailTemplateVars;
     }
 
+    /**
+     * Get the email sender details
+     *
+     * @param int $storeId
+     * @return array <mixed>
+     */
     private function getSenderDetails($storeId)
     {
         $senderData = [];
