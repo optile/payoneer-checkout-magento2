@@ -22,7 +22,10 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <language_mapping>zh_Hans_CN:zh_CN,zh_Hant_TW:zh_TW</language_mapping>
-            </payoneer>
+                <widget_appearance>
+                    <payment_icon_type>static</payment_icon_type>
+                </widget_appearance>
+            </payoneer>            
         </payment>
         <csp>
             <mode>

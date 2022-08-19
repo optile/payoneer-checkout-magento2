@@ -53,7 +53,6 @@ class Style implements HttpGetActionInterface
         if ($checkoutCssConfig) {
             $widgetCSS = $widgetCSS . $checkoutCssConfig;
         }
-
         $resultRaw = $this->resultRawFactory->create();
         $resultRaw->setHeader('Content-type', 'text/css');
         $resultRaw->setContents($widgetCSS);

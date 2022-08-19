@@ -144,9 +144,11 @@
                     <field id="checkout_css" translate="label" type="textarea" sortOrder="270" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom CSS</label>
                     </field>
+                    <field id="payment_icon_type" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Payment Icon Type</label>
+                        <source_model>Payoneer\OpenPaymentGateway\Model\Config\Source\PaymentIconType</source_model>
+                    </field>
                 </group>
-
-
             </group>
         </section>
     </system>

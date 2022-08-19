@@ -7,6 +7,10 @@
         <label class="label" data-bind="attr: {'for': getCode()}">
             <span data-bind="text: getTitle()"></span>
         </label>
+        <!-- ko if: showStaticPaymentIcons()-->
+        <img src="https://resources.sandbox.oscato.com/resource/network/MRS_TEST_TRYZENS/zh_CN/VISA/logo.png" class="payment-method-icon" name="visa_logo" alt="Visa logo" />
+        <img src="https://resources.sandbox.oscato.com/resource/network/MRS_TEST_TRYZENS/zh_CN/MASTERCARD/logo.png" class="payment-method-icon" name="mastercard_logo" alt="Mastercard logo" />
+        <!-- /ko -->
     </div>
 
     <div class="payment-method-content">
@@ -33,7 +37,7 @@
         </div>
         <!-- /ko -->
         <!-- ko ifnot: isHostedIntegration() -->
-        <div data-bind="visible: isSuccessResponse" id="paymentNetworks" class="payment-networks-container"></div>
+        <div data-bind="attr: {'class':getPaymentNetworkDivClassAttribute()}, visible: isSuccessResponse" id="paymentNetworks"></div>
         <div data-bind="visible: isSuccessResponse" id="submitBtnContainer" class="submitBtn submit-buttons-container">
             <button
                 id="submitBtn"
