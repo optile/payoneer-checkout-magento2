@@ -198,6 +198,13 @@ define(
                 }
                 return false;
             },
+            
+            /**
+             * Get #paymentNetworks div class attribute value
+             */
+             getPaymentNetworkDivClassAttribute: function() {
+                return 'payment-networks-container ' + window.checkoutConfig.payment.payoneer.config.payment_icon_type;
+            },
         });
     }
 );

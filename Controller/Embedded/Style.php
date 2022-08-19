@@ -8,7 +8,6 @@ use Magento\Framework\Controller\Result\Raw;
 use Magento\Framework\Controller\Result\RawFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
-use Payoneer\OpenPaymentGateway\Model\Config\Source\PaymentIconType;
 
 /**
  * Class Style
@@ -49,9 +48,8 @@ class Style implements HttpGetActionInterface
         $containerCSS = $this->getContainerStyle($styleConfig);
         $containerPlaceholderCSS = $this->getContainerPlaceholderStyle();
         $checkoutCssConfig = $this->config->getValue('widget_appearance/checkout_css');
-        $paymentIconStyle = $this->getPaymentIconStyle();
 
-        $widgetCSS = $containerCSS . $containerPlaceholderCSS . $paymentIconStyle;
+        $widgetCSS = $containerCSS . $containerPlaceholderCSS;
         if ($checkoutCssConfig) {
             $widgetCSS = $widgetCSS . $checkoutCssConfig;
         }
@@ -99,20 +97,5 @@ class Style implements HttpGetActionInterface
             $phContent = $phContent . $inputStyle . $selectStyle;
         }
         return $phContent;
-    }
-
-    /**
-     * If the payment icon type is static, then return
-     * css to hide the dynamic payment icon.
-     *
-     * @return string
-     */
-    private function getPaymentIconStyle()
-    {
-        $paymentIconType = $this->config->getValue('widget_appearance/payment_icon_type');
-        if ($paymentIconType == PaymentIconType::PAYMENT_ICON_STATIC) {
-            return '.op-payment-widget-container > div.list > label.imgLabel{display: none;}';
-        }
-        return '';
     }
 }

@@ -37,7 +37,7 @@
         </div>
         <!-- /ko -->
         <!-- ko ifnot: isHostedIntegration() -->
-        <div data-bind="visible: isSuccessResponse" id="paymentNetworks" class="payment-networks-container"></div>
+        <div data-bind="attr: {'class':getPaymentNetworkDivClassAttribute()}, visible: isSuccessResponse" id="paymentNetworks"></div>
         <div data-bind="visible: isSuccessResponse" id="submitBtnContainer" class="submitBtn submit-buttons-container">
             <button
                 id="submitBtn"
