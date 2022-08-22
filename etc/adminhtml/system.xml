@@ -88,8 +88,7 @@
                     <label>Magento-Payoneer Language Mapping</label>
                     <comment>Mapping will be in the format - magento_language_code:payoneer_language_code. Multiple entries should be separated by comma. Eg: en_CA:en_US,en_NL:en_GB...</comment>
                 </field>
-                <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
-                       showInStore="1">
+                <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment method position</label>
                     <frontend_class>validate-number</frontend_class>
                 </field>
@@ -97,7 +96,19 @@
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <group id="widget_appearance" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="170">
+                <group id="notification_settings" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="170">
+                    <label>Notification Setings</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
+                    <field id="cleanup_days" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Notification Cleanup Days</label>
+                        <comment>Cronjob will remove all the processed notifications which are created this much of days before.eg:4, means remove notification created 4 days before.</comment>
+                    </field>
+                    <field id="send_email_days" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Email Notification Days</label>
+                        <comment>Send email notifications for the unprocessed notification which are created this much of days before.eg:4, means send email for notification which are created 4 days before.</comment>
+                    </field>
+                </group>
+                <group id="widget_appearance" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="175">
                     <label>Payment widget appearance</label>
                     <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
                     <field id="background_color" translate="label comment" type="text" sortOrder="180" showInDefault="1" showInWebsite="1" showInStore="1">

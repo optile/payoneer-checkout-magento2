@@ -37,6 +37,8 @@
                 comment="notification content"/>
         <column xsi:type="varchar" name="cron_status" nullable="true" length="255"
                 comment="cron status"/>
+        <column xsi:type="smallint" name="send_email" unsigned="true" nullable="true" identity="false" default="0"
+                comment="Send Email"/>
         <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
                 comment="Creation Time"/>
         <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
