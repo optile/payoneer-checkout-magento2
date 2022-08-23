@@ -17,6 +17,7 @@ use Magento\Sales\Model\Order\Payment\Transaction;
 use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\CollectionFactory as OrderTransactionCollectionFactory;
 use Payoneer\OpenPaymentGateway\Model\Helper;
 use Payoneer\OpenPaymentGateway\Logger\NotificationLogger;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
  * Class Cancel
@@ -53,6 +54,11 @@ class Cancel implements HttpGetActionInterface
      * @var NotificationLogger
      */
     protected $notificationLogger;
+    
+    /**
+     * @var CheckoutSession
+     */
+    protected $checkoutSession;
 
     /**
      * Helper constructor.
@@ -62,6 +68,7 @@ class Cancel implements HttpGetActionInterface
      * @param TransactionRepositoryInterface $transactionRepository
      * @param OrderTransactionCollectionFactory $orderTransactionCollectionFactory
      * @param NotificationLogger $notificationLogger
+     * @param CheckoutSession $checkoutSession
      */
     public function __construct(
         Context $context,
@@ -69,7 +76,8 @@ class Cancel implements HttpGetActionInterface
         Helper $helper,
         TransactionRepositoryInterface $transactionRepository,
         OrderTransactionCollectionFactory $orderTransactionCollectionFactory,
-        NotificationLogger $notificationLogger
+        NotificationLogger $notificationLogger,
+        CheckoutSession $checkoutSession
     ) {
         $this->context = $context;
         $this->cartRepository = $cartRepository;
@@ -77,6 +85,7 @@ class Cancel implements HttpGetActionInterface
         $this->transactionRepository = $transactionRepository;
         $this->orderTransactionCollectionFactory = $orderTransactionCollectionFactory;
         $this->notificationLogger = $notificationLogger;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -87,6 +96,8 @@ class Cancel implements HttpGetActionInterface
         $reqParams = $this->context->getRequest()->getParams();
 
         try {
+            // Session to skip order confirmation email sending
+            $this->checkoutSession->setIsPayoneerCancelledOrder(true);
             $this->helper->setPayoneerInvalidTxnSession();
             // Place order with invalid transaction details
             $this->saveCartAndPlaceOrder($reqParams);
