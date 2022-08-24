@@ -150,6 +150,7 @@ class OrderUpdate
         }
         $collection = $this->notificationCollectionFactory->create();
         $collection->addFieldToFilter('cron_status', ['eq' => 0]);
+        $collection->addFieldToFilter('send_email', ['eq' => 0]);
         $collection->addFieldToFilter(
             'created_at',
             ['lteq' => $this->getUtcDateXDaysBefore($emailSendDays)]
