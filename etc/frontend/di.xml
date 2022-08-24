@@ -18,4 +18,8 @@
         <plugin name="payoneer_cart_update_plugin"
                 type="Payoneer\OpenPaymentGateway\Plugin\Cart\CartUpdatePlugin" />
     </type>
+    <type name="Magento\Sales\Model\Order\Email\Sender\OrderSender">
+        <plugin name="payoneer_order_email_sender_plugin"
+                type="Payoneer\OpenPaymentGateway\Plugin\Order\Email\Sender\OrderSenderPlugin" />
+    </type>
 </config>
