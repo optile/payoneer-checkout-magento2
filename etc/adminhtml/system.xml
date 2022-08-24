@@ -96,7 +96,7 @@
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <group id="notification_settings" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="170">
+                <group id="notification_settings" translate="label" showInDefault="0" showInWebsite="0" showInStore="0" sortOrder="170">
                     <label>Notification Setings</label>
                     <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
                     <field id="cleanup_days" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
