@@ -67,7 +67,7 @@ class NotificationEmailSender
                 )
                 ->setTemplateVars($emailTemplateVars)
                 ->setFromByScope($fromToAddressData)
-                ->addTo($fromToAddressData)
+                ->addTo($fromToAddressData['email'], $fromToAddressData['name'])
                 ->getTransport();
 
             $transport->sendMessage();
