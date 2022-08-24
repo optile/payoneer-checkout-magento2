@@ -22,6 +22,10 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <language_mapping>zh_Hans_CN:zh_CN,zh_Hant_TW:zh_TW</language_mapping>
+                <notification_settings>
+                    <cleanup_days>100</cleanup_days>
+                    <send_email_days>1</send_email_days>
+                </notification_settings>
                 <widget_appearance>
                     <payment_icon_type>static</payment_icon_type>
                 </widget_appearance>
