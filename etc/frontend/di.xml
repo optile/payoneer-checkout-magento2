@@ -22,4 +22,8 @@
         <plugin name="payoneer_order_email_sender_plugin"
                 type="Payoneer\OpenPaymentGateway\Plugin\Order\Email\Sender\OrderSenderPlugin" />
     </type>
+    <type name="Magento\Sales\Model\Order\Payment">
+        <plugin name="payoneer_invoice_creation_blocker_plugin"
+                type="Payoneer\OpenPaymentGateway\Plugin\Order\PaymentPlugin" />
+    </type>
 </config>

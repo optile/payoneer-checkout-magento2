@@ -98,6 +98,7 @@ class Cancel implements HttpGetActionInterface
         try {
             // Session to skip order confirmation email sending
             $this->checkoutSession->setIsPayoneerCancelledOrder(true);
+            $this->checkoutSession->setPayoneerSkipInvoiceCreation(true);
             $this->helper->setPayoneerInvalidTxnSession();
             // Place order with invalid transaction details
             $this->saveCartAndPlaceOrder($reqParams);
