@@ -37,19 +37,39 @@ class BaseRequestDataBuilder implements BuilderInterface
     {
         $countryId = null;
         $payment = SubjectReader::readPayment($buildSubject);
-        $order = $payment->getOrder();
-
-        //use country of shipping address if it exists, else billing address or store country
-        $countryId = $order->getShippingAddress()?->getCountryId()??$order->getBillingAddress()?->getCountryId()??$this->config->getCountryByStore();
 
         return [
             Config::TRANSACTION_ID  => $payment->getPayment()->getAdditionalInformation(Config::TXN_ID),
-            Config::COUNTRY         => $countryId,
+            Config::COUNTRY         => $this->getCountryId($payment),
             Config::INTEGRATION     => $this->config->getValue('payment_flow'),
             Config::DIVISION        => $this->config->getValue('environment') == Fields::ENVIRONMENT_SANDBOX_VALUE
                 ? $this->config->getValue('sandbox_store_code')
                 : $this->config->getValue('live_store_code'),
             Config::ALLOW_DELETE    => true
         ];
+    }
+
+    /**
+     * @param $payment
+     * @return string
+     */
+    private function getCountryId($payment)
+    {
+        $order = $payment->getOrder();
+
+        //use country of shipping address if it exists, else billing address or store country
+        $shippingAddress = $order->getBillingAddress();
+        if($shippingAddress) {
+            $countryId = $shippingAddress->getCountryId();
+        } else {
+            $billingAddress = $order->getBillingAddress();
+            if($billingAddress) {
+                $countryId = $billingAddress->getCountryId();
+            }
+            else {
+                $countryId = $this->config->getCountryByStore();
+            }
+        }
+        return $countryId;
     }
 }
