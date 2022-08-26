@@ -24,6 +24,7 @@ class Client implements ClientInterface
     const LIST_FETCH            =   'list_fetch';
     const LIST_CAPTURE          =   'list_capture';
     const LIST_UPDATE           =   'list_update';
+    const LIST_DELETE           =   'list_delete';
     const PREAUTH_CANCEL        =   'preauth_cancel';
 
     /**
@@ -132,6 +133,7 @@ class Client implements ClientInterface
             case self::AUTHORIZATION_CANCEL:
             case self::LIST_CAPTURE:
             case self::LIST_FETCH:
+            case self::LIST_DELETE:
                 $responseObj = $this->processRequest($transferObject);
                 break;
             default:
