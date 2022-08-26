@@ -2,6 +2,7 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
+use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
@@ -35,7 +36,6 @@ class BaseRequestDataBuilder implements BuilderInterface
      */
     public function build(array $buildSubject)
     {
-        $countryId = null;
         $payment = SubjectReader::readPayment($buildSubject);
 
         return [
@@ -50,7 +50,7 @@ class BaseRequestDataBuilder implements BuilderInterface
     }
 
     /**
-     * @param $payment
+     * @param PaymentDataObjectInterface $payment
      * @return string
      */
     private function getCountryId($payment)
@@ -59,11 +59,11 @@ class BaseRequestDataBuilder implements BuilderInterface
 
         //use country of shipping address if it exists, else billing address or store country
         $shippingAddress = $order->getShippingAddress();
-        if($shippingAddress) {
+        if(isset($shippingAddress) && $shippingAddress->getCountryId()) {
             $countryId = $shippingAddress->getCountryId();
         } else {
             $billingAddress = $order->getBillingAddress();
-            if($billingAddress) {
+            if(isset($billingAddress) && $billingAddress->getCountryId()) {
                 $countryId = $billingAddress->getCountryId();
             }
             else {

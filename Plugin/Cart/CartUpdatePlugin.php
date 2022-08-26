@@ -58,7 +58,7 @@ class CartUpdatePlugin
             return $result;
         }
 
-        $quoteId = $cart->getQuote()->getId();        
+        $quoteId = $cart->getQuote()->getId();
         $quote = $this->cartRepository->get($quoteId);
         $payment = $quote->getPayment();
         $additionalInformation = $payment->getAdditionalInformation();
@@ -68,9 +68,16 @@ class CartUpdatePlugin
         } else {
             /** @var array <mixed> $response */
             $response = $this->transactionService->process($quote->getPayment(), Config::LIST_UPDATE);
-            $isListExpired = $this->isListExpired($response);
-            if ($isListExpired) {
+            if ($this->isListExpired($response)) {
                 $payment->setAdditionalInformation(Config::LIST_ID, null);
+                $payment->setAdditionalInformation(Config::REDIRECT_URL, null);
+                $quote->setPayment($payment);
+                $this->cartRepository->save($quote);
+            }
+            elseif ($this->updateError($response)) {
+                $this->transactionService->process($quote->getPayment(), Config::LIST_DELETE);
+                $payment->setAdditionalInformation(Config::LIST_ID, null);
+                $payment->setAdditionalInformation(Config::REDIRECT_URL, null);
                 $quote->setPayment($payment);
                 $this->cartRepository->save($quote);
             }
@@ -88,5 +95,20 @@ class CartUpdatePlugin
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param array <mixed> $result
+     * @return bool
+     */
+    public function updateError($result)
+    {
+        if(isset($result['status']) && $result['status'] == 422)
+        {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }

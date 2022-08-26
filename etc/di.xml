@@ -78,6 +78,7 @@
                 <item name="list_capture" xsi:type="string">PayoneerListCaptureCommand</item>
                 <item name="list_fetch" xsi:type="string">PayoneerListFetchCommand</item>
                 <item name="list_update" xsi:type="string">PayoneerListUpdateCommand</item>
+                <item name="list_delete" xsi:type="string">PayoneerListDeleteCommand</item>
             </argument>
         </arguments>
     </virtualType>
@@ -155,6 +156,33 @@
     <virtualType name="PayoneerListUpdateClient" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
         <arguments>
             <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::LIST_UPDATE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Delete Command -->
+    <virtualType name="PayoneerListDeleteCommand" type="Payoneer\OpenPaymentGateway\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayoneerListDeleteRequestBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">PayoneerListDeleteTransferFactory</argument>
+            <argument name="client" xsi:type="object">PayoneerListDeleteClient</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Delete Request Builder -->
+    <virtualType name="PayoneerListDeleteRequestBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite">
+    </virtualType>
+
+    <!-- Payoneer List Delete Transfer Factory -->
+    <virtualType name="PayoneerListDeleteTransferFactory" type="Payoneer\OpenPaymentGateway\Gateway\Http\TransferFactory">
+        <arguments>
+            <argument name="method" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Config\Config::METHOD_DELETE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payoneer List Update Client -->
+    <virtualType name="PayoneerListDeleteClient" type="Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client">
+        <arguments>
+            <argument name="operation" xsi:type="const">Payoneer\OpenPaymentGateway\Gateway\Http\Client\Client::LIST_DELETE</argument>
         </arguments>
     </virtualType>
 

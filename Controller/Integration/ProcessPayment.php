@@ -55,6 +55,11 @@ class ProcessPayment implements ActionInterface
     protected $resultJsonFactory;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * ProcessPayment constructor.
      * @param Session $checkoutSession
      * @param TransactionService $transactionService
@@ -62,6 +67,7 @@ class ProcessPayment implements ActionInterface
      * @param ManagerInterface $messageManager
      * @param Request $request
      * @param JsonFactory $resultJsonFactory
+     * @param Config $config
      */
     public function __construct(
         Session $checkoutSession,
@@ -69,7 +75,8 @@ class ProcessPayment implements ActionInterface
         ListUpdateTransactionService $updateTransactionService,
         ManagerInterface $messageManager,
         Request $request,
-        JsonFactory $resultJsonFactory
+        JsonFactory $resultJsonFactory,
+        Config $config
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->transactionService = $transactionService;
@@ -77,6 +84,7 @@ class ProcessPayment implements ActionInterface
         $this->messageManager = $messageManager;
         $this->request = $request;
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->config = $config;
     }
 
     /**
@@ -103,8 +111,7 @@ class ProcessPayment implements ActionInterface
                     $response = $this->transactionService->process($quote);
                 }
             }
-            $integration = $this->request->getParam('integration');
-            $isHostedIntegration = $integration == self::HOSTED;
+            $isHostedIntegration = $this->config->isHostedIntegration();
             if ($isHostedIntegration) {
                 $jsonData = $this->processHostedResponse($response);
             } else {

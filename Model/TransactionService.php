@@ -125,7 +125,7 @@ class TransactionService
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
         try {
-            $integration = $this->request->getParam('integration');
+            $integration = strtolower($this->config->getIntegration());
             $address = $this->request->getParam('address');
             $address = json_decode($address, true);
 
@@ -189,7 +189,7 @@ class TransactionService
             && isset($result['response']['identification']['longId'])) {
             $listId = $result['response']['identification']['longId'];
             $payment->setAdditionalInformation(Config::LIST_ID, $listId);
-            if($this->request->getParam('integration') == self::HOSTED
+            if(strtolower($this->config->getIntegration()) == self::HOSTED
                 && isset($result['response']['redirect'])
                 && isset($result['response']['redirect']['url'])) {
                     $payment->setAdditionalInformation(Config::REDIRECT_URL, $result['response']['redirect']['url']);

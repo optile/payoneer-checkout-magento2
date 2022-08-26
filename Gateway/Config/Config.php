@@ -43,6 +43,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const LIST_CAPTURE  = 'list_capture';
     const LIST_FETCH    = 'list_fetch';
     const LIST_UPDATE   = 'list_update';
+    const LIST_DELETE   = 'list_delete';
 
     /**
      * Country path
@@ -117,7 +118,10 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     const ENTITY_PAYMENT        =   'payment';
 
-    const HOST_NAME = 'host_name';
+    const HOST_NAME             =   'host_name';
+    const HOSTED                =   'HOSTED';
+    const SELECT_NATIVE         =   'SELECTIVE_NATIVE';
+    const EMBEDDED              =   'embedded';
 
     /**
      * @var StoreManagerInterface
@@ -365,5 +369,21 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             }
         }
         return $storeLocale;
+    }
+
+    /**
+     * Return the payment flow converted to frontend integration type parameter
+     *
+     * @return string
+     */
+    public function getIntegration(): string
+    {
+        if($this->getValue('payment_flow') == Self::HOSTED) {
+            return strtolower(Self::HOSTED);
+            }
+        if($this->getValue('payment_flow') == Self::SELECT_NATIVE) {
+            return Self::EMBEDDED;
+        }
+        return '';
     }
 }
