@@ -58,7 +58,7 @@ class BaseRequestDataBuilder implements BuilderInterface
         $order = $payment->getOrder();
 
         //use country of shipping address if it exists, else billing address or store country
-        $shippingAddress = $order->getBillingAddress();
+        $shippingAddress = $order->getShippingAddress();
         if($shippingAddress) {
             $countryId = $shippingAddress->getCountryId();
         } else {
