@@ -2,6 +2,7 @@
 
 namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
+use Magento\Framework\App\RequestInterface as Request;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -20,12 +21,20 @@ class BaseRequestDataBuilder implements BuilderInterface
     private $config;
 
     /**
+     * @var
+     */
+    private $request;
+
+    /**
      * @param Config $config
+     * @param Request $request
      */
     public function __construct(
-        Config $config
+        Config $config,
+        Request $request
     ) {
         $this->config = $config;
+        $this->request = $request;
     }
 
     /**
@@ -41,7 +50,7 @@ class BaseRequestDataBuilder implements BuilderInterface
         return [
             Config::TRANSACTION_ID  => $payment->getPayment()->getAdditionalInformation(Config::TXN_ID),
             Config::COUNTRY         => $this->getCountryId($payment),
-            Config::INTEGRATION     => $this->config->getValue('payment_flow'),
+            Config::INTEGRATION     => $this->getPaymentFlow(),
             Config::DIVISION        => $this->config->getValue('environment') == Fields::ENVIRONMENT_SANDBOX_VALUE
                 ? $this->config->getValue('sandbox_store_code')
                 : $this->config->getValue('live_store_code'),
@@ -71,5 +80,22 @@ class BaseRequestDataBuilder implements BuilderInterface
             }
         }
         return $countryId;
+    }
+
+    /**
+     * Build payment flow from request
+     *
+     * @return string|void
+     */
+    private function getPaymentFlow()
+    {
+        $integration = $this->request->getParam(Config::INTEGRATION);
+        if($integration == Config::INTEGRATION_HOSTED) {
+            return Config::HOSTED;
+        }
+        if($integration = Config::INTEGRATION_EMBEDDED) {
+            return Config::SELECT_NATIVE;
+        }
+        return $this->config->getValue(Config::PAYMENT_FLOW);
     }
 }

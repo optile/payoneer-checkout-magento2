@@ -127,7 +127,9 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     const HOST_NAME             =   'host_name';
     const HOSTED                =   'HOSTED';
     const SELECT_NATIVE         =   'SELECTIVE_NATIVE';
-    const EMBEDDED              =   'embedded';
+    const INTEGRATION_EMBEDDED  =   'embedded';
+    const INTEGRATION_HOSTED    =   'hosted';
+    const PAYMENT_FLOW          =   'payment_flow';
 
     /**
      * @var StoreManagerInterface
@@ -375,21 +377,5 @@ class Config extends \Magento\Payment\Gateway\Config\Config
             }
         }
         return $storeLocale;
-    }
-
-    /**
-     * Return the payment flow converted to frontend integration type parameter
-     *
-     * @return string
-     */
-    public function getIntegration(): string
-    {
-        if($this->getValue('payment_flow') == Self::HOSTED) {
-            return strtolower(Self::HOSTED);
-            }
-        if($this->getValue('payment_flow') == Self::SELECT_NATIVE) {
-            return Self::EMBEDDED;
-        }
-        return '';
     }
 }

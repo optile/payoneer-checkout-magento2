@@ -55,11 +55,6 @@ class ProcessPayment implements ActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
      * ProcessPayment constructor.
      * @param Session $checkoutSession
      * @param TransactionService $transactionService
@@ -75,8 +70,7 @@ class ProcessPayment implements ActionInterface
         ListUpdateTransactionService $updateTransactionService,
         ManagerInterface $messageManager,
         Request $request,
-        JsonFactory $resultJsonFactory,
-        Config $config
+        JsonFactory $resultJsonFactory
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->transactionService = $transactionService;
@@ -84,7 +78,6 @@ class ProcessPayment implements ActionInterface
         $this->messageManager = $messageManager;
         $this->request = $request;
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->config = $config;
     }
 
     /**
@@ -111,8 +104,7 @@ class ProcessPayment implements ActionInterface
                     $response = $this->transactionService->process($quote);
                 }
             }
-            $isHostedIntegration = $this->config->isHostedIntegration();
-            if ($isHostedIntegration) {
+            if ($this->isHostedIntegration()) {
                 $jsonData = $this->processHostedResponse($response);
             } else {
                 $jsonData = $this->processEmbeddedResponse($response);
@@ -191,5 +183,13 @@ class ProcessPayment implements ActionInterface
             $this->messageManager->addErrorMessage(__('We couldn\'t process the payment'));
         }
         return $jsonData;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHostedIntegration()
+    {
+        return $this->request->getParam(Config::INTEGRATION) == Config::INTEGRATION_HOSTED;
     }
 }

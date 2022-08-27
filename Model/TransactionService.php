@@ -125,12 +125,11 @@ class TransactionService
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
         try {
-            $integration = strtolower($this->config->getIntegration());
             $address = $this->request->getParam('address');
             $address = json_decode($address, true);
 
             /** @var ResultInterface $result */
-            $result = $this->commandPool->get($integration)->execute([
+            $result = $this->commandPool->get($this->getIntegration())->execute([
                 'payment' => $paymentDataObject,
                 'amount' => $quote->getGrandTotal(),
                 'address' => $address,
@@ -189,7 +188,7 @@ class TransactionService
             && isset($result['response']['identification']['longId'])) {
             $listId = $result['response']['identification']['longId'];
             $payment->setAdditionalInformation(Config::LIST_ID, $listId);
-            if(strtolower($this->config->getIntegration()) == self::HOSTED
+            if($this->getIntegration() == Config::INTEGRATION_HOSTED
                 && isset($result['response']['redirect'])
                 && isset($result['response']['redirect']['url'])) {
                     $payment->setAdditionalInformation(Config::REDIRECT_URL, $result['response']['redirect']['url']);
@@ -208,5 +207,15 @@ class TransactionService
         $quote->setPayment($payment);
         //$this->quoteRepository->save($quote);//Gift cart amount is getting as null if quoterepository save is called
         $quote->save();/** @phpstan-ignore-line */
+    }
+
+    /**
+     * Get integration type from request
+     *
+     * @return string
+     */
+    private function getIntegration()
+    {
+        return (string)$this->request->getParam(Config::INTEGRATION);
     }
 }

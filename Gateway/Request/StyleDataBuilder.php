@@ -6,6 +6,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
+use Magento\Framework\App\RequestInterface as Request;
 
 /**
  * Class StyleDataBuilder
@@ -23,15 +24,23 @@ class StyleDataBuilder implements BuilderInterface
     private $urlBuilder;
 
     /**
+     * @var Request
+     */
+    private $request;
+
+    /**
      * @param UrlInterface $urlBuilder
      * @param Config $config
+     * @param Request $request
      */
     public function __construct(
         UrlInterface $urlBuilder,
-        Config $config
+        Config $config,
+        Request $request
     ) {
         $this->urlBuilder = $urlBuilder;
         $this->config = $config;
+        $this->request = $request;
     }
 
     /**
@@ -51,7 +60,7 @@ class StyleDataBuilder implements BuilderInterface
             ]
         ];
 
-        if ($this->config->isHostedIntegration()) {
+        if ($this->isHostedIntegration()) {
             return $styleData;
         } else {
             $styleDataValues = $this->config->getStyleConfig();
@@ -64,5 +73,21 @@ class StyleDataBuilder implements BuilderInterface
         }
 
         return $styleData;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isHostedIntegration()
+    {
+        $integration = $this->request->getParam(Config::INTEGRATION);
+        if($integration  == Config::INTEGRATION_HOSTED)
+        {
+            return true;
+        }
+        if($this->config->getValue(Config::PAYMENT_FLOW) == Config::HOSTED) {
+            return true;
+        }
+        return false;
     }
 }
