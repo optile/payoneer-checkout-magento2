@@ -110,10 +110,9 @@ class PayoneerResponseHandler implements HandlerInterface
                 $refundResponse
             );
         } else {
-            $orderPayment->setAdditionalInformation(
-                $this->additionalInfoKey,
-                $additionalInfo
-            );
+            $paymentAdditionalInfo = $orderPayment->getAdditionalInformation();
+            $mergedInfo = array_merge($paymentAdditionalInfo, $additionalInfo);
+            $orderPayment->setAdditionalInformation($mergedInfo);
         }
         $orderPayment->setTransactionAdditionalInfo(
             Transaction::RAW_DETAILS,
