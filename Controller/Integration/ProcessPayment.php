@@ -99,8 +99,8 @@ class ProcessPayment implements ActionInterface
                 /** @var array <mixed> $response */
                 $response = $this->updateTransactionService->process($quote->getPayment(), Config::LIST_UPDATE);
 
-                //if list session expired or gave an update error, create a new one
-                if ($this->isListExpired($response) || $this->updateError($response)) {
+                //if list session gave an update error, create a new one
+                if ($this->updateError($response)) {
                     $response = $this->transactionService->process($quote);
                 }
             }
@@ -136,7 +136,7 @@ class ProcessPayment implements ActionInterface
      */
     public function updateError($result)
     {
-        if(isset($result['status']) && $result['status'] == 422)
+        if(isset($result['status']) && ($result['status'] == 422 || $result['status'] == 409))
         {
             return true;
         }
