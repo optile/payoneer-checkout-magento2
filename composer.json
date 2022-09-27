@@ -1,13 +1,8 @@
 {
     "name": "payoneer/open-payment-gateway",
-    "description": "Integration with payment gateway",
+    "description": "Integration with Payoneer Open Payment Gateway (OPG)",
     "require": {
-        "php": "~5.5.0|~5.6.0|~7.0.0",
-        "magento/module-sales": "100.0.*",
-        "magento/module-checkout": "100.0.*",
-        "magento/module-payment": "100.0.*",
-        "magento/framework": "100.0.*",
-        "magento/magento-composer-installer": "100.0.*"
+        "php": "~7.3|~7.4|~8.1"
     },
     "type": "magento2-module",
     "version": "1.0.0",
