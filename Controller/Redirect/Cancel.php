@@ -54,7 +54,7 @@ class Cancel implements HttpGetActionInterface
      * @var NotificationLogger
      */
     protected $notificationLogger;
-    
+
     /**
      * @var CheckoutSession
      */
@@ -102,8 +102,8 @@ class Cancel implements HttpGetActionInterface
             $this->helper->setPayoneerInvalidTxnSession();
             // Place order with invalid transaction details
             $this->saveCartAndPlaceOrder($reqParams);
-            // Redirect to cart with previous cart data
-            $this->helper->redirectToReorderCart();
+            // Restore quote
+            $this->checkoutSession->restoreQuote();
             // Update the invalid order transaction type to void
             $this->updateTransactionType();
             //Add comment to the order
