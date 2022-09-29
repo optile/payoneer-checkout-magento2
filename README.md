@@ -4,7 +4,7 @@ This library includes the files of the Magento 2 Extension for Payoneer Checkout
 
 ## Requirements
 
-Magento versions 2.4.0 - 2.4.4
+Magento versions 2.4.0 - 2.4.5
 
 ## Install via [composer](https://getcomposer.org/download/) (recommended)
 
