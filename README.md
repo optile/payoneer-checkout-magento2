@@ -2,11 +2,31 @@
 
 This library includes the files of the Magento 2 Extension for Payoneer Checkout or Open Payment Gateway (OPG). The directories hierarchy is as positioned in a standard magento 2 project library.
 
+## Version
+
+Payoneer Magento Extension version: 0.5
+
+## Release Notes
+
+### 0.5 - 2022-09-30
+
+- Compatibility with Magento 2.4.5
+- Fixed issue with mini cart in case of failed transactions.
+- Update list session for already existing sessions.
+- Create new payment list session if the update session fails.
+- Fixed issue with transaction page for captured orders.
+- New Feature to display static payment icons.
+- Handle notifications from Payoneer immediately.
+- Compatibility with Magento 2.4.0
+- Fixed issue with invoice of cancelled orders.
+- Localization in Simplified and Traditional Chinese.
+- Fixed issue with partial refund.
+
 ## Requirements
 
 Magento versions 2.4.0 - 2.4.5
 
-## Install via [composer](https://getcomposer.org/download/) (recommended)
+## Install via [composer](https://getcomposer.org/download/)
 
 Run the following command under your Magento 2 root dir:
 
