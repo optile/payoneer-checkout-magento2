@@ -32,6 +32,7 @@ class ConfigProvider implements ConfigProviderInterface
 
     /**
      * ConfigProvider constructor.
+     * @param StoreManagerInterface $storeManager
      * @param Config $config
      * @param Helper $helper
      */
