@@ -143,7 +143,7 @@ define(
                     integrationType = 'embedded';
                 }
                 $('.payoneer.message.error').hide();
-                let endpoint = window.checkoutConfig.payment.payoneer.config.refreshUrl;
+                let endpoint = window.checkoutConfig.payment.payoneer.config.processPaymentUrl;
                 $('body').trigger('processStart');
                 self.shouldShowMessage(false);
                 $.ajax({

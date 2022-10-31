@@ -3,6 +3,7 @@
 namespace Payoneer\OpenPaymentGateway\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\Store;
 use Magento\Store\Model\StoreManagerInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
@@ -48,7 +49,7 @@ class ConfigProvider implements ConfigProviderInterface
      * Retrieve assoc array of checkout configuration
      *
      * @return array <mixed>
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getConfig()
     {
@@ -63,7 +64,10 @@ class ConfigProvider implements ConfigProviderInterface
                         'payment_flow' => $this->config->getValue('payment_flow'),
                         'widgetCssUrl' => $this->getStaticFilePath(),
                         'payment_icon_type' => $this->config->getValue('widget_appearance/payment_icon_type'),
-                        'refreshUrl' => $store->getUrl('payoneer/integration/processpayment', ['_secure' => $store->isCurrentlySecure()]),
+                        'processPaymentUrl' => $store->getUrl(
+                            'payoneer/integration/processpayment',
+                            ['_secure' => $store->isCurrentlySecure()]
+                        ),
                     ]
                 ]
             ]
