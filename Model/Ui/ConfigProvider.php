@@ -3,6 +3,8 @@
 namespace Payoneer\OpenPaymentGateway\Model\Ui;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
+use Magento\Store\Model\Store;
+use Magento\Store\Model\StoreManagerInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\Helper;
 
@@ -12,6 +14,10 @@ use Payoneer\OpenPaymentGateway\Model\Helper;
 class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'payoneer';
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * @var Config
@@ -29,9 +35,11 @@ class ConfigProvider implements ConfigProviderInterface
      * @param Helper $helper
      */
     public function __construct(
+        StoreManagerInterface $storeManager,
         Config $config,
         Helper $helper
     ) {
+        $this->storeManager = $storeManager;
         $this->config = $config;
         $this->helper = $helper;
     }
@@ -40,9 +48,12 @@ class ConfigProvider implements ConfigProviderInterface
      * Retrieve assoc array of checkout configuration
      *
      * @return array <mixed>
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getConfig()
     {
+        /** @var Store $store */
+        $store = $this->storeManager->getStore();
         return [
             'payment' => [
                 self::CODE => [
@@ -51,7 +62,8 @@ class ConfigProvider implements ConfigProviderInterface
                         'environment' => $this->config->getValue('environment'),
                         'payment_flow' => $this->config->getValue('payment_flow'),
                         'widgetCssUrl' => $this->getStaticFilePath(),
-                        'payment_icon_type' => $this->config->getValue('widget_appearance/payment_icon_type')
+                        'payment_icon_type' => $this->config->getValue('widget_appearance/payment_icon_type'),
+                        'refreshUrl' => $store->getUrl('payoneer/integration/processpayment', ['_secure' => $store->isCurrentlySecure()]),
                     ]
                 ]
             ]
