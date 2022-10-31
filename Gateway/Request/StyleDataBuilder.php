@@ -81,11 +81,10 @@ class StyleDataBuilder implements BuilderInterface
     private function isHostedIntegration()
     {
         $integration = $this->request->getParam(Config::INTEGRATION);
-        if($integration  == Config::INTEGRATION_HOSTED)
-        {
+        if ($integration  == Config::INTEGRATION_HOSTED) {
             return true;
         }
-        if($this->config->getValue(Config::PAYMENT_FLOW) == Config::HOSTED) {
+        if ($this->config->getValue(Config::PAYMENT_FLOW) == Config::HOSTED) {
             return true;
         }
         return false;

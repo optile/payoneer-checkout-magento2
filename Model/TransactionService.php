@@ -135,7 +135,7 @@ class TransactionService
                 'address' => $address,
                 'totalItemsCount' => $quote->getItemsCount()
             ]);
-
+            /** @phpstan-ignore-next-line */
             $this->setAdditionalInformation($quote, $result);
 
             return $result;
@@ -188,7 +188,7 @@ class TransactionService
             && isset($result['response']['identification']['longId'])) {
             $listId = $result['response']['identification']['longId'];
             $payment->setAdditionalInformation(Config::LIST_ID, $listId);
-            if($this->getIntegration() == Config::INTEGRATION_HOSTED
+            if ($this->getIntegration() == Config::INTEGRATION_HOSTED
                 && isset($result['response']['redirect'])
                 && isset($result['response']['redirect']['url'])) {
                     $payment->setAdditionalInformation(Config::REDIRECT_URL, $result['response']['redirect']['url']);
