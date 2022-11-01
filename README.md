@@ -8,6 +8,11 @@ Payoneer Magento Extension version: 0.5
 
 ## Release Notes
 
+### 0.6 - 2022-11-01
+
+- Fixed issue with locale sent to PSP list session
+- Updated documentation
+
 ### 0.5 - 2022-09-30
 
 - Compatibility with Magento 2.4.5
@@ -25,6 +30,8 @@ Payoneer Magento Extension version: 0.5
 ## Requirements
 
 Magento versions 2.4.0 - 2.4.5
+
+PHP versions 7.3, 7.4, 8.1
 
 ## Install via [composer](https://getcomposer.org/download/)
 
