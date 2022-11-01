@@ -4,7 +4,7 @@ This library includes the files of the Magento 2 Extension for Payoneer Checkout
 
 ## Version
 
-Payoneer Magento Extension version: 0.5
+Payoneer Magento Extension version: 0.6
 
 ## Release Notes
 
