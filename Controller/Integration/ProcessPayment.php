@@ -11,6 +11,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Payment\Gateway\Command\ResultInterface;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\ListUpdateTransactionService;
 use Payoneer\OpenPaymentGateway\Model\TransactionService;
@@ -62,7 +63,6 @@ class ProcessPayment implements ActionInterface
      * @param ManagerInterface $messageManager
      * @param Request $request
      * @param JsonFactory $resultJsonFactory
-     * @param Config $config
      */
     public function __construct(
         Session $checkoutSession,
@@ -91,6 +91,7 @@ class ProcessPayment implements ActionInterface
         $quote = $this->checkoutSession->getQuote();
         $payment = $quote->getPayment();
         $additionalInformation = $payment->getAdditionalInformation();
+        /** @phpstan-ignore-next-line */
         $listId = isset($additionalInformation[Config::LIST_ID]) ?? $additionalInformation[Config::LIST_ID];
         try {
             if (!$listId) {
@@ -136,19 +137,19 @@ class ProcessPayment implements ActionInterface
      */
     public function updateError($result)
     {
-        if(isset($result['status']) && ($result['status'] == 422 || $result['status'] == 409))
-        {
+        if (isset($result['status']) && ($result['status'] == 422 || $result['status'] == 409)) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     /**
      * Process response of hosted integration
-     * @param array <mixed> $result
+     * @param ResultInterface|null|bool|array <mixed> $result
      * @return array <mixed>
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function processHostedResponse($result)
     {
@@ -158,7 +159,7 @@ class ProcessPayment implements ActionInterface
             $quote = $this->checkoutSession->getQuote();
             $payment = $quote->getPayment();
             $additionalInformation = $payment->getAdditionalInformation();
-            if(isset($additionalInformation[Config::REDIRECT_URL])) {
+            if (isset($additionalInformation[Config::REDIRECT_URL])) {
                 $redirectURL = $additionalInformation[Config::REDIRECT_URL];
             } else {
                 $this->messageManager->addErrorMessage(__('We couldn\'t process the payment'));
@@ -169,7 +170,7 @@ class ProcessPayment implements ActionInterface
 
     /**
      * Process response of embedded integration
-     * @param array <mixed> $result
+     * @param ResultInterface|null|bool|array <mixed> $result
      * @return array <mixed>
      */
     public function processEmbeddedResponse($result)

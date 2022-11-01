@@ -5,6 +5,7 @@ namespace Payoneer\OpenPaymentGateway\Plugin\Cart;
 use Magento\Checkout\Model\Cart;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Model\Quote;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 use Payoneer\OpenPaymentGateway\Model\ListUpdateTransactionService;
 
@@ -59,6 +60,7 @@ class CartUpdatePlugin
         }
 
         $quoteId = $cart->getQuote()->getId();
+        /** @var Quote $quote */
         $quote = $this->cartRepository->get($quoteId);
         $payment = $quote->getPayment();
         $additionalInformation = $payment->getAdditionalInformation();
@@ -73,8 +75,7 @@ class CartUpdatePlugin
                 $payment->setAdditionalInformation(Config::REDIRECT_URL, null);
                 $quote->setPayment($payment);
                 $this->cartRepository->save($quote);
-            }
-            elseif ($this->updateError($response)) {
+            } elseif ($this->updateError($response)) {
                 $this->transactionService->process($quote->getPayment(), Config::LIST_DELETE);
                 $payment->setAdditionalInformation(Config::LIST_ID, null);
                 $payment->setAdditionalInformation(Config::REDIRECT_URL, null);
@@ -103,11 +104,9 @@ class CartUpdatePlugin
      */
     public function updateError($result)
     {
-        if(isset($result['status']) && $result['status'] == 422)
-        {
+        if (isset($result['status']) && $result['status'] == 422) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }

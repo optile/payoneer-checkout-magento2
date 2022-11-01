@@ -21,7 +21,7 @@ class BaseRequestDataBuilder implements BuilderInterface
     private $config;
 
     /**
-     * @var
+     * @var Request
      */
     private $request;
 
@@ -68,14 +68,13 @@ class BaseRequestDataBuilder implements BuilderInterface
 
         //use country of shipping address if it exists, else billing address or store country
         $shippingAddress = $order->getShippingAddress();
-        if(isset($shippingAddress) && $shippingAddress->getCountryId()) {
+        if (isset($shippingAddress) && $shippingAddress->getCountryId()) {
             $countryId = $shippingAddress->getCountryId();
         } else {
             $billingAddress = $order->getBillingAddress();
-            if(isset($billingAddress) && $billingAddress->getCountryId()) {
+            if (isset($billingAddress) && $billingAddress->getCountryId()) {
                 $countryId = $billingAddress->getCountryId();
-            }
-            else {
+            } else {
                 $countryId = $this->config->getCountryByStore();
             }
         }
@@ -85,15 +84,15 @@ class BaseRequestDataBuilder implements BuilderInterface
     /**
      * Build payment flow from request
      *
-     * @return string|void
+     * @return string
      */
     private function getPaymentFlow()
     {
         $integration = $this->request->getParam(Config::INTEGRATION);
-        if($integration == Config::INTEGRATION_HOSTED) {
+        if ($integration == Config::INTEGRATION_HOSTED) {
             return Config::HOSTED;
         }
-        if($integration = Config::INTEGRATION_EMBEDDED) {
+        if ($integration == Config::INTEGRATION_EMBEDDED) {
             return Config::SELECT_NATIVE;
         }
         return $this->config->getValue(Config::PAYMENT_FLOW);

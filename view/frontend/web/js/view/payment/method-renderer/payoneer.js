@@ -8,6 +8,7 @@ define(
         'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/model/full-screen-loader',
+        'mage/url',
         'payoneerWidget'
     ],
     function (
@@ -17,6 +18,7 @@ define(
         checkoutData,
         quote,
         fullScreenLoader,
+        urlBuilder,
         payoneerWidget
     ) {
         'use strict';
@@ -141,11 +143,11 @@ define(
                     integrationType = 'embedded';
                 }
                 $('.payoneer.message.error').hide();
-                let endpoint = '/payoneer/integration/processpayment';
+                let endpoint = window.checkoutConfig.payment.payoneer.config.processPaymentUrl;
                 $('body').trigger('processStart');
                 self.shouldShowMessage(false);
                 $.ajax({
-                    url: endpoint,
+                    url: urlBuilder.build(endpoint),
                     type: "POST",
                     data: {
                         integration : integrationType,
@@ -198,7 +200,7 @@ define(
                 }
                 return false;
             },
-            
+
             /**
              * Get #paymentNetworks div class attribute value
              */

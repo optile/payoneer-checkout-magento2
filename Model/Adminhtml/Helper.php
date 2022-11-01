@@ -278,7 +278,7 @@ class Helper
                 $this->showErrorMessage(__('We can\'t send an email with the invoice. Try again later.'));
             }
         } catch (\Exception $e) {
-            $this->showSuccessMessage(__('We can\'t generate the invoice. Try again later.'), $e);
+            $this->showSuccessMessage(__('We can\'t generate the invoice. Try again later.'));
         }
     }
 
