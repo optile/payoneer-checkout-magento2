@@ -3,6 +3,7 @@
 namespace Payoneer\OpenPaymentGateway\Gateway\Request;
 
 use Magento\Framework\App\RequestInterface as Request;
+use Magento\Framework\Module\ModuleListInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Payment\Gateway\Request\BuilderInterface;
@@ -26,15 +27,22 @@ class BaseRequestDataBuilder implements BuilderInterface
     private $request;
 
     /**
+     * @var ModuleListInterface
+     */
+    private $moduleList;
+
+    /**
      * @param Config $config
      * @param Request $request
      */
     public function __construct(
         Config $config,
-        Request $request
+        Request $request,
+        ModuleListInterface $moduleList
     ) {
         $this->config = $config;
         $this->request = $request;
+        $this->moduleList = $moduleList;
     }
 
     /**
@@ -54,7 +62,14 @@ class BaseRequestDataBuilder implements BuilderInterface
             Config::DIVISION        => $this->config->getValue('environment') == Fields::ENVIRONMENT_SANDBOX_VALUE
                 ? $this->config->getValue('sandbox_store_code')
                 : $this->config->getValue('live_store_code'),
-            Config::ALLOW_DELETE    => true
+            Config::ALLOW_DELETE    => true,
+
+            //system attributes
+            "system"                => [
+                "type"              => "SHOP_PLATFORM",
+                "code"              => "MAGENTO",
+                "version"           => $this->moduleList->getOne('Payoneer_OpenPaymentGateway')['setup_version']
+            ]
         ];
     }
 
