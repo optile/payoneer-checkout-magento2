@@ -1,5 +1,5 @@
 <div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
-    <div class="payment-method-title field choice">
+    <div class="payment-method-title field choice payoneer-payment-method-title">
         <input type="radio"
                name="payment[method]"
                class="radio"
@@ -8,8 +8,9 @@
             <span data-bind="text: getTitle()"></span>
         </label>
         <!-- ko if: showStaticPaymentIcons()-->
-        <img src="https://resources.sandbox.oscato.com/resource/network/MRS_TEST_TRYZENS/zh_CN/VISA/logo.png" class="payment-method-icon" name="visa_logo" alt="Visa logo" />
-        <img src="https://resources.sandbox.oscato.com/resource/network/MRS_TEST_TRYZENS/zh_CN/MASTERCARD/logo.png" class="payment-method-icon" name="mastercard_logo" alt="Mastercard logo" />
+        <img data-bind="attr: { src: require.toUrl('Payoneer_OpenPaymentGateway/images/visa.svg') }" class="payment-method-icon" name="visa_logo" alt="Visa logo" />
+        <img data-bind="attr: { src: require.toUrl('Payoneer_OpenPaymentGateway/images/mastercard.svg') }" class="payment-method-icon" name="mastercard_logo" alt="Mastercard logo" />
+        <img data-bind="attr: { src: require.toUrl('Payoneer_OpenPaymentGateway/images/amex.svg') }" class="payment-method-icon" name="amex_logo" alt="AmericanExpress logo" />
         <!-- /ko -->
     </div>
 
