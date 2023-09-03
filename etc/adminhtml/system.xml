@@ -49,6 +49,11 @@
                         <field id="environment">test</field>
                     </depends>
                 </field>
+                <field id="enable_taxes" translate="label" type="select" sortOrder="95" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Taxes</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Enable tax rates and calculations</comment>
+                </field>
                 <field id="sandbox_host_name" translate="label" type="text" sortOrder="100" showInDefault="0" showInWebsite="0" showInStore="0">
                     <label>Test OPG hostname</label>
                     <validate>validate-url validate-no-html-tags</validate>
