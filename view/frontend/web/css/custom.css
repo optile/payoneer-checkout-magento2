@@ -4,3 +4,7 @@
 .checkout-container .checkout-payment-method .payment-method .payment-method-content .payment-networks-container.static label.imgLabel {
     display: none;
 }
+
+.payoneer-payment-method-title {
+    display: flex;
+}
