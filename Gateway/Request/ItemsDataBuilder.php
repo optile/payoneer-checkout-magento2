@@ -16,6 +16,7 @@ use Payoneer\OpenPaymentGateway\Model\Helper;
 class ItemsDataBuilder implements BuilderInterface
 {
     const ADJUSTMENTS = 'Total Adjustments';
+    const ADJUSTMENTS_CODE = 'total_adjustments';
 
     /**
      * @var Helper
@@ -91,8 +92,12 @@ class ItemsDataBuilder implements BuilderInterface
                 $totalAdjustments += $order->getTaxAmount();
             }
             $result[] = [
-                Config::NAME => self::ADJUSTMENTS,
-                Config::AMOUNT => number_format($totalAdjustments, 2)
+                Config::NAME        =>  self::ADJUSTMENTS,
+                Config::AMOUNT      =>  number_format($totalAdjustments, 2),
+                Config::QUANTITY    =>  1,
+                Config::CURRENCY    =>  $order->getCurrencyCode(),
+                Config::NET_AMOUNT  =>  $this->helper->formatNumber($totalAdjustments),
+                Config::SKU         =>  self::ADJUSTMENTS_CODE,
             ];
         }
 

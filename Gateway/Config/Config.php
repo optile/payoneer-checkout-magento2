@@ -73,6 +73,7 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     const PAYMENT               =   'payment';
     const AMOUNT                =   'amount';
+    const PAYMENT_NET_AMOUNT    =   'netAmount';
     const CURRENCY              =   'currency';
     const REFERENCE             =   'reference';
     const CUSTOMER              =   'customer';
@@ -240,19 +241,89 @@ class Config extends \Magento\Payment\Gateway\Config\Config
     public function getMockData()
     {
         return [
-            'transactionId' => '21-0005',
-            'country' => 'DE',
+            'transactionId' => 't-'.time(),
+            'country' => 'US',
+            'integration' => 'SELECTIVE_NATIVE',
             'customer' => [
-                'email' => 'test@test.com'
+                'number' => 'c-'.time(),
+                'email' => 'e-'.time().'@example.com',
+                'addresses' => [
+                    'shipping' => [
+                        'street' => 'Ganghoferstr.',
+                        'houseNumber' => '39a',
+                        'zip' => '81241',
+                        'city' => 'New York',
+                        'country' => 'US',
+                        'id' => 'shipping',
+                        'name' => [
+                            'firstName' => 'Terry',
+                            'lastName' => 'Jerry'
+                        ]
+                    ],
+                    'billing' => [
+                        'street' => 'Ganghoferstr.',
+                        'houseNumber' => '39b',
+                        'zip' => '80339',
+                        'city' => 'New York',
+                        'country' => 'US',
+                        'id' => 'billing',
+                        'name' => [
+                            'firstName' => 'Terry',
+                            'lastName' => 'Jerry'
+                        ]
+                    ]
+                ],
+                'phones' => [
+                    'mobile' => [
+                        'unstructuredNumber' => '49089880088'
+                    ]
+                ]
             ],
             'payment' => [
-                'amount' => 0.89,
-                'currency' => 'EUR',
-                'reference' => 'Shop 101/20-03-2016'
+                'reference' => 'pr-'.time(),
+                'amount' => 9.99,
+                'netAmount' => 9.99,
+                'currency' => 'USD',
+                'invoiceId' => 'i-'.time()
+            ],
+            'clientInfo' => [
+                'timezone' => 'Europe/Berlin',
+                'javaEnabled' => true,
+                'language' => 'de-DE',
+                'colorDepth' => 24,
+                'browserScreenWidth' => 1521,
+                'browserScreenHeight' => 391,
+                'headers' => [
+                    [
+                        'name' => 'User-Agent',
+                        'value' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36'
+                    ]
+                ]
+            ],
+            'style' => [
+                'hostedVersion' => 'v4'
+            ],
+            'products' => [
+                [
+                    'code' => 'PN-001276',
+                    'name' => 'Juggling Balls (R)',
+                    'amount' => 9.99,
+                    'netAmount' => 9.99,
+                    'taxAmount' => 0,
+                    'taxRatePercentage' => 10,
+                    'currency' => 'USD',
+                    'quantity' => 1,
+                    'shippingAddressId' => 'billing',
+                    'type' => 'DIGITAL'
+                ]
             ],
             'callback' => [
-                'returnUrl' => 'https://resources.integration.oscato.com/paymentpage/v3-examples/success.html',
-                'cancelUrl' => 'https://resources.integration.oscato.com/paymentpage/v3-examples/cancel.html'
+                'returnUrl' => 'https://dev.oscato.com/shop/success.html',
+                'cancelUrl' => 'https://dev.oscato.com/shop/cancel.html',
+                'notificationUrl' => 'https://dev.oscato.com/morpritam'
+            ],
+            'preselection' => [
+                'deferral' => 'ANY'
             ]
         ];
     }

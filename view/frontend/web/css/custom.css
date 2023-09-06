@@ -1,10 +1,13 @@
-.checkout-container .checkout-payment-method .payment-method .payment-method-icon {
-    vertical-align: middle;
-}
-.checkout-container .checkout-payment-method .payment-method .payment-method-content .payment-networks-container.static label.imgLabel {
-    display: none;
+/* use .op-payment-widget-container to apply styles to payment widget only
+In this example color of input is red for any input field inside payment widget */
+.op-payment-widget-container input {
+    color: red;
 }
 
-.payoneer-payment-method-title {
-    display: flex;
+/* use #networkForm to apply styles to form of selective native iframe only
+In this example color of input is green for any input field inside iframe form of selective native */
+#networkForm input {
+    color: green;
 }
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uL3NyYy9jdXN0b20uY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO2lGQUNpRjtBQUNqRjtJQUNJLFVBQVU7QUFDZDs7QUFFQTtvR0FDb0c7QUFDcEc7SUFDSSxZQUFZO0FBQ2hCIiwiZmlsZSI6ImN1c3RvbS5jc3MiLCJzb3VyY2VzQ29udGVudCI6WyIvKiB1c2UgLm9wLXBheW1lbnQtd2lkZ2V0LWNvbnRhaW5lciB0byBhcHBseSBzdHlsZXMgdG8gcGF5bWVudCB3aWRnZXQgb25seVxuSW4gdGhpcyBleGFtcGxlIGNvbG9yIG9mIGlucHV0IGlzIHJlZCBmb3IgYW55IGlucHV0IGZpZWxkIGluc2lkZSBwYXltZW50IHdpZGdldCAqL1xuLm9wLXBheW1lbnQtd2lkZ2V0LWNvbnRhaW5lciBpbnB1dCB7XG4gICAgY29sb3I6IHJlZDtcbn1cblxuLyogdXNlICNuZXR3b3JrRm9ybSB0byBhcHBseSBzdHlsZXMgdG8gZm9ybSBvZiBzZWxlY3RpdmUgbmF0aXZlIGlmcmFtZSBvbmx5XG5JbiB0aGlzIGV4YW1wbGUgY29sb3Igb2YgaW5wdXQgaXMgZ3JlZW4gZm9yIGFueSBpbnB1dCBmaWVsZCBpbnNpZGUgaWZyYW1lIGZvcm0gb2Ygc2VsZWN0aXZlIG5hdGl2ZSAqL1xuI25ldHdvcmtGb3JtIGlucHV0IHtcbiAgICBjb2xvcjogZ3JlZW47XG59XG4iXX0= */
