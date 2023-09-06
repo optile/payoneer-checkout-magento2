@@ -74,7 +74,7 @@ class QuoteAdapter extends MagentoQuoteAdapter
     }
 
     /**
-     * Get order Subtotal
+     * Get order Grand Total
      * @return float
      */
     public function getOrderGrandTotal()
