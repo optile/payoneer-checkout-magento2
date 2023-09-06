@@ -13,6 +13,7 @@
                 </field>
                 <field id="merchant_gateway_key" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>API username</label>
+                    <backend_model>Payoneer\OpenPaymentGateway\Model\Config\Backend\ApiValidate</backend_model>
                 </field>
                 <field id="environment" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Environment</label>
