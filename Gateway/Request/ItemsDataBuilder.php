@@ -49,8 +49,17 @@ class ItemsDataBuilder implements BuilderInterface
 
         if ($order->getItems() && $totalItemsCount > 0) {
             $items = $this->buildItems($order);
+            $paymentNetAmount = 0.00;
+            if ($items) {
+                foreach ($items as $item) {
+                    $paymentNetAmount += $item[Config::NET_AMOUNT];
+                }
+            }
             return [
-                Config::PRODUCTS => $items
+                Config::PRODUCTS => $items,
+                Config::PAYMENT => [
+                    Config::NET_AMOUNT => $paymentNetAmount
+                ]
             ];
         } else {
             return [];
@@ -74,33 +83,53 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::NAME            =>  $item->getName(),
                 Config::QUANTITY        =>  $item->getData('qty'),
                 Config::CURRENCY        =>  $order->getCurrencyCode(),
-                Config::AMOUNT          =>  $this->helper->formatNumber($item->getBaseRowTotal()),
+                Config::AMOUNT          =>  $this->helper->formatNumber($item->getBaseRowTotalInclTax()),
                 Config::NET_AMOUNT      =>  $this->helper->formatNumber($item->getBaseRowTotal()),
                 Config::TAX_AMOUNT      =>  $this->helper->formatNumber($item->getBaseTaxAmount()),
-                Config::TAX_PERCENT     =>  $this->helper->formatNumber($item->getBaseRowTotalInclTax())
+                Config::TAX_PERCENT     =>  $this->helper->formatNumber($item->getTaxPercent())
             ];
         }
         if ($order instanceof PayoneerQuoteAdapter) {
             $totalAdjustments = 0.00;
+            $netTotalAdjustments = 0.00;
+            $shippingAmountWithTax = 0.00;
             if ($order->getShippingAmountInclTax() > 0) {
                 $totalAdjustments += $order->getShippingAmountInclTax();
+                $shippingAmountWithTax = $totalAdjustments;
+            }
+            if ($order->getShippingAmount() > 0) {
+                $netTotalAdjustments += $order->getShippingAmount();
             }
             if ($order->getDiscountAmount() < 0) {
                 $totalAdjustments += $order->getDiscountAmount();
             }
-            if ($order->getTaxAmount() > 0) {
-                $totalAdjustments += $order->getTaxAmount();
-            }
+
+            $adjustmentTaxAmount = $shippingAmountWithTax - $netTotalAdjustments;
+            $shippingTaxPercent = $this->calculateShippingTaxPercent($adjustmentTaxAmount, $netTotalAdjustments);
+
             $result[] = [
                 Config::NAME        =>  self::ADJUSTMENTS,
                 Config::AMOUNT      =>  number_format($totalAdjustments, 2),
                 Config::QUANTITY    =>  1,
                 Config::CURRENCY    =>  $order->getCurrencyCode(),
-                Config::NET_AMOUNT  =>  $this->helper->formatNumber($totalAdjustments),
+                Config::NET_AMOUNT  =>  $this->helper->formatNumber($netTotalAdjustments),
                 Config::SKU         =>  self::ADJUSTMENTS_CODE,
+                Config::TAX_AMOUNT  =>  $this->helper->formatNumber($adjustmentTaxAmount),
+                Config::TAX_PERCENT =>  $shippingTaxPercent
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * Calculate Shipping Tax percentage
+     * @param float$taxAmount
+     * @param float $shippingAmount
+     * @return float
+     */
+    private function calculateShippingTaxPercent($taxAmount, $shippingAmount)
+    {
+        return $this->helper->formatNumber(($taxAmount/$shippingAmount) * 100);
     }
 }

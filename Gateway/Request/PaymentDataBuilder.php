@@ -62,10 +62,10 @@ class PaymentDataBuilder implements BuilderInterface
         return [
             Config::PAYMENT => [
                 Config::AMOUNT      => number_format($buildSubject[Config::AMOUNT], 2),
-                Config::PAYMENT_NET_AMOUNT  => $this->helper->formatNumber($order->getOrderGrandTotal()),
                 Config::CURRENCY    => $order->getCurrencyCode(),
                 Config::REFERENCE   => $this->config->getValue('order_reference_message'),
-                Config::INVOICE_ID  => $order->getId()
+                Config::INVOICE_ID  => $order->getId(),
+                Config::TAX_AMOUNT  => $this->helper->formatNumber($order->getTaxAmount())
             ]
         ];
     }

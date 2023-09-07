@@ -73,7 +73,6 @@ class Config extends \Magento\Payment\Gateway\Config\Config
 
     const PAYMENT               =   'payment';
     const AMOUNT                =   'amount';
-    const PAYMENT_NET_AMOUNT    =   'netAmount';
     const CURRENCY              =   'currency';
     const REFERENCE             =   'reference';
     const CUSTOMER              =   'customer';

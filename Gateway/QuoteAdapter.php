@@ -74,15 +74,6 @@ class QuoteAdapter extends MagentoQuoteAdapter
     }
 
     /**
-     * Get order Grand Total
-     * @return float
-     */
-    public function getOrderGrandTotal()
-    {
-        return $this->quote->getBaseGrandTotal();
-    }
-
-    /**
      * @return Address
      */
     protected function getAddressModel()
