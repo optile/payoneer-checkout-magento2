@@ -10,6 +10,7 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Payoneer\OpenPaymentGateway\Gateway\Config\Config as PayoneerConfig;
 use Payoneer\OpenPaymentGateway\Model\Api\Request;
+use Payoneer\OpenPaymentGateway\Model\Adminhtml\Source\Fields;
 
 /**
  * Validate the API credentials before save
@@ -74,7 +75,7 @@ class ApiValidate extends \Magento\Framework\App\Config\Value
             return $this;
         }
 
-        if ($this->getData(self::XML_PATH_ENVIRONMENT) == 'test') {
+        if ($this->getData(self::XML_PATH_ENVIRONMENT) == Fields::ENVIRONMENT_SANDBOX_VALUE) {
             $apiKey = $this->getData(self::XML_PATH_SANDBOX_API_KEY);
             $hostName = $this->getHostValue(self::XML_PATH_SANDBOX_HOST_NAME);
             $storeCode = $this->getData(self::XML_PATH_SANDBOX_STORE_CODE);
