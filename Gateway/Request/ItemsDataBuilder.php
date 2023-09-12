@@ -118,19 +118,4 @@ class ItemsDataBuilder implements BuilderInterface
 
         return $result;
     }
-
-    /**
-     * Calculate Shipping Tax percentage
-     * @param float$taxAmount
-     * @param float $shippingAmount
-     * @return float
-     */
-    private function calculateShippingTaxPercent($taxAmount, $shippingAmount)
-    {
-        if ($taxAmount && $shippingAmount) {
-            return $this->helper->formatNumber(($taxAmount/$shippingAmount) * 100);
-        } else {
-            return 0.00;
-        }
-    }
 }
