@@ -33,7 +33,8 @@ define(
                 this._super()
                     .observe({
                         shouldShowMessage: ko.observable(false),
-                        isSuccessResponse: ko.observable(false)
+                        isSuccessResponse: ko.observable(false),
+                        showPaymentMethod: ko.observable(false)
                     });
 
                 this.shouldShowMessage.subscribe(function (newValue) {
@@ -56,6 +57,12 @@ define(
                     }
                 );
 
+                quote.shippingAddress.subscribe(
+                    function (newAddress) {
+                        self.showHidePaymentMethod(newAddress)
+                    }
+                )
+
                 quote.totals.subscribe(function (totals) {
                     if (self.getCurrentPaymentMethod() === self.getCode()) {
                         self.processPayoneerPayment('');
@@ -67,6 +74,7 @@ define(
             initialize: function () {
                 $('.payoneer.message.error').hide();
                 this._super();
+                this.showHidePaymentMethod('');
             },
 
             getCode: function() {
@@ -162,7 +170,7 @@ define(
                             self.shouldShowMessage(true);
                         }
                     } else{
-                        if (response.links) {
+                        if (response && response.links && response.links.self) {
                             var configObj = {
                                 payButton: 'submitBtn',
                                 payButtonContainer: 'submitBtnContainer',
@@ -206,6 +214,47 @@ define(
              */
              getPaymentNetworkDivClassAttribute: function() {
                 return 'payment-networks-container ' + window.checkoutConfig.payment.payoneer.config.payment_icon_type;
+            },
+
+            /**
+             * On Payment page load, show/hide Payoneer payment method based on MoR
+             */
+            showHidePaymentMethod: function(newAddress) {
+                this.showPaymentMethod(false); //start off by hiding it. And then show if needed.
+                let self = this;
+                let integrationType = '';
+                if(this.isHostedIntegration()) {
+                    integrationType = 'hosted';
+                } else {
+                    integrationType = 'embedded';
+                }
+                let endpoint = window.checkoutConfig.payment.payoneer.config.processPaymentUrl;
+                    $('body').trigger('processStart');
+                self.shouldShowMessage(false);
+                $.ajax({
+                    url: urlBuilder.build(endpoint),
+                    type: "POST",
+                    data: {
+                        integration : integrationType,
+                        shipAddress: JSON.stringify(newAddress)
+                    },
+                    dataType: 'json'
+                }).done(function (response) {
+                    if (response.hidePayment) {
+                        self.showPaymentMethod(false);
+                        $('#paymentNetworks').empty();
+                    }
+                    else {
+                        self.showPaymentMethod(true);
+                    }
+                    $('body').trigger('processStop');
+                    fullScreenLoader.stopLoader();
+                }).fail(function (response) {
+                    $('.payoneer.message.error').show();
+                    $('body').trigger('processStop');
+                    self.shouldShowMessage(true);
+                    fullScreenLoader.stopLoader();
+                });
             },
         });
     }

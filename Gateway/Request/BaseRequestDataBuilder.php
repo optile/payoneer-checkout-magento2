@@ -57,7 +57,7 @@ class BaseRequestDataBuilder implements BuilderInterface
 
         return [
             Config::TRANSACTION_ID  => $payment->getPayment()->getAdditionalInformation(Config::TXN_ID),
-            Config::COUNTRY         => $this->getCountryId($payment),
+            Config::COUNTRY         => $this->getCountryId($payment, $buildSubject),
             Config::INTEGRATION     => $this->getPaymentFlow(),
             Config::DIVISION        => $this->config->getValue('environment') == Fields::ENVIRONMENT_SANDBOX_VALUE
                 ? $this->config->getValue('sandbox_store_code')
@@ -77,23 +77,34 @@ class BaseRequestDataBuilder implements BuilderInterface
      * @param PaymentDataObjectInterface $payment
      * @return string
      */
-    private function getCountryId($payment)
+    private function getCountryId($payment, $buildSubject)
     {
-        $order = $payment->getOrder();
 
         //use country of shipping address if it exists, else billing address or store country
+        $shipAddress = $buildSubject['shipAddress'] ?? null;
+        if ($shipAddress && $shipAddress[Config::COUNTRY_ID]) {
+            return $shipAddress[Config::COUNTRY_ID];
+        }
+
+        $order = $payment->getOrder();
+
         $shippingAddress = $order->getShippingAddress();
         if (isset($shippingAddress) && $shippingAddress->getCountryId()) {
-            $countryId = $shippingAddress->getCountryId();
+            return $shippingAddress->getCountryId();
         } else {
+            $billingAddress = $buildSubject['address'] ?? null;
+            if($billingAddress && $billingAddress[Config::COUNTRY_ID]) {
+                return $billingAddress[Config::COUNTRY_ID];
+            }
             $billingAddress = $order->getBillingAddress();
             if (isset($billingAddress) && $billingAddress->getCountryId()) {
-                $countryId = $billingAddress->getCountryId();
+                return $billingAddress->getCountryId();
             } else {
-                $countryId = $this->config->getCountryByStore();
+                return $this->config->getCountryByStore();
             }
         }
-        return $countryId;
+
+        return null;
     }
 
     /**

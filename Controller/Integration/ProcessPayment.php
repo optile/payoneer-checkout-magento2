@@ -94,18 +94,32 @@ class ProcessPayment implements ActionInterface
         /** @phpstan-ignore-next-line */
         $listId = isset($additionalInformation[Config::LIST_ID]) ?? $additionalInformation[Config::LIST_ID];
         try {
+            $address = $this->request->getParam('address');
+            $address = $address ? json_decode($address, true): null;
+            $shipAddress = $this->request->getParam('shipAddress');
+            $shipAddress = $shipAddress ? json_decode($shipAddress, true): null;
+
             if (!$listId) {
-                $response = $this->transactionService->process($quote);
+                $response = $this->transactionService->process($quote, $address, $shipAddress);
             } else {
                 /** @var array <mixed> $response */
-                $response = $this->updateTransactionService->process($quote->getPayment(), Config::LIST_UPDATE);
+                $response = $this->updateTransactionService->process($quote->getPayment(),
+                    Config::LIST_UPDATE, $address, $shipAddress);
 
                 //if list session gave an update error, create a new one
                 if ($this->updateError($response)) {
-                    $response = $this->transactionService->process($quote);
+                    $response = $this->transactionService->process($quote, $address, $shipAddress);
                 }
             }
-            if ($this->isHostedIntegration()) {
+            if($this->hidePayment($response))
+            {
+                $jsonData = [
+                    'hidePayment' => true,
+                    'status' => $response['response']['status'] ?? '',
+                    'resultInfo' => $response['response']['resultInfo'] ?? ''
+                ];
+            }
+            else if ($this->isHostedIntegration()) {
                 $jsonData = $this->processHostedResponse($response);
             } else {
                 $jsonData = $this->processEmbeddedResponse($response);
@@ -192,5 +206,21 @@ class ProcessPayment implements ActionInterface
     public function isHostedIntegration()
     {
         return $this->request->getParam(Config::INTEGRATION) == Config::INTEGRATION_HOSTED;
+    }
+
+    /**
+     * Based on the response status, hide or show the Payment Method (for MoR)
+     * @param bool|array|ResultInterface|null $response <mixed> $response
+     * @return bool
+     */
+    public function hidePayment($response): bool
+    {
+        $result = false;
+        if ($response['response'] && $response['response']['returnCode']
+            && ($response['response']['returnCode']['name'] == 'INVALID_CONFIGURATION')
+            || $response['response']['returnCode']['name'] == 'INVALID_AMOUNT') {
+            $result = true;
+        }
+        return $result;
     }
 }
