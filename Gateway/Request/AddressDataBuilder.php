@@ -58,7 +58,6 @@ class AddressDataBuilder implements BuilderInterface
 
         $order = $payment->getOrder();
         $billingAddress = $order->getBillingAddress();
-        $shippingAddress = $order->getShippingAddress();
         $billingAddressChanged = false;
         $address = isset($buildSubject['address']) ? $buildSubject['address'] : null;
         if ($address) {
@@ -66,7 +65,16 @@ class AddressDataBuilder implements BuilderInterface
             $billingAddressChanged = true;
         }
 
-        $shippingAddressCountryId = $shippingAddress ? $shippingAddress->getCountryId() : null;
+        $shippingAddress = $order->getShippingAddress();
+        $shippingAddressChanged = false;
+        $shipAddress = $buildSubject['shipAddress'] ?? null;
+        if ($shipAddress) {
+            $shippingAddress = $shipAddress;
+            $shippingAddressChanged = true;
+        }
+        $shippingAddressCountryId = $shippingAddressChanged ?
+                                            $shippingAddress[Config::COUNTRY_ID] ?? null
+                                            : ($shippingAddress ? $shippingAddress->getCountryId() : null);
         if ($shippingAddressCountryId) {
             $this->checkoutSession->setShippingCountryId($shippingAddressCountryId);
         }
@@ -74,10 +82,16 @@ class AddressDataBuilder implements BuilderInterface
         return [
             Config::CUSTOMER => [
                 Config::ADDRESSES => [
-                    Config::SHIPPING => $shippingAddress ? $this->getAddressData($shippingAddress, self::SHIPPING) : [],
-                    Config::BILLING => $billingAddressChanged ?
-                        $this->getNewBillingAddress($billingAddress) :
-                        $this->getAddressData($billingAddress, self::BILLING)
+                    Config::SHIPPING => $shippingAddress ?
+                                            $shippingAddressChanged ?
+                                                $this->getNewShippingAddress($shippingAddress) :
+                                                $this->getAddressData($shippingAddress, self::SHIPPING)
+                                            : [],
+                    Config::BILLING => $billingAddress ?
+                                            $billingAddressChanged ?
+                                                $this->getNewBillingAddress($billingAddress) :
+                                                $this->getAddressData($billingAddress, self::BILLING)
+                                            : []
                 ]
             ]
         ];
@@ -157,6 +171,31 @@ class AddressDataBuilder implements BuilderInterface
                     $billingAddress[self::MIDDLE_NAME] : self::EMPTY_STRING,
                 Config::LAST_NAME => isset($billingAddress[self::LAST_NAME]) ?
                     $billingAddress[self::LAST_NAME] : self::EMPTY_STRING
+            ]
+        ];
+    }
+
+    /**
+     * Build new shipping address data
+     * @param array <mixed> $shippingAddress
+     * @return array <mixed>
+     */
+    public function getNewShippingAddress($shippingAddress)
+    {
+        $shippingAddressCountryId = $shippingAddress[Config::COUNTRY_ID]
+                ?? $this->checkoutSession->getShippingCountryId() ?? $this->config->getCountryByStore();
+
+        return [
+            Config::STREET => $shippingAddress[Config::STREET][0] ?? self::EMPTY_STRING,
+            Config::HOUSE_NUMBER => $shippingAddress[Config::STREET][1] ?? self::EMPTY_STRING,
+            Config::ZIP => $shippingAddress[Config::POSTCODE] ?? self::EMPTY_STRING,
+            Config::CITY => $shippingAddress[Config::CITY] ?? self::EMPTY_STRING,
+            Config::STATE => $shippingAddress[Config::REGION] ?? self::EMPTY_STRING,
+            Config::COUNTRY => $shippingAddressCountryId ?: $this->config->getCountryByStore(),
+            Config::NAME => [
+                Config::FIRST_NAME => $shippingAddress[self::FIRST_NAME] ?? self::EMPTY_STRING,
+                Config::MIDDLE_NAME => $shippingAddress[self::MIDDLE_NAME] ?? self::EMPTY_STRING,
+                Config::LAST_NAME => $shippingAddress[self::LAST_NAME] ?? self::EMPTY_STRING
             ]
         ];
     }

@@ -48,7 +48,7 @@ class ListUpdateTransactionService
      * @return ResultInterface|null|bool|array <mixed>
      * @throws LocalizedException
      */
-    public function process(Payment $payment, $command)
+    public function process(Payment $payment, $command, $address, $shipAddress)
     {
         try {
             /** @var InfoInterface $payment*/
@@ -57,7 +57,9 @@ class ListUpdateTransactionService
             return $this->commandPool->get($command)->execute([
                 'payment' => $paymentDataObject,
                 'amount' => $payment->getQuote()->getGrandTotal(), /** @phpstan-ignore-line */
-                'totalItemsCount' => $payment->getQuote()->getItemsCount() /** @phpstan-ignore-line */
+                'totalItemsCount' => $payment->getQuote()->getItemsCount(), /** @phpstan-ignore-line */
+                'address' => $address,
+                'shipAddress' => $shipAddress,
             ]);
         } catch (Exception $e) {
             throw new LocalizedException(__($e->getMessage()));

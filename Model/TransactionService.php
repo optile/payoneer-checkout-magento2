@@ -100,7 +100,7 @@ class TransactionService
      * @return ResultInterface|null|bool|array <mixed>
      * @throws Exception
      */
-    public function process(Quote $quote)
+    public function process(Quote $quote, $address, $shipAddress)
     {
         if (!$this->config->getValue('active')) {
             return [];
@@ -125,14 +125,13 @@ class TransactionService
 
         $paymentDataObject = $this->paymentDataObjectFactory->create($payment);
         try {
-            $address = $this->request->getParam('address');
-            $address = json_decode($address, true);
 
             /** @var ResultInterface $result */
             $result = $this->commandPool->get($this->getIntegration())->execute([
                 'payment' => $paymentDataObject,
                 'amount' => $quote->getGrandTotal(),
                 'address' => $address,
+                'shipAddress' => $shipAddress,
                 'totalItemsCount' => $quote->getItemsCount()
             ]);
             /** @phpstan-ignore-next-line */
