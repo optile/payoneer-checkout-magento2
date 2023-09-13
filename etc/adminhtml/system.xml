@@ -31,7 +31,7 @@
                         <field id="environment">live</field>
                     </depends>
                 </field>
-                <field id="live_host_name" translate="label" type="text" sortOrder="70" showInDefault="0" showInWebsite="0" showInStore="0">
+                <field id="live_host_name" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Live OPG hostname</label>
                     <validate>validate-url validate-no-html-tags</validate>
                     <depends>
@@ -50,7 +50,7 @@
                         <field id="environment">test</field>
                     </depends>
                 </field>
-                <field id="sandbox_host_name" translate="label" type="text" sortOrder="100" showInDefault="0" showInWebsite="0" showInStore="0">
+                <field id="sandbox_host_name" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Test OPG hostname</label>
                     <validate>validate-url validate-no-html-tags</validate>
                     <depends>
@@ -85,7 +85,7 @@
                     <label>Order reference message</label>
                     <validate>required-entry</validate>
                 </field>
-                <field id="language_mapping" translate="label" type="text" sortOrder="145" showInDefault="0" showInWebsite="0" showInStore="0">
+                <field id="language_mapping" translate="label" type="text" sortOrder="145" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Magento-Payoneer Language Mapping</label>
                     <comment>Mapping will be in the format - magento_language_code:payoneer_language_code. Multiple entries should be separated by comma. Eg: en_CA:en_US,en_NL:en_GB...</comment>
                 </field>
