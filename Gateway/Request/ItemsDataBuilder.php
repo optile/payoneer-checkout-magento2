@@ -85,8 +85,7 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::CURRENCY        =>  $order->getCurrencyCode(),
                 Config::AMOUNT          =>  $this->helper->formatNumber($item->getBaseRowTotalInclTax()),
                 Config::NET_AMOUNT      =>  $this->helper->formatNumber($item->getBaseRowTotal()),
-                Config::TAX_AMOUNT      =>  $this->helper->formatNumber($item->getBaseTaxAmount()),
-                Config::TAX_PERCENT     =>  $this->helper->formatNumber($item->getTaxPercent())
+                Config::TAX_AMOUNT      =>  $this->helper->formatNumber($item->getBaseTaxAmount())
             ];
         }
         if ($order instanceof PayoneerQuoteAdapter) {
@@ -105,7 +104,6 @@ class ItemsDataBuilder implements BuilderInterface
             }
 
             $adjustmentTaxAmount = $shippingAmountWithTax - $netTotalAdjustments;
-            $shippingTaxPercent = $this->calculateShippingTaxPercent($adjustmentTaxAmount, $netTotalAdjustments);
 
             $result[] = [
                 Config::NAME        =>  self::ADJUSTMENTS,
@@ -114,26 +112,10 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::CURRENCY    =>  $order->getCurrencyCode(),
                 Config::NET_AMOUNT  =>  $netTotalAdjustments?$this->helper->formatNumber($netTotalAdjustments):'0.00',
                 Config::SKU         =>  self::ADJUSTMENTS_CODE,
-                Config::TAX_AMOUNT  =>  $adjustmentTaxAmount?$this->helper->formatNumber($adjustmentTaxAmount):'0.00',
-                Config::TAX_PERCENT =>  $shippingTaxPercent
+                Config::TAX_AMOUNT  =>  $adjustmentTaxAmount?$this->helper->formatNumber($adjustmentTaxAmount):'0.00'
             ];
         }
 
         return $result;
-    }
-
-    /**
-     * Calculate Shipping Tax percentage
-     * @param float$taxAmount
-     * @param float $shippingAmount
-     * @return float
-     */
-    private function calculateShippingTaxPercent($taxAmount, $shippingAmount)
-    {
-        if ($taxAmount && $shippingAmount) {
-            return $this->helper->formatNumber(($taxAmount/$shippingAmount) * 100);
-        } else {
-            return 0.00;
-        }
     }
 }

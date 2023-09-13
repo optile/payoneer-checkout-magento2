@@ -59,14 +59,23 @@ class PaymentDataBuilder implements BuilderInterface
      */
     private function getPaymentData($order, $buildSubject): array
     {
-        return [
-            Config::PAYMENT => [
-                Config::AMOUNT      => number_format($buildSubject[Config::AMOUNT], 2),
-                Config::CURRENCY    => $order->getCurrencyCode(),
-                Config::REFERENCE   => $this->config->getValue('order_reference_message'),
-                Config::INVOICE_ID  => $order->getId(),
+        $paymentDetails = [
+            Config::AMOUNT      => number_format($buildSubject[Config::AMOUNT], 2),
+            Config::CURRENCY    => $order->getCurrencyCode(),
+            Config::REFERENCE   => $this->config->getValue('order_reference_message'),
+            Config::INVOICE_ID  => $order->getId()
+        ];
+
+        if ($order instanceof \Payoneer\OpenPaymentGateway\Gateway\QuoteAdapter) {
+            $taxAmount = [
                 Config::TAX_AMOUNT  => $this->helper->formatNumber($order->getTaxAmount())
-            ]
+            ];
+
+            $paymentDetails = array_merge($paymentDetails, $taxAmount);
+        }
+
+        return [
+            Config::PAYMENT => $paymentDetails
         ];
     }
 }
