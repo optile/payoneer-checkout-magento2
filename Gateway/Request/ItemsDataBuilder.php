@@ -112,9 +112,9 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::AMOUNT      =>  number_format($totalAdjustments, 2),
                 Config::QUANTITY    =>  1,
                 Config::CURRENCY    =>  $order->getCurrencyCode(),
-                Config::NET_AMOUNT  =>  $this->helper->formatNumber($netTotalAdjustments),
+                Config::NET_AMOUNT  =>  $netTotalAdjustments?$this->helper->formatNumber($netTotalAdjustments):'0.00',
                 Config::SKU         =>  self::ADJUSTMENTS_CODE,
-                Config::TAX_AMOUNT  =>  $this->helper->formatNumber($adjustmentTaxAmount),
+                Config::TAX_AMOUNT  =>  $adjustmentTaxAmount?$this->helper->formatNumber($adjustmentTaxAmount):'0.00',
                 Config::TAX_PERCENT =>  $shippingTaxPercent
             ];
         }
