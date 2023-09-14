@@ -215,11 +215,10 @@ class ProcessPayment implements ActionInterface
      */
     public function hidePayment($response): bool
     {
-        $result = false;
-        if ($response['response'] && $response['response']['returnCode']
-            && ($response['response']['returnCode']['name'] == 'INVALID_CONFIGURATION')
-            || $response['response']['returnCode']['name'] == 'INVALID_AMOUNT') {
-            $result = true;
+        $result = true;
+        if ($response['response'] && $response['response']['status']
+            && $response['response']['status']['code'] == 'listed') {
+            $result = false;
         }
         return $result;
     }
