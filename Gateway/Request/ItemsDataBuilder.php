@@ -49,17 +49,8 @@ class ItemsDataBuilder implements BuilderInterface
 
         if ($order->getItems() && $totalItemsCount > 0) {
             $items = $this->buildItems($order);
-            $paymentNetAmount = 0.00;
-            if ($items) {
-                foreach ($items as $item) {
-                    $paymentNetAmount += $item[Config::NET_AMOUNT];
-                }
-            }
             return [
-                Config::PRODUCTS => $items,
-                Config::PAYMENT => [
-                    Config::NET_AMOUNT => $paymentNetAmount
-                ]
+                Config::PRODUCTS => $items
             ];
         } else {
             return [];
@@ -83,7 +74,7 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::NAME            =>  $item->getName(),
                 Config::QUANTITY        =>  $item->getData('qty'),
                 Config::CURRENCY        =>  $order->getCurrencyCode(),
-                Config::AMOUNT          =>  floatval($this->helper->formatNumber($item->getBaseRowTotalInclTax())),
+                Config::AMOUNT          =>  floatval($this->helper->formatNumber($item->getBaseRowTotal() + $item->getTaxAmount())),
                 Config::NET_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseRowTotal() - $item->getBaseDiscountAmount())),
                 Config::TAX_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseTaxAmount()))
             ];
