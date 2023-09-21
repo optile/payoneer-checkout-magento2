@@ -84,7 +84,7 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::QUANTITY        =>  $item->getData('qty'),
                 Config::CURRENCY        =>  $order->getCurrencyCode(),
                 Config::AMOUNT          =>  floatval($this->helper->formatNumber($item->getBaseRowTotalInclTax())),
-                Config::NET_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseRowTotal())),
+                Config::NET_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseRowTotal() - $item->getBaseDiscountAmount())),
                 Config::TAX_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseTaxAmount()))
             ];
         }

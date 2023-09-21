@@ -63,7 +63,8 @@ class PaymentDataBuilder implements BuilderInterface
             Config::AMOUNT      => floatval(number_format($buildSubject[Config::AMOUNT], 2)),
             Config::CURRENCY    => $order->getCurrencyCode(),
             Config::REFERENCE   => $this->config->getValue('order_reference_message'),
-            Config::INVOICE_ID  => $order->getId()
+            Config::INVOICE_ID  => $order->getId(),
+            Config::NET_AMOUNT  => $order->getOrderSubtotalWithDiscount() + $order->getShippingAmount()
         ];
 
         if ($order instanceof \Payoneer\OpenPaymentGateway\Gateway\QuoteAdapter) {

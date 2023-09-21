@@ -74,6 +74,15 @@ class QuoteAdapter extends MagentoQuoteAdapter
     }
 
     /**
+     * Get discount amount
+     * @return float
+     */
+    public function getOrderSubtotalWithDiscount()
+    {
+        return $this->getAddressModel()->getSubtotalWithDiscount();
+    }
+
+    /**
      * @return Address
      */
     protected function getAddressModel()
