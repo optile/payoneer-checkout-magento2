@@ -45,10 +45,12 @@ class ListUpdateTransactionService
      *
      * @param Payment $payment
      * @param string $command
+     * @param array $address
+     * @param array $shipAddress
      * @return ResultInterface|null|bool|array <mixed>
      * @throws LocalizedException
      */
-    public function process(Payment $payment, $command, $address, $shipAddress)
+    public function process(Payment $payment, $command, $address = [], $shipAddress = [])
     {
         try {
             /** @var InfoInterface $payment*/

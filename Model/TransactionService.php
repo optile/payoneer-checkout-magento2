@@ -97,10 +97,12 @@ class TransactionService
      * Process Api request
      *
      * @param Quote $quote
+     * @param array $address
+     * @param array $shipAddress
      * @return ResultInterface|null|bool|array <mixed>
      * @throws Exception
      */
-    public function process(Quote $quote, $address, $shipAddress)
+    public function process(Quote $quote, $address = [], $shipAddress = [])
     {
         if (!$this->config->getValue('active')) {
             return [];
