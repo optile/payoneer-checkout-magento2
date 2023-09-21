@@ -4,6 +4,7 @@ namespace Payoneer\OpenPaymentGateway\Model;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Sales\Api\CreditmemoManagementInterface;
@@ -115,6 +116,11 @@ class TransactionOrderUpdater
     private $session;
 
     /**
+     * @var PriceCurrencyInterface
+     */
+    private $priceCurrency;
+
+    /**
      * TransactionOrderUpdater construct function
      *
      * @param OrderCollectionFactory $orderCollectionFactory
@@ -132,6 +138,7 @@ class TransactionOrderUpdater
      * @param Invoice $invoice
      * @param Registry $registry
      * @param Session $checkoutSession
+     * @param PriceCurrencyInterface $priceCurrency
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
@@ -148,7 +155,8 @@ class TransactionOrderUpdater
         CreditmemoManagementInterface $creditmemoManagement,
         Invoice $invoice,
         Registry $registry,
-        Session $checkoutSession
+        Session $checkoutSession,
+        PriceCurrencyInterface $priceCurrency
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderTransactionCollectionFactory = $orderTransactionCollectionFactory;
@@ -165,6 +173,7 @@ class TransactionOrderUpdater
         $this->registry = $registry;
         $this->invoice = $invoice;
         $this->session = $checkoutSession;
+        $this->priceCurrency = $priceCurrency;
     }
 
     /**
@@ -183,6 +192,7 @@ class TransactionOrderUpdater
         $filteredResponse['reason_code'] = $response['reasonCode'];
         $filteredResponse['longId'] = $response['longId'];
         $filteredResponse['amount'] = $response['amount'];
+        $filteredResponse['currency'] = $response['currency'];
         $filteredResponse['interactionReason'] = $response['interactionReason'];
         $filteredResponse['interactionCode'] = $response['interactionCode'];
         $filteredResponse['previousReasonCode'] =
@@ -219,8 +229,10 @@ class TransactionOrderUpdater
         $filteredResponse['reason_code'] = $actualResponse['status']['reason'];
         $filteredResponse['longId'] = $actualResponse['identification']['longId'];
         $filteredResponse['amount'] = $actualResponse['payment']['amount'];
+        $filteredResponse['currency'] = $actualResponse['payment']['currency'];
         $filteredResponse['interactionReason'] = $actualResponse['interaction']['reason'];
         $filteredResponse['interactionCode'] = $actualResponse['interaction']['code'];
+
 
         return $filteredResponse;
     }
@@ -344,15 +356,15 @@ class TransactionOrderUpdater
             if ($authTxn != null && $authTxn->getTransactionId()) {
                 return $this->changeOrderToProcessing($orderObj);
             }
-            $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
-                $orderObj->getGrandTotal()
+            $amount = $this->priceCurrency->format(
+                $response['amount'], true, 2
             );
             $txnData = [
                 'additional_info' => $response,
                 'additional_info_key' => 'auth_response',
                 'is_transaction_closed' => false,
                 'transaction_type' => Helper::AUTHORIZATION,
-                'order_comment' => __('Authorized amount of %1', $orderTotal),
+                'order_comment' => __('Authorized amount of %1', $amount),
                 'parent_txn_id' => null
             ];
 
@@ -659,15 +671,15 @@ class TransactionOrderUpdater
 
         $this->orderManager->cancel($orderObj->getId());
 
-        $orderTotal = $orderObj->getBaseCurrency()->formatTxt(
-            $orderObj->getGrandTotal()
+        $amount = $this->priceCurrency->format(
+            $response['amount'], true, 2
         );
         $txnData = [
             'additional_info' => $response,
             'additional_info_key' => PayoneerResponseHandler::ADDITIONAL_INFO_KEY_AUTH_CANCEL_RESPONSE,
             'is_transaction_closed' => true,
             'transaction_type' => Client::VOID,
-            'order_comment' => __('The amount of %1 is void', $orderTotal),
+            'order_comment' => __('The amount of %1 is void', $amount),
             'parent_txn_id' => $response['transaction_id'],
             'txn_id_post_text' => 'void'
         ];
