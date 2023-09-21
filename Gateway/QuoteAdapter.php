@@ -74,7 +74,7 @@ class QuoteAdapter extends MagentoQuoteAdapter
     }
 
     /**
-     * Get discount amount
+     * Get Order Subtotal with discount
      * @return float
      */
     public function getOrderSubtotalWithDiscount()
