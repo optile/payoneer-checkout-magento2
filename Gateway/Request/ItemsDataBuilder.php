@@ -15,8 +15,10 @@ use Payoneer\OpenPaymentGateway\Model\Helper;
  */
 class ItemsDataBuilder implements BuilderInterface
 {
-    const ADJUSTMENTS = 'Total Adjustments';
-    const ADJUSTMENTS_CODE = 'total_adjustments';
+    const SHIPPING_ADJUSTMENTS = 'Shipping Adjustments';
+    const SHIPPING_ADJUSTMENTS_CODE = 'shipping_adjustments';
+    const DISCOUNT_ADJUSTMENTS = 'Discount Adjustments';
+    const DISCOUNT_ADJUSTMENTS_CODE = 'discount_adjustments';
 
     /**
      * @var Helper
@@ -74,36 +76,37 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::NAME            =>  $item->getName(),
                 Config::QUANTITY        =>  $item->getData('qty'),
                 Config::CURRENCY        =>  $order->getCurrencyCode(),
-                Config::AMOUNT          =>  floatval($this->helper->formatNumber($item->getBaseRowTotal() + $item->getTaxAmount())),
-                Config::NET_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseRowTotal() - $item->getBaseDiscountAmount())),
+                Config::AMOUNT          =>  floatval($this->helper->formatNumber($item->getBaseRowTotalInclTax())),
+                Config::NET_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseRowTotal())),
                 Config::TAX_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseTaxAmount()))
             ];
         }
         if ($order instanceof PayoneerQuoteAdapter) {
-            $totalAdjustments = 0.00;
-            $netTotalAdjustments = 0.00;
-            $shippingAmountWithTax = 0.00;
-            if ($order->getShippingAmountInclTax() > 0) {
-                $totalAdjustments += $order->getShippingAmountInclTax();
-                $shippingAmountWithTax = $totalAdjustments;
-            }
-            if ($order->getShippingAmount() > 0) {
-                $netTotalAdjustments += $order->getShippingAmount();
-            }
-            if ($order->getDiscountAmount() < 0) {
-                $totalAdjustments += $order->getDiscountAmount();
-            }
 
-            $adjustmentTaxAmount = $shippingAmountWithTax - $netTotalAdjustments;
+            $shippingAmount = $order->getShippingAmountInclTax()?$this->helper->formatNumber($order->getShippingAmountInclTax()):'0.00';
+            $shippingNetAmount = $order->getShippingAmount()?$this->helper->formatNumber($order->getShippingAmount()):'0.00';
+            $shippingTaxAmount = $order->getOrderShippingTaxAmount()?$this->helper->formatNumber($order->getOrderShippingTaxAmount()):'0.00';
 
             $result[] = [
-                Config::NAME        =>  self::ADJUSTMENTS,
-                Config::AMOUNT      =>  floatval(number_format($totalAdjustments, 2)),
+                Config::NAME        =>  self::SHIPPING_ADJUSTMENTS,
+                Config::AMOUNT      =>  floatval($shippingAmount),
                 Config::QUANTITY    =>  1,
                 Config::CURRENCY    =>  $order->getCurrencyCode(),
-                Config::NET_AMOUNT  =>  floatval($netTotalAdjustments?$this->helper->formatNumber($netTotalAdjustments):'0.00'),
-                Config::SKU         =>  self::ADJUSTMENTS_CODE,
-                Config::TAX_AMOUNT  =>  floatval($adjustmentTaxAmount?$this->helper->formatNumber($adjustmentTaxAmount):'0.00')
+                Config::NET_AMOUNT  =>  floatval($shippingNetAmount),
+                Config::SKU         =>  self::SHIPPING_ADJUSTMENTS_CODE,
+                Config::TAX_AMOUNT  =>  floatval($shippingTaxAmount)
+            ];
+
+            $orderDiscountAmount = $order->getDiscountAmount()?$this->helper->formatNumber($order->getDiscountAmount()):'0.00';
+
+            $result[] = [
+                Config::NAME        =>  self::DISCOUNT_ADJUSTMENTS,
+                Config::AMOUNT      =>  floatval($orderDiscountAmount),
+                Config::QUANTITY    =>  1,
+                Config::CURRENCY    =>  $order->getCurrencyCode(),
+                Config::NET_AMOUNT  =>  floatval($orderDiscountAmount),
+                Config::SKU         =>  self::DISCOUNT_ADJUSTMENTS_CODE,
+                Config::TAX_AMOUNT  =>  floatval('0.00')
             ];
         }
 

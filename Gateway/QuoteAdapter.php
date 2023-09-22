@@ -83,6 +83,24 @@ class QuoteAdapter extends MagentoQuoteAdapter
     }
 
     /**
+     * Get Order Shipping Tax Amount
+     * @return float
+     */
+    public function getOrderShippingTaxAmount()
+    {
+        return $this->getAddressModel()->getShippingTaxAmount();
+    }
+
+    /**
+     * Get Order Shipping Discount Amount
+     * @return float
+     */
+    public function getOrderShippingDiscountAmount()
+    {
+        return $this->getAddressModel()->getShippingDiscountAmount();
+    }
+
+    /**
      * @return Address
      */
     protected function getAddressModel()
