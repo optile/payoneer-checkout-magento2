@@ -83,9 +83,9 @@ class ItemsDataBuilder implements BuilderInterface
                 Config::NAME            =>  $item->getName(),
                 Config::QUANTITY        =>  $item->getData('qty'),
                 Config::CURRENCY        =>  $order->getCurrencyCode(),
-                Config::AMOUNT          =>  $this->helper->formatNumber($item->getBaseRowTotalInclTax()),
-                Config::NET_AMOUNT      =>  $this->helper->formatNumber($item->getBaseRowTotal()),
-                Config::TAX_AMOUNT      =>  $this->helper->formatNumber($item->getBaseTaxAmount())
+                Config::AMOUNT          =>  floatval($this->helper->formatNumber($item->getBaseRowTotalInclTax())),
+                Config::NET_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseRowTotal())),
+                Config::TAX_AMOUNT      =>  floatval($this->helper->formatNumber($item->getBaseTaxAmount()))
             ];
         }
         if ($order instanceof PayoneerQuoteAdapter) {
@@ -107,12 +107,12 @@ class ItemsDataBuilder implements BuilderInterface
 
             $result[] = [
                 Config::NAME        =>  self::ADJUSTMENTS,
-                Config::AMOUNT      =>  number_format($totalAdjustments, 2),
+                Config::AMOUNT      =>  floatval(number_format($totalAdjustments, 2)),
                 Config::QUANTITY    =>  1,
                 Config::CURRENCY    =>  $order->getCurrencyCode(),
-                Config::NET_AMOUNT  =>  $netTotalAdjustments?$this->helper->formatNumber($netTotalAdjustments):'0.00',
+                Config::NET_AMOUNT  =>  floatval($netTotalAdjustments?$this->helper->formatNumber($netTotalAdjustments):'0.00'),
                 Config::SKU         =>  self::ADJUSTMENTS_CODE,
-                Config::TAX_AMOUNT  =>  $adjustmentTaxAmount?$this->helper->formatNumber($adjustmentTaxAmount):'0.00'
+                Config::TAX_AMOUNT  =>  floatval($adjustmentTaxAmount?$this->helper->formatNumber($adjustmentTaxAmount):'0.00')
             ];
         }
 

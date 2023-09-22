@@ -60,7 +60,7 @@ class PaymentDataBuilder implements BuilderInterface
     private function getPaymentData($order, $buildSubject): array
     {
         $paymentDetails = [
-            Config::AMOUNT      => number_format($buildSubject[Config::AMOUNT], 2),
+            Config::AMOUNT      => floatval(number_format($buildSubject[Config::AMOUNT], 2)),
             Config::CURRENCY    => $order->getCurrencyCode(),
             Config::REFERENCE   => $this->config->getValue('order_reference_message'),
             Config::INVOICE_ID  => $order->getId()
