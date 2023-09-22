@@ -67,11 +67,12 @@ class PaymentDataBuilder implements BuilderInterface
         ];
 
         if ($order instanceof \Payoneer\OpenPaymentGateway\Gateway\QuoteAdapter) {
-            $taxAmount = [
-                Config::TAX_AMOUNT  => $this->helper->formatNumber($order->getTaxAmount())
+            $quoteRequest = [
+                Config::TAX_AMOUNT  => floatVal($this->helper->formatNumber($order->getTaxAmount())),
+                Config::NET_AMOUNT  => $order->getOrderSubtotalWithDiscount() + $order->getShippingAmount()
             ];
 
-            $paymentDetails = array_merge($paymentDetails, $taxAmount);
+            $paymentDetails = array_merge($paymentDetails, $quoteRequest);
         }
 
         return [
