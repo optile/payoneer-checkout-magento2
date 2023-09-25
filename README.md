@@ -1,14 +1,20 @@
-# Payoneer Magento 2 Integration Extension with [Open Payment Gateway](https://www.optile.io/opg)
+# Payoneer Magento 2 Integration Extension with [Payoneer Checkout](https://checkoutdocs.payoneer.com/)
 
 This library includes the files of the Magento 2 Extension for Payoneer Checkout or Open Payment Gateway (OPG). The directories hierarchy is as positioned in a standard magento 2 project library.
 
 ## Version
 
-Payoneer Magento Extension version: 0.7
+Payoneer Magento Extension version: 0.8
 
 ## Release Notes
 
+### 0.8 - 2023-09-26
+
+ - Compatability with Magento 2.4.6
+ - Add MoR (Merchant on Record) features
+
 ### 0.7 - 2022-11-18
+ - 
  - Send system information in list session call
 
 ### 0.6 - 2022-11-01
@@ -32,7 +38,7 @@ Payoneer Magento Extension version: 0.7
 
 ## Requirements
 
-Magento versions 2.4.0 - 2.4.5
+Magento versions 2.4.0 - 2.4.6
 
 PHP versions 7.3, 7.4, 8.1
 
