@@ -1,6 +1,6 @@
 {
-    "name": "payoneer/open-payment-gateway",
-    "description": "Integration with Payoneer Open Payment Gateway (OPG)",
+    "name": "payoneer/payoneer-checkout",
+    "description": "Integration with Payoneer Checkout (Open Payment Gateway, OPG)",
     "require": {
         "php": "~7.3|~7.4|~8.1"
     },

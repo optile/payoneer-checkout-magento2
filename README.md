@@ -12,6 +12,7 @@ Payoneer Magento Extension version: 0.8
 
  - Compatability with Magento 2.4.6
  - Add MoR (Merchant on Record) features
+ - Rename extension package name
 
 ### 0.7 - 2022-11-18
  - 
@@ -47,7 +48,7 @@ PHP versions 7.3, 7.4, 8.1
 Run the following command under your Magento 2 root dir:
 
 ```cmd
-composer require payoneer/open-payment-gateway
+composer require payoneer/payoneer-checkout
 php bin/magento maintenance:enable
 php bin/magento setup:upgrade
 php bin/magento setup:di:compile
