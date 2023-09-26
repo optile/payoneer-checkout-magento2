@@ -1,10 +1,10 @@
-# Payoneer Magento 2 Integration Extension with [Payoneer Checkout](https://checkoutdocs.payoneer.com/)
+# [Payoneer Checkout](https://checkoutdocs.payoneer.com/docs/integrate-with-magento/) Magento 2 extension
 
-This library includes the files of the Magento 2 Extension for Payoneer Checkout or Open Payment Gateway (OPG). The directories hierarchy is as positioned in a standard magento 2 project library.
+This library includes the Magento 2 Extension for Payoneer Checkout. The directories hierarchy is as positioned in a standard Magento 2 project library.
 
 ## Version
 
-Payoneer Magento Extension version: 0.8
+Payoneer Checkout Magento 2 extension version: 0.8
 
 ## Release Notes
 
@@ -78,18 +78,18 @@ After the installation, Go to the Magento 2 admin panel
 
 Go to Stores -> Settings -> Configuration -> Sales -> Payment Methods -> Other Payment Methods -> Payoneer Checkout
 
-![Payoneer Main Configuration](docs/img/payoneer_config.png)
+![Payoneer Checkout Configuration](docs/img/payoneer_config.png)
 
 Enable the payment gateway and choose whether it's Test environment or Live. Provide the corresponding merchant code and API key. If your Merchant account doesn't have a default Store code against it, provide it here.
 
 ## Advanced Configuration
 
-![Payoneer Advanced Configuration](docs/img/payoneer_advanced_config.png)
+![Payoneer Checkout Advanced Configuration](docs/img/payoneer_advanced_config.png)
 
 You can set advanced configurations here.
 
 ## Style Configuration
 
-![Payoneer Style Configuration](docs/img/payoneer_style_config.png)
+![Payoneer Checkout Style Configuration](docs/img/payoneer_style_config.png)
 
 You can set the style of the embedded widget from here. Please note that, styles defined in the field Custom CSS will override any conflicting configurations as per CSS specificity rules.
