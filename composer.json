@@ -1,14 +1,13 @@
 {
     "name": "payoneer/payoneer-checkout",
-    "description": "Integration with Payoneer Checkout (Open Payment Gateway, OPG)",
+    "description": "Payoneer Checkout for Magento 2",
     "require": {
         "php": "~7.3|~7.4|~8.1"
     },
     "type": "magento2-module",
     "version": "0.8",
     "license": [
-        "OSL-3.0",
-        "AFL-3.0"
+        "MPL-2.0"
     ],
     "autoload": {
         "files": [ "registration.php" ],
