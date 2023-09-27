@@ -6,7 +6,7 @@
                 <active>0</active>
                 <model>PayoneerFacade</model>
                 <order_status>pending_payment</order_status>
-                <payment_action>authorize</payment_action>
+                <payment_action>authorize_capture</payment_action>
                 <title>Payoneer Checkout</title>
                 <live_host_name>https://api.live.oscato.com/</live_host_name>
                 <sandbox_host_name>https://api.sandbox.oscato.com/</sandbox_host_name>
