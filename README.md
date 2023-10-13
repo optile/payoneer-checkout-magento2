@@ -8,6 +8,14 @@ Payoneer Checkout Magento 2 extension version: 0.8
 
 ## Release Notes
 
+### 0.8.2 - 2023-10-16
+
+ - Admin can download log files.
+
+### 0.8.1 - 2023-09-27
+
+ - Default payment mode as Capture.
+
 ### 0.8 - 2023-09-26
 
  - Compatability with Magento 2.4.6

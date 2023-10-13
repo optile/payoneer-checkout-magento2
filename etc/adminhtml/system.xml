@@ -97,6 +97,10 @@
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="download_logs" translate="label" type="label" sortOrder="170" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\System\Config\Form\Field\Link\DownloadLogs</frontend_model>
+                </field>
                 <group id="notification_settings" translate="label" showInDefault="0" showInWebsite="0" showInStore="0" sortOrder="170">
                     <label>Notification Setings</label>
                     <frontend_model>Magento\Config\Block\System\Config\Form\Fieldset</frontend_model>
