@@ -30,4 +30,14 @@ class Handler extends BaseHandler
         $this->fileName = $fileName;
         parent::__construct($filesystem, $filePath);
     }
+
+    /**
+     * Gets logs file location
+     *
+     * @return string
+     */
+    public function getLogLocation(): string
+    {
+        return $this->fileName;
+    }
 }
