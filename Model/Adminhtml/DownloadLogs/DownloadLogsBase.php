@@ -33,13 +33,11 @@ class DownloadLogsBase
      * @param File $file
      * @param FileFactory $fileFactory
      * @param DirectoryList $dirList
-     * @param Config $config
      */
     public function __construct(
         File $file,
         FileFactory $fileFactory,
         DirectoryList $dirList,
-        Config $config
     ) {
         $this->file = $file;
         $this->fileFactory = $fileFactory;
