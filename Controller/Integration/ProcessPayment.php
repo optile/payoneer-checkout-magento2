@@ -210,16 +210,19 @@ class ProcessPayment implements ActionInterface
 
     /**
      * Based on the response status, hide or show the Payment Method (for MoR)
-     * @param bool|array|ResultInterface|null $response <mixed> $response
+     * @param mixed $response <mixed> $response
      * @return bool
      */
-    public function hidePayment($response): bool
+    public function hidePayment(mixed $response): bool
     {
         $result = true;
-        if ($response['response'] && $response['response']['status']
+
+        if (is_array($response)
+            && isset($response['response']['status']['code'])
             && $response['response']['status']['code'] == 'listed') {
             $result = false;
         }
+
         return $result;
     }
 }

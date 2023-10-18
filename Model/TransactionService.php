@@ -177,16 +177,16 @@ class TransactionService
 
     /**
      * @param Quote $quote
-     * @param array <mixed> $result
+     * @param array<mixed> $result
      * @return void
      * @throws LocalizedException
      */
-    public function setAdditionalInformation($quote, $result)
+    public function setAdditionalInformation(Quote $quote, $result): void
     {
         $payment = $quote->getPayment();
-        if (isset($result['response'])
-            && isset($result['response']['identification'])
-            && isset($result['response']['identification']['longId'])) {
+        if (isset($result['response']['identification']['longId'])
+            && isset($result['response']['status']['code'])
+            && $result['response']['status']['code'] == 'listed') {
             $listId = $result['response']['identification']['longId'];
             $payment->setAdditionalInformation(Config::LIST_ID, $listId);
             if ($this->getIntegration() == Config::INTEGRATION_HOSTED

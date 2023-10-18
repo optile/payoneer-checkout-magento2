@@ -46,7 +46,7 @@
 "Test Store code", "Test Store code"
 "Test OPG hostname", "Test OPG hostname"
 "Makes a List API call to check if it returns HTTP 200 and the interaction reason is OK", "Makes a List API call to check if it returns HTTP 200 and the interaction reason is OK"
-"Success URL", "Success URL"
+"Return URL", "Return URL"
 "Cancel URL", "Cancel URL"
 "Notification URL", "Notification URL"
 "Payment action", "Payment action"
