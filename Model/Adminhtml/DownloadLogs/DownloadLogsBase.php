@@ -37,7 +37,7 @@ class DownloadLogsBase
     public function __construct(
         File $file,
         FileFactory $fileFactory,
-        DirectoryList $dirList,
+        DirectoryList $dirList
     ) {
         $this->file = $file;
         $this->fileFactory = $fileFactory;
