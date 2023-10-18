@@ -8,7 +8,6 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\App\Response\Http\FileFactory;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\LocalizedException;
-use Payoneer\OpenPaymentGateway\Gateway\Config\Config;
 
 /**
  * Class for handling zipping and downloading log file
@@ -31,11 +30,6 @@ class DownloadLogsBase
     private DirectoryList $dirList;
 
     /**
-     * @var Config
-     */
-    private Config $config;
-
-    /**
      * @param File $file
      * @param FileFactory $fileFactory
      * @param DirectoryList $dirList
@@ -50,7 +44,6 @@ class DownloadLogsBase
         $this->file = $file;
         $this->fileFactory = $fileFactory;
         $this->dirList = $dirList;
-        $this->config = $config;
     }
 
     /**
