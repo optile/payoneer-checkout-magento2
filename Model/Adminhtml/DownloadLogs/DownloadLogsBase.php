@@ -2,7 +2,6 @@
 
 namespace Payoneer\OpenPaymentGateway\Model\Adminhtml\DownloadLogs;
 
-use Dk4software\Debug;
 use Exception;
 use \Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\App\ResponseInterface;
@@ -33,6 +32,7 @@ class DownloadLogsBase
     /**
      * @param File $file
      * @param FileFactory $fileFactory
+     * @param DirectoryList $dirList
      */
     public function __construct(
         File $file,
@@ -55,7 +55,11 @@ class DownloadLogsBase
     {
         try {
             $content = [];
-            $downloadedFileName = 'logfile.zip';
+            $hostName = '';
+            if (isset($_SERVER['HTTP_HOST'])) {
+                $hostName = $_SERVER['HTTP_HOST'];
+            }
+            $downloadedFileName = $hostName . '-logfile.zip';
             $content['type'] = 'filename';
             $content['value'] = $location;
             $content['rm'] = 1;

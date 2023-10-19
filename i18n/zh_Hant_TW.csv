@@ -46,7 +46,7 @@
 "Test Store code","測試店舖代碼"
 "Test OPG hostname","測試OPG主機名稱"
 "Makes a List API call to check if it returns HTTP 200 and the interaction reason is OK","進行List API調用以檢查它是否返回HTTP 200，以及互動原因是否正確"
-"Success URL","成功URL"
+"Return URL","成功URL"
 "Cancel URL","取消URL"
 "Notification URL","通知URL"
 "Payment action","付款操作"

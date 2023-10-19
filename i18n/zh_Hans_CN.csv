@@ -46,7 +46,7 @@
 "Test Store code","测试店铺代码"
 "Test OPG hostname","测试 OPG 主机名称"
 "Makes a List API call to check if it returns HTTP 200 and the interaction reason is OK","进行 List API 调用以检查它是否返回 HTTP 200 以及交互原因是否正确"
-"Success URL","成功 URL"
+"Return URL","成功 URL"
 "Cancel URL","取消 URL"
 "Notification URL","通知 URL"
 "Payment action","付款操作"

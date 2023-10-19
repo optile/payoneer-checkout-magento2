@@ -131,7 +131,8 @@ class Logger
         return [
             'magentoVersion'    =>  $this->productMetadata->getVersion(),
             'magentoEdition'    =>  $this->productMetadata->getEdition(),
-            'moduleVersion'     =>  $this->getModuleVersion()
+            'moduleVersion'     =>  $this->getModuleVersion(),
+            'phpVersion'        =>  phpversion()
         ];
     }
 

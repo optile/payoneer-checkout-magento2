@@ -63,7 +63,7 @@
                     <comment>Makes a List API call to check if it returns HTTP 200 and the interaction reason is OK</comment>
                 </field>
                 <field id="success_url" translate="label" type="text" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Success URL</label>
+                    <label>Return URL</label>
                     <frontend_model>Payoneer\OpenPaymentGateway\Block\Adminhtml\Form\Field\Disable</frontend_model>
                 </field>
                 <field id="cancel_url" translate="label" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
