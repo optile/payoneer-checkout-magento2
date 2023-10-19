@@ -4,13 +4,14 @@ This library includes the Magento 2 Extension for Payoneer Checkout. The directo
 
 ## Version
 
-Payoneer Checkout Magento 2 extension version: 0.8
+Payoneer Checkout Magento 2 extension version: 0.8.2
 
 ## Release Notes
 
-### 0.8.2 - 2023-10-16
+### 0.8.2 - 2023-10-19
 
  - Admin can download log files.
+ - Few other minor bug fixes.
 
 ### 0.8.1 - 2023-09-27
 
