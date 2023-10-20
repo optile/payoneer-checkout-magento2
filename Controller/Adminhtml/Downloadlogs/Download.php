@@ -2,7 +2,6 @@
 
 namespace Payoneer\OpenPaymentGateway\Controller\Adminhtml\Downloadlogs;
 
-use Magento\Framework\Controller\Result\Redirect;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
