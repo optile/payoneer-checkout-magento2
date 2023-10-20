@@ -4,28 +4,32 @@ This library includes the Magento 2 Extension for Payoneer Checkout. The directo
 
 ## Version
 
-Payoneer Checkout Magento 2 extension version: 0.8.2
+Payoneer Checkout Magento 2 extension version: 0.8.3
 
 ## Release Notes
 
+### 0.8.3 - 2023-10-20
+
+- Fixed PHP version issue in Magento 2.4.4
+
 ### 0.8.2 - 2023-10-19
 
- - Admin can download log files.
- - Few other minor bug fixes.
+- Admin can download log files.
+- Few other minor bug fixes.
 
 ### 0.8.1 - 2023-09-27
 
- - Default payment mode as Capture.
+- Default payment mode as Capture.
 
 ### 0.8 - 2023-09-26
 
- - Compatability with Magento 2.4.6
- - Add MoR (Merchant on Record) features
- - Rename extension package name
+- Compatability with Magento 2.4.6
+- Add MoR (Merchant on Record) features
+- Rename extension package name
 
 ### 0.7 - 2022-11-18
- - 
- - Send system information in list session call
+
+- Send system information in list session call
 
 ### 0.6 - 2022-11-01
 
