@@ -2,11 +2,10 @@
 
 namespace Payoneer\OpenPaymentGateway\Controller\Adminhtml\Downloadlogs;
 
-use Payoneer\OpenPaymentGateway\Logger\Handler;
+use Magento\Framework\Controller\Result\Redirect;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Payoneer\OpenPaymentGateway\Model\Adminhtml\DownloadLogs\DownloadLogsBase;
 use Magento\Framework\Controller\ResultInterface;
@@ -22,10 +21,6 @@ class Download extends Action
      */
     private DownloadLogsBase $downloadLogBase;
 
-    /**
-     * @var Handler
-     */
-    private Handler $handler;
 
     /**
      * @var DirectoryList
@@ -33,30 +28,26 @@ class Download extends Action
     private DirectoryList $dirList;
 
     /**
-     * @param Handler $handler
      * @param DownloadLogsBase $downloadLogBase
      * @param Context $context
      * @param DirectoryList $dirList
      */
     public function __construct(
-        Handler  $handler,
         DownloadLogsBase $downloadLogBase,
         Context          $context,
         DirectoryList $dirList
     ) {
         $this->downloadLogBase = $downloadLogBase;
         parent::__construct($context);
-        $this->handler = $handler;
         $this->dirList = $dirList;
     }
 
     /**
      * Downloads the zipped log file
      *
-     * @return ResponseInterface|ResultInterface
      * @throws Exception
      */
-    public function execute(): ResultInterface|ResponseInterface
+    public function execute(): ResultInterface
     {
         try {
             $logFiles = array(
